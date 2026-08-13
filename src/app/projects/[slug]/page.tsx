@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { serverFetch } from "@/lib/api";
+import { serverFetch } from "@/lib/server-api";
 import { Project } from "@/lib/types";
 import SubNav from "@/components/public/SubNav";
 import Markdown from "@/components/public/Markdown";

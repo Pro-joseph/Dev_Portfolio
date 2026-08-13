@@ -1,4 +1,4 @@
-import { serverFetch } from "@/lib/api";
+import { serverFetch } from "@/lib/server-api";
 import {
   Paginated,
   Project,

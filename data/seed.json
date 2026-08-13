@@ -1,0 +1,1265 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Youssef Jdira",
+      "email": "admin@josephlab.dev",
+      "email_verified_at": null,
+      "password": "$2b$10$dYk3PtulSHagtgjnIQDx3OehMPS3QopJidBrwO5cJU0Lkv8n08LSu",
+      "role": "admin",
+      "remember_token": null,
+      "created_at": "2026-08-11T15:55:52.000Z",
+      "updated_at": "2026-08-11T15:55:52.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Editor",
+      "email": "editor@josephlab.dev",
+      "email_verified_at": null,
+      "password": "$2b$10$dYk3PtulSHagtgjnIQDx3OehMPS3QopJidBrwO5cJU0Lkv8n08LSu",
+      "role": "editor",
+      "remember_token": null,
+      "created_at": "2026-08-11T15:55:52.000Z",
+      "updated_at": "2026-08-11T15:55:52.000Z"
+    }
+  ],
+  "site_settings": [
+    {
+      "id": 1,
+      "key": "site_title",
+      "value": "JosephLab",
+      "type": "string",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 2,
+      "key": "site_tagline",
+      "value": "Engineering robust digital systems from the database up",
+      "type": "string",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 3,
+      "key": "site_description",
+      "value": "Full-stack developer with extensive experience in backend systems, databases, and software architecture.",
+      "type": "text",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 4,
+      "key": "author_name",
+      "value": "Youssef Jdira",
+      "type": "string",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 5,
+      "key": "author_role",
+      "value": "Systems Architect",
+      "type": "string",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 6,
+      "key": "contact_email",
+      "value": "hello@josephlab.dev",
+      "type": "string",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 7,
+      "key": "accent_color",
+      "value": "#4f46e5",
+      "type": "string",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 8,
+      "key": "hero_image",
+      "value": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_9e24dbd5ce_9e25a387ca2cf719.png",
+      "type": "string",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 9,
+      "key": "announcement_enabled",
+      "value": "0",
+      "type": "boolean",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 10,
+      "key": "seo",
+      "value": "{\"twitter\":\"@josephlab\",\"locale\":\"en\"}",
+      "type": "json",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    }
+  ],
+  "social_links": [
+    {
+      "id": 1,
+      "platform": "github",
+      "url": "https://github.com/Pro-joseph",
+      "icon": "fa-brands fa-github",
+      "order_index": 0,
+      "is_visible": 1
+    },
+    {
+      "id": 2,
+      "platform": "linkedin",
+      "url": "https://www.linkedin.com/in/youssef-jdira-85b113167/",
+      "icon": "fa-brands fa-linkedin",
+      "order_index": 1,
+      "is_visible": 1
+    },
+    {
+      "id": 3,
+      "platform": "twitter",
+      "url": "https://twitter.com/josephlab",
+      "icon": "fa-brands fa-x-twitter",
+      "order_index": 2,
+      "is_visible": 0
+    },
+    {
+      "id": 4,
+      "platform": "email",
+      "url": "deve.youssef@gmail.com",
+      "icon": "fa-solid fa-envelope",
+      "order_index": 3,
+      "is_visible": 1
+    }
+  ],
+  "menu_items": [
+    {
+      "id": 1,
+      "parent_id": null,
+      "label": "Projects",
+      "page_id": null,
+      "external_url": "#projects",
+      "open_in_new_tab": 0,
+      "order_index": 0,
+      "is_visible": 1
+    },
+    {
+      "id": 2,
+      "parent_id": null,
+      "label": "Skills",
+      "page_id": null,
+      "external_url": "#skills",
+      "open_in_new_tab": 0,
+      "order_index": 1,
+      "is_visible": 1
+    },
+    {
+      "id": 3,
+      "parent_id": null,
+      "label": "Blog",
+      "page_id": null,
+      "external_url": "#blog",
+      "open_in_new_tab": 0,
+      "order_index": 2,
+      "is_visible": 1
+    },
+    {
+      "id": 4,
+      "parent_id": null,
+      "label": "Contact",
+      "page_id": null,
+      "external_url": "contact",
+      "open_in_new_tab": 0,
+      "order_index": 3,
+      "is_visible": 1
+    }
+  ],
+  "pages": [],
+  "resumes": [
+    {
+      "id": 2,
+      "label": "MON CV",
+      "language": "Fr",
+      "media_id": 20,
+      "is_active": 1,
+      "created_at": "2026-08-11T20:05:40.000Z",
+      "updated_at": "2026-08-12T15:08:44.000Z"
+    },
+    {
+      "id": 3,
+      "label": "My cv",
+      "language": "En",
+      "media_id": 21,
+      "is_active": 0,
+      "created_at": "2026-08-12T15:08:09.000Z",
+      "updated_at": "2026-08-12T15:08:38.000Z"
+    }
+  ],
+  "media": [
+    {
+      "id": 1,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_a97d8defad_2694cc03a08462bf.png",
+      "filename": "gen_a97d8defad_2694cc03a08462bf.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "cover",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 1,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 2,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_f686fc69e6_c25de1d2d3b052a6.png",
+      "filename": "gen_f686fc69e6_c25de1d2d3b052a6.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "gallery",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 1,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 3,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_526c33065e_8f3376d8de7c9bf2.png",
+      "filename": "gen_526c33065e_8f3376d8de7c9bf2.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "gallery",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 1,
+      "order_index": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 4,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_26dd24d570_84ea69ddb7248c1c.png",
+      "filename": "gen_26dd24d570_84ea69ddb7248c1c.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "cover",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 2,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 5,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_11ea30e065_d829c32a3626d7b1.png",
+      "filename": "gen_11ea30e065_d829c32a3626d7b1.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "gallery",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 2,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 6,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_ed119e12be_b85c54e011116eef.png",
+      "filename": "gen_ed119e12be_b85c54e011116eef.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "gallery",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 2,
+      "order_index": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 7,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_290aab57e2_de2a531c8a7fd4ac.png",
+      "filename": "gen_290aab57e2_de2a531c8a7fd4ac.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "cover",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 3,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 8,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_86939eb441_a6785ae55923bf0d.png",
+      "filename": "gen_86939eb441_a6785ae55923bf0d.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "gallery",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 3,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 9,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_376ac989b7_738b8d2269ed9eae.png",
+      "filename": "gen_376ac989b7_738b8d2269ed9eae.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "gallery",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 3,
+      "order_index": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 10,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_c0444bf740_771526f40dfbe373.png",
+      "filename": "gen_c0444bf740_771526f40dfbe373.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "cover",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 4,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 11,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_6bdcf1ab58_e42a6b4f0c22bcbf.png",
+      "filename": "gen_6bdcf1ab58_e42a6b4f0c22bcbf.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "cover",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 5,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 12,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_84e86ca772_b9f8e660a5b56c80.png",
+      "filename": "gen_84e86ca772_b9f8e660a5b56c80.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "cover",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 6,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 13,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_f318bb59a4_85671cc68fc6b8e4.png",
+      "filename": "gen_f318bb59a4_85671cc68fc6b8e4.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": "cover",
+      "mediable_type": "App\\Models\\Project",
+      "mediable_id": 7,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 14,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_b05f1fcb3b_27f12dd866a83889.png",
+      "filename": "gen_b05f1fcb3b_27f12dd866a83889.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": null,
+      "mediable_type": null,
+      "mediable_id": null,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 15,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_b05f1fcb3b_5b38b28f65abf90c.png",
+      "filename": "gen_b05f1fcb3b_5b38b28f65abf90c.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": null,
+      "mediable_type": null,
+      "mediable_id": null,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 16,
+      "disk": "url",
+      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_b05f1fcb3b_15bb496fd741e532.png",
+      "filename": "gen_b05f1fcb3b_15bb496fd741e532.png",
+      "mime_type": "image/png",
+      "size_kb": 0,
+      "alt_text": null,
+      "collection": null,
+      "mediable_type": null,
+      "mediable_id": null,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 17,
+      "disk": "url",
+      "path": "https://josephlab.dev/cv/joseph_jdira_cv_2024.pdf",
+      "filename": "Joseph_CV_2024.pdf",
+      "mime_type": "application/pdf",
+      "size_kb": 210,
+      "alt_text": null,
+      "collection": "cv",
+      "mediable_type": null,
+      "mediable_id": null,
+      "order_index": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 20,
+      "disk": "public",
+      "path": "uploads/0JJ6zmJ4i5dzx9AtqQmzekgbLBCIgyPnMaKfutNA.pdf",
+      "filename": "YOUSSEF_JDIRA_CV_FR.pdf",
+      "mime_type": "application/pdf",
+      "size_kb": 112,
+      "alt_text": null,
+      "collection": null,
+      "mediable_type": null,
+      "mediable_id": null,
+      "order_index": 0,
+      "created_at": "2026-08-11T20:04:36.000Z",
+      "updated_at": "2026-08-11T20:04:36.000Z"
+    },
+    {
+      "id": 21,
+      "disk": "public",
+      "path": "uploads/O1poqbfQ9YMd9ZkoeyTWSfU9g1bhJAI4QLvN6SqB.pdf",
+      "filename": "YOUSSEF_JDIRA_CV_EN.pdf",
+      "mime_type": "application/pdf",
+      "size_kb": 110,
+      "alt_text": null,
+      "collection": null,
+      "mediable_type": null,
+      "mediable_id": null,
+      "order_index": 0,
+      "created_at": "2026-08-12T15:07:26.000Z",
+      "updated_at": "2026-08-12T15:07:26.000Z"
+    }
+  ],
+  "skill_categories": [
+    {
+      "id": 1,
+      "name": "Backend",
+      "slug": "backend",
+      "order_index": 0
+    },
+    {
+      "id": 2,
+      "name": "Frontend",
+      "slug": "frontend",
+      "order_index": 1
+    },
+    {
+      "id": 3,
+      "name": "DevOps",
+      "slug": "devops",
+      "order_index": 2
+    }
+  ],
+  "skills": [
+    {
+      "id": 1,
+      "skill_category_id": 1,
+      "name": "Rust",
+      "slug": "rust",
+      "icon": "rust",
+      "proficiency": 81,
+      "order_index": 0,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 2,
+      "skill_category_id": 1,
+      "name": "Go",
+      "slug": "go",
+      "icon": "go",
+      "proficiency": 77,
+      "order_index": 1,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 3,
+      "skill_category_id": 1,
+      "name": "Python",
+      "slug": "python",
+      "icon": "python",
+      "proficiency": 89,
+      "order_index": 2,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 4,
+      "skill_category_id": 1,
+      "name": "Laravel",
+      "slug": "laravel",
+      "icon": "laravel",
+      "proficiency": 93,
+      "order_index": 3,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 5,
+      "skill_category_id": 1,
+      "name": "PostgreSQL",
+      "slug": "postgresql",
+      "icon": "postgresql",
+      "proficiency": 91,
+      "order_index": 4,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:10:33.000Z"
+    },
+    {
+      "id": 6,
+      "skill_category_id": 1,
+      "name": "Redis",
+      "slug": "redis",
+      "icon": "redis",
+      "proficiency": 75,
+      "order_index": 5,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 7,
+      "skill_category_id": 1,
+      "name": "gRPC",
+      "slug": "grpc",
+      "icon": "grpc",
+      "proficiency": 91,
+      "order_index": 6,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:10:46.000Z"
+    },
+    {
+      "id": 8,
+      "skill_category_id": 1,
+      "name": "GraphQL",
+      "slug": "graphql",
+      "icon": "graphql",
+      "proficiency": 80,
+      "order_index": 7,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:09:50.000Z"
+    },
+    {
+      "id": 9,
+      "skill_category_id": 2,
+      "name": "TypeScript",
+      "slug": "typescript",
+      "icon": "typescript",
+      "proficiency": 91,
+      "order_index": 0,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 10,
+      "skill_category_id": 2,
+      "name": "React",
+      "slug": "react",
+      "icon": "react",
+      "proficiency": 97,
+      "order_index": 1,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 11,
+      "skill_category_id": 2,
+      "name": "Next.js",
+      "slug": "nextjs",
+      "icon": "next.js",
+      "proficiency": 89,
+      "order_index": 2,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 12,
+      "skill_category_id": 2,
+      "name": "Tailwind CSS",
+      "slug": "tailwind-css",
+      "icon": "tailwind-css",
+      "proficiency": 91,
+      "order_index": 3,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 13,
+      "skill_category_id": 2,
+      "name": "WebGL",
+      "slug": "webgl",
+      "icon": "webgl",
+      "proficiency": 97,
+      "order_index": 4,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:11:02.000Z"
+    },
+    {
+      "id": 15,
+      "skill_category_id": 3,
+      "name": "Docker",
+      "slug": "docker",
+      "icon": "docker",
+      "proficiency": 82,
+      "order_index": 0,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 16,
+      "skill_category_id": 3,
+      "name": "Kubernetes",
+      "slug": "kubernetes",
+      "icon": "kubernetes",
+      "proficiency": 96,
+      "order_index": 1,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:09:33.000Z"
+    },
+    {
+      "id": 17,
+      "skill_category_id": 3,
+      "name": "Terraform",
+      "slug": "terraform",
+      "icon": "terraform",
+      "proficiency": 87,
+      "order_index": 2,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 18,
+      "skill_category_id": 3,
+      "name": "CI/CD",
+      "slug": "cicd",
+      "icon": "ci/cd",
+      "proficiency": 91,
+      "order_index": 3,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 19,
+      "skill_category_id": 3,
+      "name": "AWS",
+      "slug": "aws",
+      "icon": "aws",
+      "proficiency": 90,
+      "order_index": 4,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 20,
+      "skill_category_id": 3,
+      "name": "GCP",
+      "slug": "gcp",
+      "icon": "gcp",
+      "proficiency": 95,
+      "order_index": 5,
+      "is_visible": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "title": "Nexus Platform",
+      "slug": "nexus-platform",
+      "summary": "An enterprise-grade SaaS infrastructure designed for high-availability distributed systems.",
+      "description": "## The Challenge\n\nExisting solutions struggled with real-time state synchronization across multiple regions, leading to high latency for global users. The goal was a system that maintains sub-100ms response times with strict data consistency.\n\n## Key Features\n\n- Real-time delta-sync reducing bandwidth by 60%\n- Zero-trust mTLS + JWT auth at every microservice boundary\n- Native Prometheus + OpenTelemetry observability\n- Custom HPA controllers based on request latency",
+      "status": "published",
+      "is_featured": 1,
+      "client": "Nexus Inc.",
+      "role_on_project": "Lead Systems Architect",
+      "started_on": "2023-09-01T00:00:00.000Z",
+      "completed_on": null,
+      "order_index": 0,
+      "views_count": 18375,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T16:38:49.000Z"
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "title": "Atlas Engine",
+      "slug": "atlas-engine",
+      "summary": "Data infrastructure platform for petabyte-scale analytics pipelines.",
+      "description": "A distributed compute engine built on Kubernetes that orchestrates batch and streaming workloads across global regions.\n\n## Highlights\n\n- Custom scheduling atop K8s for cost-efficient batch jobs\n- Exactly-once semantics via idempotent state stores\n- Terabyte-scale ingestion at 40GB/s sustained throughput",
+      "status": "published",
+      "is_featured": 1,
+      "client": "Atlas Labs",
+      "role_on_project": "Distributed Systems Engineer",
+      "started_on": "2022-11-01T00:00:00.000Z",
+      "completed_on": "2024-02-28T00:00:00.000Z",
+      "order_index": 1,
+      "views_count": 14250,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T16:38:49.000Z"
+    },
+    {
+      "id": 3,
+      "user_id": 1,
+      "title": "Cipher Vault",
+      "slug": "cipher-vault",
+      "summary": "Security tooling for secrets management and zero-trust access control.",
+      "description": "Cipher Vault centralizes secrets management with hardware-backed key encryption, audit logging, and fine-grained access policies.\n\n## Highlights\n\n- KMS-backed envelope encryption\n- Rego-based access policy engine\n- Full audit trail with tamper-evident logs",
+      "status": "published",
+      "is_featured": 1,
+      "client": "Cipher Security",
+      "role_on_project": "Security Architect",
+      "started_on": "2023-01-15T00:00:00.000Z",
+      "completed_on": "2023-10-30T00:00:00.000Z",
+      "order_index": 2,
+      "views_count": 9202,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T16:38:49.000Z"
+    },
+    {
+      "id": 4,
+      "user_id": 1,
+      "title": "Neural Canvas",
+      "slug": "neural-canvas",
+      "summary": "AI/ML platform for generative image workflows.",
+      "description": "A full AI/ML web application that orchestrates GPU inference pipelines and serves generations through a fast Next.js frontend.",
+      "status": "published",
+      "is_featured": 0,
+      "client": null,
+      "role_on_project": "Full-stack Engineer",
+      "started_on": "2024-03-01T00:00:00.000Z",
+      "completed_on": null,
+      "order_index": 3,
+      "views_count": 12400,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 5,
+      "user_id": 1,
+      "title": "DeFi Analytics Dashboard",
+      "slug": "defi-analytics-dashboard",
+      "summary": "Real-time analytics for decentralized finance protocols.",
+      "description": "Streams on-chain data and renders live dashboards with sub-second freshness for protocol teams.",
+      "status": "published",
+      "is_featured": 0,
+      "client": null,
+      "role_on_project": "Backend Engineer",
+      "started_on": "2023-06-01T00:00:00.000Z",
+      "completed_on": "2023-12-15T00:00:00.000Z",
+      "order_index": 4,
+      "views_count": 8900,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 6,
+      "user_id": 1,
+      "title": "Habit Loop Mobile",
+      "slug": "habit-loop-mobile",
+      "summary": "Mobile habit tracker with offline-first sync.",
+      "description": "Cross-platform mobile app built on a sync engine that works offline-first.",
+      "status": "draft",
+      "is_featured": 0,
+      "client": null,
+      "role_on_project": "Mobile Engineer",
+      "started_on": "2024-05-01T00:00:00.000Z",
+      "completed_on": null,
+      "order_index": 5,
+      "views_count": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 7,
+      "user_id": 1,
+      "title": "Shopwave Commerce",
+      "slug": "shopwave-commerce",
+      "summary": "Headless e-commerce platform with instant search.",
+      "description": "Headless commerce backend with a blazing-fast search layer and full inventory orchestration.",
+      "status": "published",
+      "is_featured": 0,
+      "client": "Shopwave",
+      "role_on_project": "Full-stack Engineer",
+      "started_on": "2023-03-01T00:00:00.000Z",
+      "completed_on": "2023-09-30T00:00:00.000Z",
+      "order_index": 6,
+      "views_count": 6100,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 9,
+      "user_id": null,
+      "title": "Dignissimos dolor ab",
+      "slug": "Perferendis ut magna",
+      "summary": "Est explicabo Proi",
+      "description": "Doloremque eum deser",
+      "status": "published",
+      "is_featured": 0,
+      "client": "Culpa quos eum et in",
+      "role_on_project": "Enim laboriosam dol",
+      "started_on": "1984-09-16T00:00:00.000Z",
+      "completed_on": "2002-05-24T00:00:00.000Z",
+      "order_index": 42,
+      "views_count": 66,
+      "created_at": "2026-08-11T20:01:59.000Z",
+      "updated_at": "2026-08-11T20:01:59.000Z"
+    }
+  ],
+  "project_links": [
+    {
+      "id": 1,
+      "project_id": 1,
+      "label": "Live Demo",
+      "url": "https://nexus.example.com",
+      "type": "demo",
+      "order_index": 0
+    },
+    {
+      "id": 2,
+      "project_id": 1,
+      "label": "Source Code",
+      "url": "https://github.com/josephlab/nexus",
+      "type": "github",
+      "order_index": 1
+    },
+    {
+      "id": 3,
+      "project_id": 2,
+      "label": "Case Study",
+      "url": "https://atlas.example.com/case-study",
+      "type": "docs",
+      "order_index": 0
+    },
+    {
+      "id": 4,
+      "project_id": 2,
+      "label": "Source Code",
+      "url": "https://github.com/josephlab/atlas",
+      "type": "github",
+      "order_index": 1
+    },
+    {
+      "id": 5,
+      "project_id": 3,
+      "label": "Live Demo",
+      "url": "https://cipher.example.com",
+      "type": "demo",
+      "order_index": 0
+    },
+    {
+      "id": 6,
+      "project_id": 3,
+      "label": "Documentation",
+      "url": "https://docs.cipher.example.com",
+      "type": "docs",
+      "order_index": 1
+    },
+    {
+      "id": 7,
+      "project_id": 3,
+      "label": "Source Code",
+      "url": "https://github.com/josephlab/cipher",
+      "type": "github",
+      "order_index": 2
+    },
+    {
+      "id": 8,
+      "project_id": 4,
+      "label": "Live Demo",
+      "url": "https://canvas.example.com",
+      "type": "demo",
+      "order_index": 0
+    },
+    {
+      "id": 9,
+      "project_id": 5,
+      "label": "Live Demo",
+      "url": "https://defi.example.com",
+      "type": "demo",
+      "order_index": 0
+    },
+    {
+      "id": 10,
+      "project_id": 7,
+      "label": "Live Demo",
+      "url": "https://shopwave.example.com",
+      "type": "demo",
+      "order_index": 0
+    },
+    {
+      "id": 11,
+      "project_id": 7,
+      "label": "Source Code",
+      "url": "https://github.com/josephlab/shopwave",
+      "type": "github",
+      "order_index": 1
+    }
+  ],
+  "project_skill": [
+    {
+      "project_id": 1,
+      "skill_id": 1
+    },
+    {
+      "project_id": 1,
+      "skill_id": 2
+    },
+    {
+      "project_id": 1,
+      "skill_id": 5
+    },
+    {
+      "project_id": 1,
+      "skill_id": 6
+    },
+    {
+      "project_id": 1,
+      "skill_id": 16
+    },
+    {
+      "project_id": 1,
+      "skill_id": 17
+    },
+    {
+      "project_id": 1,
+      "skill_id": 7
+    },
+    {
+      "project_id": 1,
+      "skill_id": 8
+    },
+    {
+      "project_id": 2,
+      "skill_id": 1
+    },
+    {
+      "project_id": 2,
+      "skill_id": 2
+    },
+    {
+      "project_id": 2,
+      "skill_id": 5
+    },
+    {
+      "project_id": 2,
+      "skill_id": 15
+    },
+    {
+      "project_id": 2,
+      "skill_id": 16
+    },
+    {
+      "project_id": 2,
+      "skill_id": 17
+    },
+    {
+      "project_id": 3,
+      "skill_id": 1
+    },
+    {
+      "project_id": 3,
+      "skill_id": 2
+    },
+    {
+      "project_id": 3,
+      "skill_id": 6
+    },
+    {
+      "project_id": 3,
+      "skill_id": 15
+    },
+    {
+      "project_id": 3,
+      "skill_id": 16
+    },
+    {
+      "project_id": 4,
+      "skill_id": 3
+    },
+    {
+      "project_id": 4,
+      "skill_id": 9
+    },
+    {
+      "project_id": 4,
+      "skill_id": 10
+    },
+    {
+      "project_id": 4,
+      "skill_id": 11
+    },
+    {
+      "project_id": 4,
+      "skill_id": 15
+    },
+    {
+      "project_id": 5,
+      "skill_id": 2
+    },
+    {
+      "project_id": 5,
+      "skill_id": 5
+    },
+    {
+      "project_id": 5,
+      "skill_id": 6
+    },
+    {
+      "project_id": 5,
+      "skill_id": 10
+    },
+    {
+      "project_id": 5,
+      "skill_id": 9
+    },
+    {
+      "project_id": 6,
+      "skill_id": 9
+    },
+    {
+      "project_id": 6,
+      "skill_id": 10
+    },
+    {
+      "project_id": 7,
+      "skill_id": 4
+    },
+    {
+      "project_id": 7,
+      "skill_id": 5
+    },
+    {
+      "project_id": 7,
+      "skill_id": 6
+    },
+    {
+      "project_id": 7,
+      "skill_id": 10
+    },
+    {
+      "project_id": 7,
+      "skill_id": 9
+    },
+    {
+      "project_id": 9,
+      "skill_id": 19
+    },
+    {
+      "project_id": 9,
+      "skill_id": 17
+    },
+    {
+      "project_id": 9,
+      "skill_id": 18
+    }
+  ],
+  "certifications": [
+    {
+      "id": 2,
+      "type": "education",
+      "title": "B.Sc. in Software Engineering",
+      "issuer": "Polytechnic University",
+      "icon": null,
+      "period": "2015 - 2018",
+      "issued_on": null,
+      "credential_id": "DIPLOMA_02",
+      "verify_url": null,
+      "description": "Focused on Core Software Engineering principles, Data Structures, and Database Management Systems.",
+      "order_index": 1,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:18:39.000Z"
+    },
+    {
+      "id": 3,
+      "type": "certification",
+      "title": "AWS Certified Solutions Architect",
+      "issuer": "Professional Level",
+      "icon": "fa-brands fa-aws",
+      "period": null,
+      "issued_on": "2024-03-01T00:00:00.000Z",
+      "credential_id": "AWS-SOL-ARCH-001",
+      "verify_url": "https://www.credly.com",
+      "description": "Expertise in designing distributed systems on AWS, cost optimization, and multi-tier architecture deployment.",
+      "order_index": 2,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:18:30.000Z"
+    },
+    {
+      "id": 4,
+      "type": "certification",
+      "title": "Certified Kubernetes Administrator",
+      "issuer": "CNCF / Linux Foundation",
+      "icon": "fa-solid fa-cubes",
+      "period": null,
+      "issued_on": "2024-01-01T00:00:00.000Z",
+      "credential_id": "CKA-24-9981",
+      "verify_url": "https://www.cncf.io",
+      "description": "Proficiency in managing containerized workloads, clusters, networking, and security at production scale.",
+      "order_index": 3,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:18:27.000Z"
+    },
+    {
+      "id": 5,
+      "type": "certification",
+      "title": "PostgreSQL Professional",
+      "issuer": "EnterpriseDB",
+      "icon": "fa-solid fa-database",
+      "period": null,
+      "issued_on": "2023-06-01T00:00:00.000Z",
+      "credential_id": "PG-SQL-9.6",
+      "verify_url": "https://www.enterprisedb.com",
+      "description": "Advanced database management, query optimization, high-availability clusters, and performance tuning.",
+      "order_index": 4,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:18:22.000Z"
+    },
+    {
+      "id": 6,
+      "type": "certification",
+      "title": "CompTIA Security+",
+      "issuer": "Network Security",
+      "icon": "fa-solid fa-shield-halved",
+      "period": null,
+      "issued_on": "2022-12-01T00:00:00.000Z",
+      "credential_id": "SEC-PL-881",
+      "verify_url": "https://www.comptia.org",
+      "description": "Foundational knowledge in network security, risk management, threat mitigation, and cryptography.",
+      "order_index": 5,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:18:18.000Z"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": 1,
+      "quote": "An exceptional engineer who transformed our legacy infrastructure into a modern, scalable platform.",
+      "author": "Alex Morgan",
+      "role": "CTO, TechCorp",
+      "avatar_media_id": 14,
+      "order_index": 0,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:14:01.000Z"
+    },
+    {
+      "id": 2,
+      "quote": "His deep understanding of databases and systems architecture is rare and invaluable.",
+      "author": "Sarah Chen",
+      "role": "VP Engineering, DataFlow",
+      "avatar_media_id": 15,
+      "order_index": 1,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:13:56.000Z"
+    },
+    {
+      "id": 3,
+      "quote": "Delivered a complex microservices migration ahead of schedule with zero downtime.",
+      "author": "Marcus Webb",
+      "role": "Director, CloudScale",
+      "avatar_media_id": 16,
+      "order_index": 2,
+      "is_visible": 0,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-12T15:13:52.000Z"
+    }
+  ],
+  "contact_messages": [
+    {
+      "id": 1,
+      "name": "Alicia Roberts",
+      "email": "alicia@startup.io",
+      "subject": "Consulting inquiry",
+      "message": "We are looking for a systems architect to help scale our platform. Are you available for a short engagement next quarter?",
+      "is_read": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T18:57:46.000Z"
+    },
+    {
+      "id": 3,
+      "name": "Priya Shah",
+      "email": "priya@agency.co",
+      "subject": "Contract role",
+      "message": "We have a 6-month contract for a Laravel/PostgreSQL specialist. Open to discussing.",
+      "is_read": 1,
+      "created_at": "2026-08-11T15:55:53.000Z",
+      "updated_at": "2026-08-11T15:55:53.000Z"
+    }
+  ]
+}

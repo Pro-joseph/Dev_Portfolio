@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { serverFetch } from "@/lib/api";
+import { serverFetch } from "@/lib/server-api";
 import { Certification } from "@/lib/types";
 import SubNav from "@/components/public/SubNav";
 import { certIcon } from "@/lib/icons";

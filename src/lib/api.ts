@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 
-export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8899/api/v1";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api/v1";
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -117,20 +116,6 @@ export const http = {
       },
     }),
 };
-
-export async function serverFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: { Accept: "application/json", ...init?.headers },
-    next: { revalidate: 30 },
-  });
-
-  if (!response.ok) {
-    throw new Error(`API ${response.status} for ${path}`);
-  }
-
-  return (await response.json()) as T;
-}
 
 export function requireLogin(admin = true): void {
   if (typeof window === "undefined") return;
