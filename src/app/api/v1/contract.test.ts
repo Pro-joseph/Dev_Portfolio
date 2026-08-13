@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { resetDb } from "@/lib/db";
+import { resetDb, query } from "@/lib/db";
 import { GET as siteGet } from "@/app/api/v1/site/route";
 import { GET as skillsGet } from "@/app/api/v1/skills/route";
 import { GET as certsGet } from "@/app/api/v1/certifications/route";
@@ -392,5 +392,24 @@ describe("PATCH /admin/contact-messages/{id}/read", () => {
     expect(res.status).toBe(200);
     const { data } = (await body(res)) as { data: { is_read: boolean } };
     expect(data.is_read).toBe(true);
+  });
+});
+
+describe("concurrent cold start (first request after reset)", () => {
+  it("handles simultaneous queries without duplicate-seed errors", async () => {
+    await resetDb();
+    const results = await Promise.all([
+      siteGet(),
+      query("SELECT COUNT(*)::int AS n FROM users"),
+      query("SELECT COUNT(*)::int AS n FROM projects"),
+      query("SELECT COUNT(*)::int AS n FROM skills"),
+    ]);
+    for (const res of results) {
+      if (res instanceof Response) expect(res.status).toBe(200);
+    }
+    const users = await query<{ n: number }>(
+      "SELECT COUNT(*)::int AS n FROM users"
+    );
+    expect(Number(users[0].n)).toBe(2);
   });
 });

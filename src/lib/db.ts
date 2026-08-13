@@ -182,6 +182,7 @@ async function seedMem() {
 // ------------------------------------------------------------------ facade
 
 let memReady = false;
+let seedPromise: Promise<void> | null = null;
 
 export async function query<T extends object = Record<string, unknown>>(
   text: string,
@@ -192,8 +193,16 @@ export async function query<T extends object = Record<string, unknown>>(
     return res.rows.map((r) => normalizeRow(r)) as unknown as T[];
   }
   if (!memReady) {
-    await seedMem();
-    memReady = true;
+    if (!seedPromise) {
+      seedPromise = seedMem()
+        .then(() => {
+          memReady = true;
+        })
+        .finally(() => {
+          seedPromise = null;
+        });
+    }
+    await seedPromise;
   }
   const res = await memQuery(text, params);
   return res.rows as unknown as T[];
@@ -217,6 +226,7 @@ export async function resetDb(): Promise<void> {
   memReady = false;
   memDb = null;
   memClient = null;
+  seedPromise = null;
 }
 
 export async function nextId(table: string): Promise<number> {
