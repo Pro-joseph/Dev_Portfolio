@@ -1,4 +1,12 @@
-import { query } from "./db";
+import { query, queryOne } from "./db";
+import type {
+  Certification,
+  Project,
+  ProjectListItem,
+  SiteData,
+  SkillCategory,
+  Testimonial,
+} from "./types";
 
 // ----------------------------------------------------------- types
 
@@ -199,6 +207,62 @@ export async function buildProjectList(rows: ProjectRow[]): Promise<ProjectWithR
   return Promise.all(rows.map(buildProject));
 }
 
+/** Batched N+1-free relation load for a whole page of projects (3 queries total). */
+export async function buildProjectListBatched(
+  rows: ProjectRow[]
+): Promise<ProjectWithRelations[]> {
+  if (!rows.length) return [];
+  const ids = rows.map((p) => p.id);
+  const [links, skills, media] = await Promise.all([
+    query<ProjectLinkRow & { project_id: number }>(
+      "SELECT id, project_id, label, url, type FROM project_links WHERE project_id = ANY($1::int[]) ORDER BY order_index",
+      [ids]
+    ),
+    query<SkillRow & { project_id: number }>(
+      `SELECT s.id, s.name, s.slug, s.icon, s.proficiency, s.order_index, ps.project_id
+       FROM skills s
+       JOIN project_skill ps ON ps.skill_id = s.id
+       WHERE ps.project_id = ANY($1::int[])
+       ORDER BY s.order_index`,
+      [ids]
+    ),
+    query<MediaRow & { project_id: number }>(
+      `SELECT m.*, m.mediable_id AS project_id
+       FROM media m
+       WHERE m.mediable_type = 'App\\Models\\Project' AND m.mediable_id = ANY($1::int[])
+       ORDER BY m.order_index`,
+      [ids]
+    ),
+  ]);
+
+  const linksByProject = new Map<number, ProjectLinkRow[]>();
+  const skillsByProject = new Map<number, SkillRow[]>();
+  const mediaByProject = new Map<number, MediaRow[]>();
+  for (const l of links) {
+    const list = linksByProject.get(l.project_id) ?? [];
+    list.push(l);
+    linksByProject.set(l.project_id, list);
+  }
+  for (const s of skills) {
+    const list = skillsByProject.get(s.project_id) ?? [];
+    list.push(s);
+    skillsByProject.set(s.project_id, list);
+  }
+  for (const m of media) {
+    const list = mediaByProject.get(m.project_id) ?? [];
+    list.push(m);
+    mediaByProject.set(m.project_id, list);
+  }
+
+  return rows.map((project) => {
+    const links = linksByProject.get(project.id) ?? [];
+    const skills = skillsByProject.get(project.id) ?? [];
+    const media = mediaByProject.get(project.id) ?? [];
+    const cover = media.find((m) => m.collection === "cover") ?? media[0] ?? null;
+    return { project, links, skills, media, cover };
+  });
+}
+
 // --------------------------------------------------------------- site
 
 export interface SiteSettingsRow {
@@ -315,6 +379,151 @@ async function loadSiteData(): Promise<{
 
 export async function siteResource(): Promise<Record<string, unknown>> {
   return loadSiteData();
+}
+
+// ------------------------------------------------------------ data loaders
+
+export interface ProjectListQuery {
+  featured?: boolean;
+  search?: string;
+  perPage?: number;
+  page?: number;
+}
+
+export async function loadProjectList(q: ProjectListQuery): Promise<{
+  rows: ProjectRow[];
+  total: number;
+  perPage: number;
+  page: number;
+}> {
+  const perPage = Math.max(1, q.perPage || 12);
+  const page = Math.max(1, q.page || 1);
+
+  const conditions: string[] = ["status = 'published'"];
+  const params: unknown[] = [];
+
+  if (q.featured) {
+    params.push(true);
+    conditions.push(`is_featured = $${params.length}`);
+  }
+  if (q.search) {
+    params.push(`%${q.search}%`);
+    conditions.push(
+      `(title ILIKE $${params.length} OR summary ILIKE $${params.length})`
+    );
+  }
+
+  const where = conditions.join(" AND ");
+  const totalRow = await query<{ n: number }>(
+    `SELECT COUNT(*)::int AS n FROM projects WHERE ${where}`,
+    params
+  );
+  const total = Number(totalRow[0]?.n ?? 0);
+
+  const rows = await query<ProjectRow>(
+    `SELECT * FROM projects WHERE ${where}
+     ORDER BY is_featured DESC, order_index ASC, id ASC
+     LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+    [...params, perPage, (page - 1) * perPage]
+  );
+
+  return { rows, total, perPage, page };
+}
+
+export async function loadProjectBySlug(
+  slug: string
+): Promise<ProjectWithRelations | null> {
+  const project = await queryOne<ProjectRow>(
+    "SELECT * FROM projects WHERE slug = $1 AND status = 'published'",
+    [slug]
+  );
+  if (!project) return null;
+  return buildProject(project);
+}
+
+export async function loadSkillCategories(): Promise<Record<string, unknown>[]> {
+  const categories = await query<{
+    id: number;
+    name: string;
+    slug: string;
+    order_index: number;
+  }>(
+    "SELECT id, name, slug, order_index FROM skill_categories ORDER BY order_index"
+  );
+  return Promise.all(
+    categories.map(async (cat) => {
+      const skills = await query<SkillRow>(
+        "SELECT id, name, slug, icon, proficiency, order_index FROM skills WHERE skill_category_id = $1 AND is_visible = true ORDER BY order_index",
+        [cat.id]
+      );
+      return {
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        order_index: cat.order_index,
+        skills: skills.map(skillResource),
+      };
+    })
+  );
+}
+
+export async function loadTestimonials(): Promise<Record<string, unknown>[]> {
+  const testimonials = await query<TestimonialRow>(
+    "SELECT * FROM testimonials WHERE is_visible = true ORDER BY order_index"
+  );
+  return Promise.all(
+    testimonials.map(async (t) => {
+      const avatar = await queryOne<MediaRow>(
+        "SELECT * FROM media WHERE id = $1",
+        [t.avatar_media_id]
+      );
+      return testimonialResource({ ...t, avatar });
+    })
+  );
+}
+
+export async function loadCertifications(): Promise<Record<string, unknown>[]> {
+  const certifications = await query<CertificationRow>(
+    "SELECT * FROM certifications WHERE is_visible = true ORDER BY order_index"
+  );
+  return certifications.map(certificationResource);
+}
+
+// ---------------------------------------------------- typed page loaders
+
+export async function getSiteData(): Promise<SiteData> {
+  return (await siteResource()) as unknown as SiteData;
+}
+
+export async function getSkillCategories(): Promise<SkillCategory[]> {
+  return (await loadSkillCategories()) as unknown as SkillCategory[];
+}
+
+export async function getTestimonialsData(): Promise<Testimonial[]> {
+  return (await loadTestimonials()) as unknown as Testimonial[];
+}
+
+export async function getCertificationsData(): Promise<Certification[]> {
+  return (await loadCertifications()) as unknown as Certification[];
+}
+
+export async function getProjectListItems(
+  q: ProjectListQuery
+): Promise<ProjectListItem[]> {
+  const { rows } = await loadProjectList(q);
+  const projects = await buildProjectListBatched(rows);
+  return projects.map((p) => projectListResource(p) as unknown as ProjectListItem);
+}
+
+export async function getProjectsFull(q: ProjectListQuery): Promise<Project[]> {
+  const { rows } = await loadProjectList(q);
+  const projects = await buildProjectListBatched(rows);
+  return projects.map((p) => projectResource(p) as unknown as Project);
+}
+
+export async function getProjectBySlugTyped(slug: string): Promise<Project | null> {
+  const withRels = await loadProjectBySlug(slug);
+  return withRels ? (projectResource(withRels) as unknown as Project) : null;
 }
 
 // ------------------------------------------------------- certifications

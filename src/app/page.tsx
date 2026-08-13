@@ -1,12 +1,9 @@
-import { serverFetch } from "@/lib/server-api";
 import {
-  Paginated,
-  Project,
-  ProjectListItem,
-  SiteData,
-  SkillCategory,
-  Testimonial,
-} from "@/lib/types";
+  getSiteData,
+  getProjectsFull,
+  getSkillCategories,
+  getTestimonialsData,
+} from "@/lib/resources";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
 import SectionHeader from "@/components/public/SectionHeader";
@@ -18,20 +15,15 @@ import Cta from "@/components/public/Cta";
 import Reveal from "@/components/public/Reveal";
 import { FaArrowRight, FaChevronDown } from "react-icons/fa";
 
-export default async function HomePage() {
-  const [site, featuredList, skills, testimonials] = await Promise.all([
-    serverFetch<SiteData>("/site"),
-    serverFetch<Paginated<ProjectListItem>>("/projects?featured=true&per_page=3"),
-    serverFetch<{ data: SkillCategory[] }>("/skills"),
-    serverFetch<{ data: Testimonial[] }>("/testimonials"),
-  ]);
+export const revalidate = 60;
 
-  const featuredDetails = await Promise.all(
-    featuredList.data.map((p) =>
-      serverFetch<{ data: Project }>(`/projects/${p.slug}`)
-    )
-  );
-  const featuredProjects = featuredDetails.map((d) => d.data);
+export default async function HomePage() {
+  const [site, featuredProjects, skills, testimonials] = await Promise.all([
+    getSiteData(),
+    getProjectsFull({ featured: true, perPage: 3 }),
+    getSkillCategories(),
+    getTestimonialsData(),
+  ]);
 
   const galleryImages = [
     ...new Map(
@@ -42,7 +34,7 @@ export default async function HomePage() {
     ).values(),
   ].slice(0, 4);
 
-  const skillCategories = skills.data;
+  const skillCategories = skills;
   const techNames = skillCategories.flatMap((c) => c.skills.map((s) => s.name)).slice(0, 12);
   const totalSkills = skillCategories.reduce((n, c) => n + c.skills.length, 0);
   const settings = site.settings as {
@@ -246,7 +238,7 @@ export default async function HomePage() {
       </section>
 
       {/* Testimonials */}
-      {testimonials.data.length > 0 && (
+      {testimonials.length > 0 && (
         <section className="py-24 px-6">
           <div className="container mx-auto">
             <Reveal>
@@ -258,7 +250,7 @@ export default async function HomePage() {
             </Reveal>
             <Reveal delay={100}>
               <div className="flex gap-8 overflow-x-auto pb-6 snap-x scrollbar-thin">
-                {testimonials.data.map((t) => (
+                {testimonials.map((t) => (
                   <TestimonialCard key={t.id} testimonial={t} />
                 ))}
               </div>

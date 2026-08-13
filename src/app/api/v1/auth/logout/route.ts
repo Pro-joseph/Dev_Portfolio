@@ -1,4 +1,4 @@
-import { requireAuth, type AuthUser } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { json } from "@/lib/http";
 import { handleError } from "@/lib/route-helpers";
 

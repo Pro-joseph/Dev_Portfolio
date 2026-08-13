@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { serverFetch } from "@/lib/server-api";
-import { Project } from "@/lib/types";
+import { getProjectBySlugTyped } from "@/lib/resources";
 import SubNav from "@/components/public/SubNav";
 import Markdown from "@/components/public/Markdown";
 import ProjectLightbox from "@/components/public/ProjectLightbox";
@@ -12,11 +11,13 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const revalidate = 60;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   try {
-    const { data } = await serverFetch<{ data: Project }>(`/projects/${slug}`);
-    return { title: data.title, description: data.summary ?? undefined };
+    const project = await getProjectBySlugTyped(slug);
+    return { title: project?.title ?? "Project", description: project?.summary ?? undefined };
   } catch {
     return { title: "Project" };
   }
@@ -24,13 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
-  let project: Project;
-  try {
-    const { data } = await serverFetch<{ data: Project }>(`/projects/${slug}`);
-    project = data;
-  } catch {
-    notFound();
-  }
+  const project = await getProjectBySlugTyped(slug);
+  if (!project) notFound();
 
   const demoLink = project.links.find((l) => l.type === "demo");
   const githubLink = project.links.find((l) => l.type === "github");

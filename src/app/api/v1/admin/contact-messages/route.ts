@@ -1,7 +1,7 @@
 import { query, queryOne } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
-import { json, notFound, paginate } from "@/lib/http";
-import { handleError, parseId } from "@/lib/route-helpers";
+import { json, paginate } from "@/lib/http";
+import { handleError } from "@/lib/route-helpers";
 import { castRow as cast } from "@/lib/admin-crud";
 
 export const dynamic = "force-dynamic";

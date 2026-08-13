@@ -21,8 +21,8 @@ export async function GET(request: Request): Promise<Response> {
       query<{ total_views: number; total_projects: number; published_projects: number; draft_projects: number }>(
         `SELECT COALESCE(SUM(views_count),0)::int AS total_views,
                 COUNT(*)::int AS total_projects,
-                COUNT(*) FILTER (WHERE status = 'published')::int AS published_projects,
-                COUNT(*) FILTER (WHERE status = 'draft')::int AS draft_projects
+                COALESCE(SUM(CASE WHEN status = 'published' THEN 1 ELSE 0 END),0)::int AS published_projects,
+                COALESCE(SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END),0)::int AS draft_projects
          FROM projects`
       ),
       query<{ id: number; title: string; slug: string; status: string; views_count: number; updated_at: string }>(
@@ -31,7 +31,7 @@ export async function GET(request: Request): Promise<Response> {
       ),
       query<{ n: number }>("SELECT COUNT(*)::int AS n FROM skills"),
       query<{ unread: number; total: number }>(
-        `SELECT COUNT(*) FILTER (WHERE is_read = false)::int AS unread,
+        `SELECT COALESCE(SUM(CASE WHEN is_read = false THEN 1 ELSE 0 END),0)::int AS unread,
                 COUNT(*)::int AS total FROM contact_messages`
       ),
       query<{ label: string; language: string; media_disk: string; media_path: string }>(

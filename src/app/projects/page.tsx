@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { serverFetch } from "@/lib/server-api";
-import { Paginated, ProjectListItem } from "@/lib/types";
+import { getProjectListItems } from "@/lib/resources";
 import SubNav from "@/components/public/SubNav";
 import Link from "next/link";
 import { FaLongArrowAltRight } from "react-icons/fa";
@@ -10,8 +9,10 @@ export const metadata: Metadata = {
   description: "A selection of systems, platforms, and tools engineered from the database up.",
 };
 
+export const revalidate = 60;
+
 export default async function ProjectsPage() {
-  const { data } = await serverFetch<Paginated<ProjectListItem>>("/projects?per_page=50");
+  const data = await getProjectListItems({ perPage: 50 });
 
   return (
     <>

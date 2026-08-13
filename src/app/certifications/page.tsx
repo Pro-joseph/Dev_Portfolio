@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { serverFetch } from "@/lib/server-api";
+import { getCertificationsData } from "@/lib/resources";
 import { Certification } from "@/lib/types";
 import SubNav from "@/components/public/SubNav";
 import { certIcon } from "@/lib/icons";
@@ -10,12 +10,14 @@ export const metadata: Metadata = {
   description: "Formal credentials and continuous professional development in software engineering and systems architecture.",
 };
 
+export const revalidate = 60;
+
 function certIconFor(cert: Certification) {
   return certIcon(cert.title, cert.issuer ?? "");
 }
 
 export default async function CertificationsPage() {
-  const { data } = await serverFetch<{ data: Certification[] }>("/certifications");
+  const data = await getCertificationsData();
 
   const education = data.filter((c) => c.type === "education");
   const certifications = data.filter((c) => c.type === "certification");
