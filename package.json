@@ -12,8 +12,6 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "next": "16.3.0",
-    "pg": "^8.23.0",
-    "pg-mem": "^3.0.14",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-icons": "^5.7.0",
@@ -23,8 +21,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/pg": "^8.21.0",
+    "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/supertest": "^7.2.1",

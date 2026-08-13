@@ -1,10 +1,9 @@
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { Pool, type QueryResult } from "pg";
-import { newDb, type IMemoryDb } from "pg-mem";
+import { DatabaseSync } from "node:sqlite";
 
 const DATA_DIR = path.join(process.cwd(), "data");
-const SCHEMA_PATH = path.join(DATA_DIR, "schema.sql");
+const SCHEMA_PATH = path.join(DATA_DIR, "schema.sqlite.sql");
 
 type SeedData = Record<string, unknown[] | undefined>;
 function loadSeedData(): SeedData {
@@ -18,6 +17,8 @@ const NUMERIC_KEYS = new Set([
   "proficiency",
   "views_count",
   "total",
+  "n",
+  "m",
   "from",
   "to",
   "per_page",
@@ -25,11 +26,22 @@ const NUMERIC_KEYS = new Set([
   "last_page",
 ]);
 
+const BOOLEAN_KEYS = new Set([
+  "is_visible",
+  "is_published",
+  "open_in_new_tab",
+  "is_active",
+  "is_featured",
+  "is_read",
+]);
+
 function normalizeRow(raw: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(raw)) {
     if (value instanceof Date) {
       out[key] = value.toISOString();
+    } else if (BOOLEAN_KEYS.has(key) && value !== null) {
+      out[key] = Boolean(value);
     } else if (
       value !== null &&
       typeof value === "string" &&
@@ -44,65 +56,98 @@ function normalizeRow(raw: Record<string, unknown>): Record<string, unknown> {
   return out;
 }
 
-export function isUsingPg(): boolean {
-  return Boolean(process.env.DATABASE_URL);
+function toBindValue(v: unknown): null | number | string {
+  if (typeof v === "boolean") return v ? 1 : 0;
+  if (v === undefined || v === null) return null;
+  if (typeof v === "string") return v;
+  if (typeof v === "number") return v;
+  if (typeof v === "bigint") return Number(v);
+  return String(v);
 }
 
-// ---------------------------------------------------------------- real pg
-
-let pool: Pool | null = null;
-
-function getPool(): Pool {
-  if (!pool) {
-    pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ...(process.env.DATABASE_SSL !== "false"
-        ? { ssl: { rejectUnauthorized: false } }
-        : {}),
-    });
-  }
-  return pool;
-}
-
-// --------------------------------------------------------------- pg-mem
-
-let memDb: IMemoryDb | null = null;
-let memClient: import("pg").Client | null = null;
-
-function ensureMemDb(): IMemoryDb {
-  if (memDb) return memDb;
-  const db = newDb();
-  const raw = readFileSync(SCHEMA_PATH, "utf8");
-  const withoutComments = raw
-    .split("\n")
-    .filter((line) => !line.trim().startsWith("--"))
-    .join("\n");
-  const statements = withoutComments
-    .split(/;\s*(?:\r?\n|$)/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-  for (const stmt of statements) {
-    db.public.none(stmt);
-  }
-  memDb = db;
-  const { Client } = db.adapters.createPg() as {
-    Client: new () => import("pg").Client;
-  };
-  memClient = new Client();
-  memClient.connect();
-  return db;
-}
-
-function memQuery(
+/**
+ * Translates Postgres-flavored SQL to SQLite:
+ *  - $n -> ? placeholders (arrays passed to ANY($n::int[]) are expanded)
+ *  - strips ::int / ::text / ::timestamp casts
+ *  - ILIKE -> LIKE
+ *  - ANY($n::int[]) -> IN (?, ?, ...)
+ */
+function translateSql(
   text: string,
-  params?: unknown[]
-): Promise<{ rows: Record<string, unknown>[] }> {
-  return new Promise((resolve, reject) => {
-    memClient!.query(text, params ?? [], (err, res: QueryResult) => {
-      if (err) return reject(err);
-      resolve({ rows: (res.rows ?? []).map((r) => normalizeRow(r)) });
-    });
-  });
+  params: unknown[]
+): { sql: string; params: (null | number | string)[] } {
+  const outParams: (null | number | string)[] = [];
+  const out: string[] = [];
+  const re =
+    /(?:=|\bIN)\s*ANY\(\s*\$(\d+)\s*::int\[\]\s*\)|\$(\d+)(?:::[a-zA-Z\[\]]+)?|::(?:int|text|bigint|float|numeric|timestamp|timestamptz|boolean)\b|\bILIKE\b/gi;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    out.push(text.slice(last, m.index));
+    const [whole, anyIdx, plainIdx] = m;
+    if (anyIdx !== undefined) {
+      const arr = (params[Number(anyIdx) - 1] ?? []) as unknown[];
+      if (arr.length === 0) {
+        out.push("IN (NULL)");
+      } else {
+        out.push(`IN (${arr.map(() => "?").join(", ")})`);
+        outParams.push(...arr.map(toBindValue));
+      }
+    } else if (plainIdx !== undefined) {
+      out.push("?");
+      outParams.push(toBindValue(params[Number(plainIdx) - 1]));
+    } else if (/^::/.test(whole)) {
+      out.push("");
+    } else {
+      out.push("LIKE");
+    }
+    last = m.index + whole.length;
+  }
+  out.push(text.slice(last));
+  return { sql: out.join(""), params: outParams };
+}
+
+// ---------------------------------------------------------------- sqlite
+
+let db: DatabaseSync | null = null;
+let dbPath: string | null = null;
+
+function getDb(): DatabaseSync {
+  if (db) return db;
+  const file = process.env.DB_FILE;
+  dbPath = file && file !== ":memory:" ? path.resolve(process.cwd(), file) : null;
+  if (dbPath) {
+    mkdirSync(path.dirname(dbPath), { recursive: true });
+  }
+  const conn = new DatabaseSync(dbPath ?? ":memory:");
+  if (dbPath) {
+    conn.exec("PRAGMA journal_mode = WAL");
+    conn.exec("PRAGMA foreign_keys = ON");
+  }
+  db = conn;
+  return conn;
+}
+
+function applySchema(conn: DatabaseSync): void {
+  const raw = readFileSync(SCHEMA_PATH, "utf8");
+  conn.exec(raw);
+}
+
+function exec(text: string, params: unknown[] = []): Record<string, unknown>[] {
+  const conn = getDb();
+  const { sql, params: bind } = translateSql(text, params);
+  const stmt = conn.prepare(sql);
+  const rows = (stmt.all(...bind) as Record<string, unknown>[]).map(
+    (r) => normalizeRow(r) as Record<string, unknown>
+  );
+  return rows;
+}
+
+function run(text: string, params: unknown[] = []): void {
+  const conn = getDb();
+  const { sql, params: bind } = translateSql(text, params);
+  const stmt = conn.prepare(sql);
+  stmt.run(...bind);
 }
 
 // ------------------------------------------------------------------ seed
@@ -142,70 +187,55 @@ const INSERT_ORDER: SeedTable[] = [
   "contact_messages",
 ];
 
-function buildInsert(table: SeedTable, rows: unknown[]) {
-  if (!rows.length) return null;
+function buildInsert(table: SeedTable, rows: unknown[]): [string, unknown[]][] {
+  if (!rows.length) return [];
   const cols = Object.keys(rows[0] as Record<string, unknown>);
   const placeholders = cols.map((_, i) => `$${i + 1}`).join(", ");
   const sql = `INSERT INTO ${table} (${cols.join(", ")}) VALUES (${placeholders})`;
-  const prepared: unknown[][] = [];
+  const prepared: [string, unknown[]][] = [];
   for (const row of rows) {
     const values = cols.map((c) => {
       const v = (row as Record<string, unknown>)[c];
       if (v === undefined) return null;
-      if (typeof v === "boolean") return v;
+      if (typeof v === "boolean") return v ? 1 : 0;
       if (typeof v === "object" && v !== null) return JSON.stringify(v);
       return v;
     });
-    prepared.push([sql, values] as unknown[]);
+    prepared.push([sql, values]);
   }
   return prepared;
 }
 
-async function seedMem() {
-  ensureMemDb();
-  const res = await memQuery(
-    "SELECT COUNT(*)::int AS ok FROM users"
-  );
-  if (Number(res.rows[0]?.ok) > 0) return;
+async function seedDb() {
+  const conn = getDb();
+  applySchema(conn);
+  const rows = exec("SELECT COUNT(*) AS ok FROM users");
+  if (Number(rows[0]?.ok) > 0) return;
   const data = loadSeedData();
   for (const table of INSERT_ORDER) {
-    const rows = data[table];
-    if (!Array.isArray(rows) || !rows.length) continue;
-    const prepared = buildInsert(table, rows) as [string, unknown[]][];
-    if (!prepared) continue;
-    for (const [sql, values] of prepared) {
-      await memQuery(sql, values);
+    const rowsForTable = data[table];
+    if (!Array.isArray(rowsForTable) || !rowsForTable.length) continue;
+    for (const [sql, values] of buildInsert(table, rowsForTable)) {
+      run(sql, values);
     }
   }
 }
 
 // ------------------------------------------------------------------ facade
 
-let memReady = false;
 let seedPromise: Promise<void> | null = null;
 
 export async function query<T extends object = Record<string, unknown>>(
   text: string,
   params?: unknown[]
 ): Promise<T[]> {
-  if (isUsingPg()) {
-    const res = await getPool().query(text, params ?? []);
-    return res.rows.map((r) => normalizeRow(r)) as unknown as T[];
+  if (!seedPromise) {
+    seedPromise = seedDb().finally(() => {
+      seedPromise = null;
+    });
   }
-  if (!memReady) {
-    if (!seedPromise) {
-      seedPromise = seedMem()
-        .then(() => {
-          memReady = true;
-        })
-        .finally(() => {
-          seedPromise = null;
-        });
-    }
-    await seedPromise;
-  }
-  const res = await memQuery(text, params);
-  return res.rows as unknown as T[];
+  await seedPromise;
+  return exec(text, params) as unknown as T[];
 }
 
 export async function queryOne<T extends object = Record<string, unknown>>(
@@ -217,15 +247,20 @@ export async function queryOne<T extends object = Record<string, unknown>>(
 }
 
 export async function resetDb(): Promise<void> {
-  if (isUsingPg()) {
-    await getPool().query(
-      "TRUNCATE users, site_settings, social_links, pages, menu_items, media, resumes, skill_categories, skills, projects, project_links, project_skill, certifications, testimonials, contact_messages RESTART IDENTITY CASCADE"
-    );
-    return;
+  const file = process.env.DB_FILE;
+  if (db) {
+    db.close();
+    db = null;
   }
-  memReady = false;
-  memDb = null;
-  memClient = null;
+  if (file && file !== ":memory:") {
+    try {
+      // Drop the file so a fresh DB + seed is created on next access.
+      const { rmSync } = await import("node:fs");
+      rmSync(path.resolve(process.cwd(), file), { force: true });
+    } catch {
+      // ignore
+    }
+  }
   seedPromise = null;
 }
 

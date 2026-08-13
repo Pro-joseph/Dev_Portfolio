@@ -1,29 +1,20 @@
 #!/usr/bin/env node
 /**
- * Seed a real Postgres database from data/schema.sql + data/seed.json.
- * Requires DATABASE_URL in the environment.
+ * Seed a SQLite database from data/schema.sqlite.sql + data/seed.json.
+ * Requires DB_FILE in the environment (defaults to data/portfolio.db).
  */
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import pg from "pg";
+import { DatabaseSync } from "node:sqlite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 const DATA_DIR = path.join(ROOT, "data");
-
-const dbUrl = process.env.DATABASE_URL;
-if (!dbUrl) {
-  console.error("DATABASE_URL is required");
-  process.exit(1);
-}
-
-const pool = new pg.Pool({
-  connectionString: dbUrl,
-  ...(process.env.DATABASE_SSL !== "false"
-    ? { ssl: { rejectUnauthorized: false } }
-    : {}),
-});
+const DB_FILE = path.resolve(
+  ROOT,
+  process.env.DB_FILE || path.join(DATA_DIR, "portfolio.db")
+);
 
 const INSERT_ORDER = [
   "users",
@@ -43,53 +34,53 @@ const INSERT_ORDER = [
   "contact_messages",
 ];
 
-async function main() {
-  const schema = readFileSync(path.join(DATA_DIR, "schema.sql"), "utf8");
+function main() {
+  const schema = readFileSync(path.join(DATA_DIR, "schema.sqlite.sql"), "utf8");
   const seed = JSON.parse(
     readFileSync(path.join(DATA_DIR, "seed.json"), "utf8")
   );
 
+  mkdirSync(path.dirname(DB_FILE), { recursive: true });
+  rmSync(DB_FILE, { force: true });
+
+  const db = new DatabaseSync(DB_FILE);
+  db.exec("PRAGMA journal_mode = WAL");
+  db.exec("PRAGMA foreign_keys = ON");
+
+  console.log(`Seeding ${DB_FILE}...`);
+
   console.log("Applying schema...");
-  const statements = schema
-    .split("\n")
-    .filter((line) => !line.trim().startsWith("--"))
-    .join("\n")
-    .split(/;\s*(?:\r?\n|$)/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-  for (const stmt of statements) {
-    await pool.query(stmt);
-  }
+  db.exec(schema);
 
   console.log("Inserting seed data...");
   for (const table of INSERT_ORDER) {
     const rows = seed[table];
     if (!Array.isArray(rows) || !rows.length) continue;
     const cols = Object.keys(rows[0]);
-    const placeholders = cols.map((_, i) => `$${i + 1}`).join(", ");
+    const placeholders = cols.map(() => "?").join(", ");
+    const insert = db.prepare(
+      `INSERT INTO ${table} (${cols.join(", ")}) VALUES (${placeholders})`
+    );
     for (const row of rows) {
       const values = cols.map((c) => {
         const v = row[c];
         if (v === undefined || v === null) return null;
-        if (typeof v === "boolean") return v;
+        if (typeof v === "boolean") return v ? 1 : 0;
         if (typeof v === "object") return JSON.stringify(v);
         return v;
       });
-      await pool.query(
-        `INSERT INTO ${table} (${cols.join(", ")}) VALUES (${placeholders})`,
-        values
-      );
+      insert.run(...values);
     }
     console.log(`  - ${table}: ${rows.length}`);
   }
 
+  db.close();
   console.log("Done.");
 }
 
-main()
-  .then(() => pool.end())
-  .catch(async (e) => {
-    console.error(e);
-    await pool.end();
-    process.exit(1);
-  });
+try {
+  main();
+} catch (e) {
+  console.error(e);
+  process.exit(1);
+}
