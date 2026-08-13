@@ -121,7 +121,7 @@ export async function GET(request: Request): Promise<Response> {
       recent_projects: projects,
       media_storage: {
         used_bytes: usedBytes,
-        quota_bytes: 6 * 1024 * 1024 * 1024,
+        quota_bytes: Number(process.env.MEDIA_QUOTA_BYTES) || 6 * 1024 * 1024 * 1024,
         breakdown: categories,
       },
     });

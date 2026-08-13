@@ -4,6 +4,7 @@ import { queryOne, query } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, notFound } from "@/lib/http";
 import { handleError, parseId } from "@/lib/route-helpers";
+import { uploadRoot } from "@/lib/media-storage";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export async function DELETE(
     if (!media) return notFound();
 
     if (media.disk === "public") {
-      const filePath = path.join(process.cwd(), "public", String(media.path));
+      const filePath = path.join(uploadRoot(), path.basename(String(media.path)));
       try {
         await unlink(filePath);
       } catch {

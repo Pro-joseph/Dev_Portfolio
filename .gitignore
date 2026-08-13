@@ -46,6 +46,16 @@ yarn-error.log*
 /../Laravel
 /Laravel
 
+# runtime media uploads (seeded files remain tracked)
+/public/uploads/*.png
+/public/uploads/*.jpg
+/public/uploads/*.jpeg
+/public/uploads/*.gif
+/public/uploads/*.webp
+/public/uploads/*.mp4
+/public/uploads/*.pdf
+/public/uploads/*.tmp
+
 # vercel
 .vercel
 

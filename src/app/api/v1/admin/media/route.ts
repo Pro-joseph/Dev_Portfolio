@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/auth";
 import { json, validationError, paginate } from "@/lib/http";
 import { handleError } from "@/lib/route-helpers";
 import { mediaRowWithUrl } from "@/lib/admin-crud";
+import { uploadRoot, uploadRelPath } from "@/lib/media-storage";
 
 export const dynamic = "force-dynamic";
 
@@ -54,11 +55,12 @@ export async function POST(request: Request): Promise<Response> {
 
     const ext = path.extname(file.name) || (mime === "application/pdf" ? ".pdf" : "");
     const storedName = `${randomBytes(16).toString("hex")}${ext}`;
-    const relativePath = `uploads/${storedName}`;
+    const relativePath = uploadRelPath(storedName);
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    await mkdir(path.join(process.cwd(), "public", "uploads"), { recursive: true });
-    await writeFile(path.join(process.cwd(), "public", "uploads", storedName), buffer);
+    const root = uploadRoot();
+    await mkdir(root, { recursive: true });
+    await writeFile(path.join(root, storedName), buffer);
 
     const collection = (form.get("collection") as string) || null;
     const altText = (form.get("alt_text") as string) || null;

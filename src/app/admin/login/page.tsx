@@ -102,7 +102,7 @@ export default function AdminLoginPage() {
         </div>
 
         <p className="text-center text-[12px] text-ink-400 mt-6">
-          Demo: admin@josephlab.dev / josephlab-secret
+          Demo: admin@josephlab.dev / password
         </p>
       </div>
     </div>
