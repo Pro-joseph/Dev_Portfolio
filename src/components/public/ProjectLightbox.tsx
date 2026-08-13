@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Media } from "@/lib/types";
+import Image from "next/image";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 
 interface Props {
@@ -52,7 +53,7 @@ export default function ProjectLightbox({ images }: Props) {
             className="block w-full h-full cursor-zoom-in"
             aria-label={`Open ${images[0].alt_text ?? "project image"} in lightbox`}
           >
-            <img className="w-full h-full object-cover" src={images[0].url ?? ""} alt={images[0].alt_text ?? "JosephLab project image"} />
+            <Image className="w-full h-full object-cover" src={images[0].url ?? ""} alt={images[0].alt_text ?? "JosephLab project image"} width={1280} height={720} sizes="(max-width: 768px) 100vw, 66vw" />
           </button>
         </div>
         <div className="md:col-span-4 grid grid-rows-2 gap-6">
@@ -64,7 +65,7 @@ export default function ProjectLightbox({ images }: Props) {
                 className="block w-full h-full cursor-zoom-in"
                 aria-label={`Open ${image.alt_text ?? "project image"} in lightbox`}
               >
-                <img className="w-full h-full object-cover" src={image.url ?? ""} alt={image.alt_text ?? "JosephLab project image"} />
+                <Image className="w-full h-full object-cover" src={image.url ?? ""} alt={image.alt_text ?? "JosephLab project image"} width={640} height={640} sizes="(max-width: 768px) 100vw, 33vw" />
               </button>
             </div>
           ))}
@@ -113,10 +114,13 @@ export default function ProjectLightbox({ images }: Props) {
             <FaChevronRight />
           </button>
 
-          <img
+          <Image
             className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
             src={current.url ?? ""}
             alt={current.alt_text ?? "JosephLab project image"}
+            width={1920}
+            height={1080}
+            sizes="100vw"
           />
 
           <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/70 font-mono text-sm">

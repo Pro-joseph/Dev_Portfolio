@@ -1,5 +1,6 @@
 import { Project } from "@/lib/types";
 import Link from "next/link";
+import Image from "next/image";
 import { FaArrowRight } from "react-icons/fa";
 
 export default function ProjectCard({
@@ -35,11 +36,14 @@ export default function ProjectCard({
         <div className="grid grid-cols-3 gap-3">
           {[0, 1, 2].map((i) =>
             images[i] ? (
-              <img
+              <Image
                 key={i}
                 className="w-full aspect-[4/5] object-cover rounded-xl grayscale group-hover:grayscale-0 group-hover:scale-[1.03] transition-all duration-500"
                 src={images[i].url ?? ""}
                 alt={images[i].alt_text ?? project.title}
+                width={320}
+                height={400}
+                sizes="(max-width: 768px) 33vw, 320px"
               />
             ) : (
               <div key={i} className="w-full aspect-[4/5] rounded-xl bg-card" />

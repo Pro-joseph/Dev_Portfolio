@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Media } from "@/lib/types";
+import Image from "next/image";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 
 const SPANS = [
@@ -53,10 +54,13 @@ export default function Gallery({ images }: { images: Media[] }) {
             onClick={() => setActive(i)}
             className={`${SPANS[i % SPANS.length]} relative rounded-jumbo overflow-hidden group text-left cursor-zoom-in`}
           >
-            <img
+            <Image
               className="w-full h-full min-h-64 object-cover transition-transform duration-700 group-hover:scale-110"
               src={image.url ?? ""}
               alt={image.alt_text ?? "JosephLab systems gallery"}
+              width={640}
+              height={800}
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
             <span className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors duration-300" />
           </button>
@@ -101,10 +105,13 @@ export default function Gallery({ images }: { images: Media[] }) {
           >
             <FaChevronRight />
           </button>
-          <img
+          <Image
             className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
             src={current.url ?? ""}
             alt={current.alt_text ?? "JosephLab systems gallery"}
+            width={1920}
+            height={1080}
+            sizes="100vw"
           />
           <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/70 font-mono text-sm">
             {active! + 1} / {images.length}

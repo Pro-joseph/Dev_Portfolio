@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import useSWR from "swr";
+import Image from "next/image";
 import { http } from "@/lib/api";
 import { Paginated } from "@/lib/types";
 import { Spinner, Toast, EmptyState } from "@/components/admin/ui";
@@ -136,7 +137,7 @@ export default function MediaPage() {
             >
               <div className="aspect-video bg-ink-100 flex items-center justify-center relative overflow-hidden">
                 {isImage(item.mime_type) ? (
-                  <img src={item.url} alt={item.filename} className="w-full h-full object-cover" />
+                  <Image src={item.url} alt={item.filename} width={640} height={360} sizes="(max-width: 768px) 50vw, 25vw" className="w-full h-full object-cover" />
                 ) : (
                   <PiFile className="text-[34px] text-ink-300" />
                 )}

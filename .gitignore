@@ -40,7 +40,12 @@ yarn-error.log*
 
 # local sqlite / data
 /data/*.db
+/data/*.db-wal
+/data/*.db-shm
 *.sqlite
+
+# deployment bundles (contain .env.production secrets)
+joseph-portfolio-deploy.zip
 
 # sibling laravel backend (removed after migration)
 /../Laravel

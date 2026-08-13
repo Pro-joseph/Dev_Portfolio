@@ -1,4 +1,5 @@
 import { Testimonial } from "@/lib/types";
+import Image from "next/image";
 import { FaQuoteLeft } from "react-icons/fa";
 
 export default function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
@@ -8,9 +9,11 @@ export default function TestimonialCard({ testimonial }: { testimonial: Testimon
       <p className="text-xl mb-8 leading-relaxed font-heading">&ldquo;{testimonial.quote}&rdquo;</p>
       <div className="flex items-center gap-4">
         {testimonial.avatar?.url ? (
-          <img
+          <Image
             src={testimonial.avatar.url}
             alt={testimonial.author}
+            width={64}
+            height={64}
             className="w-16 h-16 rounded-full object-cover ring-2 ring-accent/30"
           />
         ) : (

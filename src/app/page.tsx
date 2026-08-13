@@ -1,9 +1,5 @@
-import {
-  getSiteData,
-  getProjectsFull,
-  getSkillCategories,
-  getTestimonialsData,
-} from "@/lib/resources";
+import { getSiteData, getProjectsFull, getSkillCategories, getTestimonialsData } from "@/lib/resources";
+import Image from "next/image";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
 import SectionHeader from "@/components/public/SectionHeader";
@@ -94,10 +90,13 @@ export default async function HomePage() {
               {settings.hero_image && (
                 <Reveal delay={200} className="w-full max-w-md">
                   <div className="relative aspect-video rounded-jumbo overflow-hidden shadow-2xl ring-1 ring-line group">
-                    <img
+                    <Image
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       src={settings.hero_image}
                       alt="JosephLab abstract software dashboard"
+                      width={960}
+                      height={540}
+                      sizes="(max-width: 1024px) 100vw, 42vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent pointer-events-none" />
                     <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-surface/80 backdrop-blur-md px-4 py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest text-secondary">
