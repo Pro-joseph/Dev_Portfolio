@@ -1,6 +1,9 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
+  outputFileTracingRoot: path.join(__dirname),
   images: {
     // Serve images as-is. The seed data references remote Google-hosted
     // URLs and local /uploads files; cPanel shared hosting has no sharp,

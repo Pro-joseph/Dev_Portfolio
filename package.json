@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start:prod": "NODE_ENV=production node server.js",
     "seed": "node scripts/seed.mjs",
     "lint": "eslint",
     "test": "vitest run"

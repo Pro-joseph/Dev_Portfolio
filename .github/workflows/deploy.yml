@@ -1,4 +1,4 @@
-name: Deploy to cPanel
+name: Deploy to cPanel (FTP)
 
 on:
   push:
@@ -19,19 +19,43 @@ jobs:
       - run: npm test
 
   deploy:
-    name: Deploy
+    name: Build & FTP Deploy
     needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.2.0
+      - uses: actions/setup-node@v4
         with:
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            cd ${{ vars.APP_ROOT }}
-            /bin/bash scripts/deploy.sh
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (standalone output)
+        run: npm run build
+
+      - name: Assemble deploy bundle
+        run: |
+          mkdir -p deploy
+          # Standalone runtime (server.js + traced node_modules)
+          cp -r .next/standalone/. deploy/
+          # Static assets Next expects next to the server
+          cp -r .next/static deploy/.next/static
+          # Public assets (media uploads, favicon, etc.)
+          cp -r public deploy/public
+          # Schema + seed for auto-provisioning the SQLite DB on first boot
+          mkdir -p deploy/data
+          cp data/schema.sqlite.sql data/seed.json deploy/data/
+
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ${{ secrets.FTP_PROTOCOL }}
+          local-dir: deploy/
+          server-dir: ${{ vars.SERVER_DIR }}
+          dangerous-clean-slate: false
