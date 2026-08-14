@@ -42,7 +42,18 @@ jobs:
           cp -r .next/standalone/. deploy/
           # Static assets Next expects next to the server
           cp -r .next/static deploy/.next/static
-          # Public assets (media uploads, favicon, etc.)
+          # Prune repo pollution the file tracer copied into standalone/
+          # (process.cwd()-relative data/ reads defeat the tracer, so the
+          # whole project ends up in .next/standalone — strip all of it).
+          rm -rf deploy/src deploy/tests deploy/docs deploy/scripts \
+            deploy/AGENTS.md deploy/CLAUDE.md deploy/README.md \
+            deploy/next.config.ts deploy/package-lock.json \
+            deploy/postcss.config.mjs deploy/tsconfig.json \
+            deploy/tsconfig.tsbuildinfo deploy/vitest.config.mjs \
+            deploy/eslint.config.mjs deploy/joseph-portfolio-deploy.zip \
+            deploy/.env.production
+          # Re-add public and data cleanly (standalone copies were polluted)
+          rm -rf deploy/public deploy/data
           cp -r public deploy/public
           # Schema + seed for auto-provisioning the SQLite DB on first boot
           mkdir -p deploy/data
