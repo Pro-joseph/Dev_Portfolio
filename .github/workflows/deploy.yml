@@ -68,5 +68,9 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           protocol: ${{ secrets.FTP_PROTOCOL }}
           local-dir: deploy/
-          server-dir: ${{ vars.SERVER_DIR }}
+          # The FTP account is rooted at the app folder
+          # (/home/josecciq/josephlab.dev/Portfolio/), so the server-dir is the
+          # FTP home root. Do NOT set this to an absolute path or a nested path
+          # — the FTP client resolves it relative to the account home.
+          server-dir: /
           dangerous-clean-slate: false
