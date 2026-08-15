@@ -6,7 +6,12 @@ import { requireAdmin } from "@/lib/auth";
 import { json, validationError, paginate } from "@/lib/http";
 import { handleError } from "@/lib/route-helpers";
 import { mediaRowWithUrl } from "@/lib/admin-crud";
-import { uploadRoot, uploadRelPath } from "@/lib/media-storage";
+import {
+  supabaseEnabled,
+  saveMediaFile,
+  uploadRoot,
+  uploadRelPath,
+} from "@/lib/media-storage";
 
 export const dynamic = "force-dynamic";
 
@@ -58,9 +63,14 @@ export async function POST(request: Request): Promise<Response> {
     const relativePath = uploadRelPath(storedName);
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const root = uploadRoot();
-    await mkdir(root, { recursive: true });
-    await writeFile(path.join(root, storedName), buffer);
+    const disk = supabaseEnabled() ? "supabase" : "public";
+    if (disk === "supabase") {
+      await saveMediaFile(buffer, storedName);
+    } else {
+      const root = uploadRoot();
+      await mkdir(root, { recursive: true });
+      await writeFile(path.join(root, storedName), buffer);
+    }
 
     const collection = (form.get("collection") as string) || null;
     const altText = (form.get("alt_text") as string) || null;
@@ -76,7 +86,7 @@ export async function POST(request: Request): Promise<Response> {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 0, $11, $11)`,
       [
         id,
-        "public",
+        disk,
         relativePath,
         file.name,
         mime,

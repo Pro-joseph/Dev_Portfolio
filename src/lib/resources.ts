@@ -1,4 +1,5 @@
 import { query, queryOne } from "./db";
+import { mediaPublicUrl } from "./media-storage";
 import type {
   Certification,
   Project,
@@ -86,6 +87,7 @@ export function toDateString(value: string | Date | null | undefined): string | 
 
 export function mediaUrl(row: { disk: string; path: string }): string {
   if (row.disk === "url") return row.path;
+  if (row.disk === "supabase") return mediaPublicUrl(row.path) ?? row.path;
   return `/${row.path.replace(/^\/+/, "")}`;
 }
 

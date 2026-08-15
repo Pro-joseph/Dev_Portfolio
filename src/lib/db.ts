@@ -1,9 +1,11 @@
 import { mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import postgres from "postgres";
 
 const DATA_DIR = path.join(process.cwd(), "data");
-const SCHEMA_PATH = path.join(DATA_DIR, "schema.sqlite.sql");
+
+const USE_POSTGRES = Boolean(process.env.DATABASE_URL?.trim());
 
 type SeedData = Record<string, unknown[] | undefined>;
 function loadSeedData(): SeedData {
@@ -56,6 +58,25 @@ function normalizeRow(raw: Record<string, unknown>): Record<string, unknown> {
   return out;
 }
 
+// ---------------------------------------------------------------- postgres
+
+let pg: ReturnType<typeof postgres> | null = null;
+
+function getPg() {
+  if (!pg) {
+    pg = postgres(process.env.DATABASE_URL as string, {
+      max: 1,
+      idle_timeout: 20,
+    });
+  }
+  return pg;
+}
+
+// ---------------------------------------------------------------- sqlite
+
+let sqlite: DatabaseSync | null = null;
+let dbPath: string | null = null;
+
 function toBindValue(v: unknown): null | number | string {
   if (typeof v === "boolean") return v ? 1 : 0;
   if (v === undefined || v === null) return null;
@@ -107,13 +128,8 @@ function translateSql(
   return { sql: out.join(""), params: outParams };
 }
 
-// ---------------------------------------------------------------- sqlite
-
-let db: DatabaseSync | null = null;
-let dbPath: string | null = null;
-
-function getDb(): DatabaseSync {
-  if (db) return db;
+function getSqlite(): DatabaseSync {
+  if (sqlite) return sqlite;
   const file = process.env.DB_FILE;
   dbPath = file && file !== ":memory:" ? path.resolve(process.cwd(), file) : null;
   if (dbPath) {
@@ -124,27 +140,45 @@ function getDb(): DatabaseSync {
     conn.exec("PRAGMA journal_mode = WAL");
     conn.exec("PRAGMA foreign_keys = ON");
   }
-  db = conn;
+  sqlite = conn;
   return conn;
 }
 
-function applySchema(conn: DatabaseSync): void {
-  const raw = readFileSync(SCHEMA_PATH, "utf8");
+function applySqliteSchema(conn: DatabaseSync): void {
+  const raw = readFileSync(path.join(DATA_DIR, "schema.sqlite.sql"), "utf8");
   conn.exec(raw);
 }
 
-function exec(text: string, params: unknown[] = []): Record<string, unknown>[] {
-  const conn = getDb();
+// ------------------------------------------------------------- query exec
+
+async function exec(
+  text: string,
+  params: unknown[] = []
+): Promise<Record<string, unknown>[]> {
+  if (USE_POSTGRES) {
+    const bind = params.map((p) => (p === undefined ? null : p)) as never[];
+    const rows = (await getPg().unsafe(text, bind)) as Record<
+      string,
+      unknown
+    >[];
+    return rows.map((r) => normalizeRow(r));
+  }
+  const conn = getSqlite();
   const { sql, params: bind } = translateSql(text, params);
   const stmt = conn.prepare(sql);
-  const rows = (stmt.all(...bind) as Record<string, unknown>[]).map(
-    (r) => normalizeRow(r) as Record<string, unknown>
+  const rows = (stmt.all(...bind) as Record<string, unknown>[]).map((r) =>
+    normalizeRow(r)
   );
   return rows;
 }
 
-function run(text: string, params: unknown[] = []): void {
-  const conn = getDb();
+async function run(text: string, params: unknown[] = []): Promise<void> {
+  if (USE_POSTGRES) {
+    const bind = params.map((p) => (p === undefined ? null : p)) as never[];
+    await getPg().unsafe(text, bind);
+    return;
+  }
+  const conn = getSqlite();
   const { sql, params: bind } = translateSql(text, params);
   const stmt = conn.prepare(sql);
   stmt.run(...bind);
@@ -197,7 +231,10 @@ function buildInsert(table: SeedTable, rows: unknown[]): [string, unknown[]][] {
     const values = cols.map((c) => {
       const v = (row as Record<string, unknown>)[c];
       if (v === undefined) return null;
-      if (typeof v === "boolean") return v ? 1 : 0;
+      if (BOOLEAN_KEYS.has(c)) {
+        // SQLite binds 1/0 (toBindValue), Postgres gets a real boolean.
+        return v === true || v === 1 || v === "1" || v === "true";
+      }
       if (typeof v === "object" && v !== null) return JSON.stringify(v);
       return v;
     });
@@ -206,17 +243,25 @@ function buildInsert(table: SeedTable, rows: unknown[]): [string, unknown[]][] {
   return prepared;
 }
 
+async function applySchema(): Promise<void> {
+  if (USE_POSTGRES) {
+    const raw = readFileSync(path.join(DATA_DIR, "schema.postgres.sql"), "utf8");
+    await getPg().unsafe(raw);
+    return;
+  }
+  applySqliteSchema(getSqlite());
+}
+
 async function seedDb() {
-  const conn = getDb();
-  applySchema(conn);
-  const rows = exec("SELECT COUNT(*) AS ok FROM users");
+  await applySchema();
+  const rows = await exec("SELECT COUNT(*) AS ok FROM users");
   if (Number(rows[0]?.ok) > 0) return;
   const data = loadSeedData();
   for (const table of INSERT_ORDER) {
     const rowsForTable = data[table];
     if (!Array.isArray(rowsForTable) || !rowsForTable.length) continue;
     for (const [sql, values] of buildInsert(table, rowsForTable)) {
-      run(sql, values);
+      await run(sql, values);
     }
   }
 }
@@ -247,10 +292,15 @@ export async function queryOne<T extends object = Record<string, unknown>>(
 }
 
 export async function resetDb(): Promise<void> {
+  if (USE_POSTGRES) {
+    // Non-destructive: tests run against the in-memory SQLite path.
+    seedPromise = null;
+    return;
+  }
   const file = process.env.DB_FILE;
-  if (db) {
-    db.close();
-    db = null;
+  if (sqlite) {
+    sqlite.close();
+    sqlite = null;
   }
   if (file && file !== ":memory:") {
     try {

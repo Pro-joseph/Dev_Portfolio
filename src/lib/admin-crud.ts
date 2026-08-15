@@ -1,4 +1,5 @@
 import { query, queryOne, nextId } from "./db";
+import { mediaPublicUrl } from "./media-storage";
 import { uniqueSlug } from "./slug";
 import { json, validationError, notFound, paginate } from "./http";
 
@@ -131,6 +132,7 @@ export function mediaUrlFor(raw: Record<string, unknown>): string {
   const disk = String(raw.disk ?? "public");
   const path = String(raw.path ?? "");
   if (disk === "url") return path;
+  if (disk === "supabase") return mediaPublicUrl(path) ?? path;
   return `/${path.replace(/^\/+/, "")}`;
 }
 
