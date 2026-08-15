@@ -92,7 +92,7 @@ export default function MediaPage() {
           ref={inputRef}
           type="file"
           className="hidden"
-          accept="image/*,.pdf,.doc,.docx,.txt"
+          accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml,application/pdf,video/mp4"
           onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
         />
         <div className="flex flex-col items-center gap-3">
@@ -115,7 +115,7 @@ export default function MediaPage() {
                 </>
               )}
             </p>
-            <p className="text-[12px] text-ink-400 mt-0.5">Images, PDFs, documents · up to 2 GB</p>
+            <p className="text-[12px] text-ink-400 mt-0.5">Images, PDFs, videos · up to 10 MB</p>
           </div>
         </div>
       </div>

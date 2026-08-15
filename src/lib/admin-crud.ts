@@ -28,6 +28,30 @@ function laravelDateOnly(value: string | Date | null | undefined): string | null
 
 type CastKind = "bool" | "int" | "datetime" | "date" | "json";
 
+const TIMESTAMPED_TABLES = new Set([
+  "users",
+  "pages",
+  "media",
+  "resumes",
+  "skills",
+  "projects",
+  "certifications",
+  "testimonials",
+  "contact_messages",
+]);
+
+const UPDATED_ONLY_TABLES = new Set(["site_settings"]);
+
+function applyTimestamps(table: string, data: Record<string, unknown>): void {
+  const now = new Date().toISOString();
+  if (TIMESTAMPED_TABLES.has(table)) {
+    if (!data.created_at) data.created_at = now;
+    if (!data.updated_at) data.updated_at = now;
+  } else if (UPDATED_ONLY_TABLES.has(table)) {
+    if (!data.updated_at) data.updated_at = now;
+  }
+}
+
 const TABLE_CASTS: Record<string, Record<string, CastKind>> = {
   projects: {
     is_featured: "bool",
@@ -361,10 +385,7 @@ export async function crudStore(crud: Crud, request: Request): Promise<Response>
   let data = result.data;
 
   data = await ensureSlug(crud, data);
-  if (crud.table !== "site_settings") {
-    if (!data.created_at) data.created_at = new Date().toISOString();
-    if (!data.updated_at) data.updated_at = new Date().toISOString();
-  }
+  applyTimestamps(crud.table, data);
 
   const id = await nextId(crud.table);
   data = { id, ...data };
@@ -426,7 +447,7 @@ export async function crudUpdate(crud: Crud, id: number, request: Request): Prom
     await crud.afterUpdate(id, data, existing);
   }
 
-  if (crud.table !== "site_settings") data.updated_at = new Date().toISOString();
+  applyTimestamps(crud.table, data);
 
   const virtuals = new Set(crud.virtualFields ?? []);
   const cols = Object.keys(data).filter((c) => !virtuals.has(c));

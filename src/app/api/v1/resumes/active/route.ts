@@ -1,5 +1,5 @@
 import { query } from "@/lib/db";
-import { mediaUrl } from "@/lib/resources";
+import { resumeDownloadUrl } from "@/lib/resources";
 import { json } from "@/lib/http";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,7 @@ export async function GET(): Promise<Response> {
       id: row.resume_id,
       label: row.label,
       language: row.language,
-      url: mediaUrl({ disk: row.media_disk, path: row.media_path }),
+      url: resumeDownloadUrl({ disk: row.media_disk, path: row.media_path }),
     },
   });
 }

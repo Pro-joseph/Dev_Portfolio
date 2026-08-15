@@ -91,6 +91,20 @@ export function mediaUrl(row: { disk: string; path: string }): string {
   return `/${row.path.replace(/^\/+/, "")}`;
 }
 
+/**
+ * URL for the resume download button. Supabase public object URLs are told to
+ * send a Content-Disposition attachment via the `download` query param, so
+ * clicking the button downloads the file instead of opening it in the tab.
+ */
+export function resumeDownloadUrl(row: { disk: string; path: string }): string {
+  const url = mediaUrl(row);
+  if (row.disk === "supabase") {
+    const sep = url.includes("?") ? "&" : "?";
+    return `${url}${sep}download=`;
+  }
+  return url;
+}
+
 // ------------------------------------------------------------- media
 
 export function mediaResource(row: MediaRow | null | undefined): Record<string, unknown> | null {
@@ -362,7 +376,7 @@ async function loadSiteData(): Promise<{
         id: resumes[0].resume_id,
         label: resumes[0].label,
         language: resumes[0].language,
-        url: mediaUrl({ disk: resumes[0].media_disk, path: resumes[0].media_path }),
+        url: resumeDownloadUrl({ disk: resumes[0].media_disk, path: resumes[0].media_path }),
       }
     : null;
 

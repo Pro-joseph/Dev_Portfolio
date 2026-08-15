@@ -17,6 +17,7 @@ export default function Nav({ resumeUrl }: { resumeUrl?: string | null }) {
       {resumeUrl ? (
         <a
           href={resumeUrl}
+          download
           target="_blank"
           rel="noreferrer"
           className="group relative overflow-hidden bg-primary text-white px-6 py-2 rounded-full text-xs font-bold tracking-widest hover:bg-gray-800 transition-colors"
