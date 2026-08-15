@@ -272,26 +272,31 @@ const INSERT_ORDER: SeedTable[] = [
   "contact_messages",
 ];
 
+const PK_COLUMNS: Partial<Record<SeedTable, string[]>> = {
+  project_skill: ["project_id", "skill_id"],
+};
+
 function buildInsert(table: SeedTable, rows: unknown[]): [string, unknown[]][] {
   if (!rows.length) return [];
   const cols = Object.keys(rows[0] as Record<string, unknown>);
-  const placeholders = cols.map((_, i) => `$${i + 1}`).join(", ");
-  const sql = `INSERT INTO ${table} (${cols.join(", ")}) VALUES (${placeholders})`;
-  const prepared: [string, unknown[]][] = [];
+  const conflict = (PK_COLUMNS[table] ?? ["id"]).join(", ");
+  const valuesList: unknown[] = [];
+  const rowGroup: string[] = [];
+  let offset = 0;
   for (const row of rows) {
-    const values = cols.map((c) => {
+    const placeholders = cols.map((_, i) => `$${offset + i + 1}`).join(", ");
+    rowGroup.push(`(${placeholders})`);
+    for (const c of cols) {
       const v = (row as Record<string, unknown>)[c];
-      if (v === undefined) return null;
-      if (BOOLEAN_KEYS.has(c)) {
-        // SQLite binds 1/0 (toBindValue), Postgres gets a real boolean.
-        return v === true || v === 1 || v === "1" || v === "true";
-      }
-      if (typeof v === "object" && v !== null) return JSON.stringify(v);
-      return v;
-    });
-    prepared.push([sql, values]);
+      if (v === undefined) valuesList.push(null);
+      else if (typeof v === "object" && v !== null) valuesList.push(JSON.stringify(v));
+      else valuesList.push(v);
+    }
+    offset += cols.length;
   }
-  return prepared;
+  const sql = `INSERT INTO ${table} (${cols.join(", ")}) VALUES ${rowGroup.join(", ")}
+    ON CONFLICT (${conflict}) DO NOTHING`;
+  return [[sql, valuesList]];
 }
 
 async function applySchema(): Promise<void> {
@@ -303,10 +308,15 @@ async function applySchema(): Promise<void> {
   applySqliteSchema(getSqlite());
 }
 
+const SEED_FLAG_KEY = "_seed_complete";
+const SEED_FLAG_ID = 999999001;
+
 async function seedDb() {
   await applySchema();
-  const rows = await exec("SELECT COUNT(*) AS ok FROM users");
-  if (Number(rows[0]?.ok) > 0) return;
+  const flag = await exec("SELECT value FROM site_settings WHERE key = $1", [
+    SEED_FLAG_KEY,
+  ]);
+  if (flag.length && flag[0]?.value) return;
   const data = loadSeedData();
   for (const table of INSERT_ORDER) {
     const rowsForTable = data[table];
@@ -315,6 +325,10 @@ async function seedDb() {
       await run(sql, values);
     }
   }
+  await run(
+    "INSERT INTO site_settings (id, key, value, type, updated_at) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (key) DO NOTHING",
+    [SEED_FLAG_ID, SEED_FLAG_KEY, "1", "flag", new Date().toISOString()]
+  );
 }
 
 // ------------------------------------------------------------------ facade

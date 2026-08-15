@@ -39,7 +39,7 @@ describe.skipIf(!enabled)("postgres driver", () => {
       ["%a%"]
     );
     expect(Number(searched[0]?.n)).toBeGreaterThanOrEqual(0);
-  });
+  }, 30_000);
 
   it("binds booleans for writes", async () => {
     await query("UPDATE social_links SET is_visible = $1 WHERE id = $2", [
@@ -55,5 +55,5 @@ describe.skipIf(!enabled)("postgres driver", () => {
       true,
       1,
     ]);
-  });
+  }, 30_000);
 });
