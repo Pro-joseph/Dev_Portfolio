@@ -5,7 +5,15 @@ import postgres from "postgres";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
-const USE_POSTGRES = Boolean(process.env.DATABASE_URL?.trim());
+/**
+ * Resolved Postgres connection string. Accepts both `DATABASE_URL` and the
+ * `POSTGRES_URL` (transaction pooler) that the Vercel-Supabase integration
+ * syncs. `POSTGRES_URL_NON_POOLING` is deliberately NOT used: it is the
+ * direct IPv6 endpoint, unreachable from Vercel serverless.
+ */
+const DATABASE_URL = (process.env.DATABASE_URL || process.env.POSTGRES_URL || "").trim();
+
+const USE_POSTGRES = Boolean(DATABASE_URL);
 
 if (
   process.env.VERCEL === "1" &&
@@ -13,9 +21,9 @@ if (
   !USE_POSTGRES
 ) {
   console.error(
-    "[db] DATABASE_URL is not set. The app is falling back to an ephemeral " +
-      "in-memory SQLite database: reads work, but no writes persist. " +
-      "Set DATABASE_URL (Supabase transaction pooler) in the Vercel project."
+    "[db] DATABASE_URL/POSTGRES_URL is not set. The app is falling back to an " +
+      "ephemeral in-memory SQLite database: reads work, but no writes persist. " +
+      "Link Supabase to Vercel or set DATABASE_URL (transaction pooler)."
   );
 }
 
@@ -32,7 +40,7 @@ function pgSslConfig(): boolean | "verify-full" | "require" {
     return false;
   }
   try {
-    const url = new URL(process.env.DATABASE_URL as string);
+    const url = new URL(DATABASE_URL);
     const sslmode = url.searchParams.get("sslmode");
     if (sslmode === "disable") return false;
     if (sslmode === "verify-full" || sslmode === "verify-ca") return "verify-full";
@@ -106,7 +114,7 @@ let pg: ReturnType<typeof postgres> | null = null;
 
 function getPg() {
   if (!pg) {
-    pg = postgres(process.env.DATABASE_URL as string, {
+    pg = postgres(DATABASE_URL, {
       max: 1,
       idle_timeout: 20,
       ssl: pgSslConfig(),
@@ -174,7 +182,7 @@ function translateSql(
 function getSqlite(): DatabaseSync {
   if (sqlite) return sqlite;
   const file = process.env.DB_FILE;
-  dbPath = file && file !== ":memory:" ? path.resolve(process.cwd(), file) : null;
+  dbPath = file && file !== ":memory:" ? path.resolve(/* turbopackIgnore: true */ process.cwd(), file) : null;
   if (dbPath) {
     mkdirSync(path.dirname(dbPath), { recursive: true });
   }
@@ -349,7 +357,7 @@ export async function resetDb(): Promise<void> {
     try {
       // Drop the file so a fresh DB + seed is created on next access.
       const { rmSync } = await import("node:fs");
-      rmSync(path.resolve(process.cwd(), file), { force: true });
+      rmSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), file), { force: true });
     } catch {
       // ignore
     }

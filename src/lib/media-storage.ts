@@ -12,7 +12,7 @@ export function uploadRoot(): string {
   if (!configured) return path.join(process.cwd(), "public", "uploads");
   return path.isAbsolute(configured)
     ? configured
-    : path.join(process.cwd(), configured);
+    : path.join(/* turbopackIgnore: true */ process.cwd(), configured);
 }
 
 /**
@@ -35,9 +35,21 @@ export function uploadRelPath(storedName: string): string {
 
 // ---------------------------------------------------------------- supabase
 
+/**
+ * Server-side key for Supabase Storage. Accepts both `SUPABASE_SERVICE_ROLE_KEY`
+ * and `SUPABASE_SECRET_KEY` (the name the Vercel-Supabase integration syncs).
+ */
+function serviceRoleKey(): string {
+  return (
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
+    process.env.SUPABASE_SECRET_KEY?.trim() ||
+    ""
+  );
+}
+
 export function supabaseEnabled(): boolean {
   return Boolean(
-    process.env.SUPABASE_URL?.trim() && process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+    process.env.SUPABASE_URL?.trim() && serviceRoleKey()
   );
 }
 
@@ -51,7 +63,7 @@ function getSupabase(): SupabaseClient {
   if (!sb) {
     sb = createClient(
       process.env.SUPABASE_URL as string,
-      process.env.SUPABASE_SERVICE_ROLE_KEY as string,
+      serviceRoleKey(),
       { auth: { persistSession: false } }
     );
   }
