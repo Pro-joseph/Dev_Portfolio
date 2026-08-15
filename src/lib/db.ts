@@ -7,6 +7,48 @@ const DATA_DIR = path.join(process.cwd(), "data");
 
 const USE_POSTGRES = Boolean(process.env.DATABASE_URL?.trim());
 
+if (
+  process.env.VERCEL === "1" &&
+  process.env.VERCEL_ENV === "production" &&
+  !USE_POSTGRES
+) {
+  console.error(
+    "[db] DATABASE_URL is not set. The app is falling back to an ephemeral " +
+      "in-memory SQLite database: reads work, but no writes persist. " +
+      "Set DATABASE_URL (Supabase transaction pooler) in the Vercel project."
+  );
+}
+
+/**
+ * SSL strategy for the Postgres driver:
+ *  - DATABASE_SSL=false disables TLS (local Docker/dev).
+ *  - otherwise honor `?sslmode=` from the connection string
+ *    (disable -> off; verify-* -> verify; require/prefer/allow -> require).
+ *  - with no sslmode, default to require for remote hosts and off for localhost.
+ */
+function pgSslConfig(): boolean | "verify-full" | "require" {
+  const override = process.env.DATABASE_SSL?.trim().toLowerCase();
+  if (override === "false" || override === "disable" || override === "0") {
+    return false;
+  }
+  try {
+    const url = new URL(process.env.DATABASE_URL as string);
+    const sslmode = url.searchParams.get("sslmode");
+    if (sslmode === "disable") return false;
+    if (sslmode === "verify-full" || sslmode === "verify-ca") return "verify-full";
+    if (sslmode === "require" || sslmode === "prefer" || sslmode === "allow") {
+      return "require";
+    }
+    const host = url.hostname;
+    if (host === "localhost" || host === "127.0.0.1" || host.endsWith(".local")) {
+      return false;
+    }
+    return "require";
+  } catch {
+    return "require";
+  }
+}
+
 type SeedData = Record<string, unknown[] | undefined>;
 function loadSeedData(): SeedData {
   return JSON.parse(readFileSync(path.join(DATA_DIR, "seed.json"), "utf8"));
@@ -67,6 +109,7 @@ function getPg() {
     pg = postgres(process.env.DATABASE_URL as string, {
       max: 1,
       idle_timeout: 20,
+      ssl: pgSslConfig(),
     });
   }
   return pg;

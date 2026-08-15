@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { query, queryOne, nextId, resetDb } from "../src/lib/db";
+import { query, queryOne, nextId, resetDb } from "./db";
 
 /**
  * Postgres driver smoke test. Runs only when BOTH DATABASE_URL and
