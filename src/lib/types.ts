@@ -177,6 +177,7 @@ export interface DashboardStats {
   published_projects: number;
   draft_projects: number;
   total_skills: number;
+  total_certifications: number;
   unread_messages: number;
   total_messages: number;
   active_resume: { label: string; language: string; url: string } | null;
@@ -193,4 +194,12 @@ export interface DashboardStats {
     quota_bytes: number;
     breakdown: { images: number; documents: number; video: number; other: number };
   };
+}
+
+export interface SystemStatus {
+  ok: boolean;
+  status: string;
+  db: { ok: boolean; latency_ms: number };
+  storage: { status: string; latency_ms: number | null };
+  timestamp: string;
 }

@@ -28,6 +28,7 @@ const fmtSize = (kb: number) => {
 export default function MediaPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const [toasts, setToasts] = useState<{ id: number; message: string; type: "success" | "error" }[]>([]);
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
@@ -90,7 +91,30 @@ export default function MediaPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border-2 border-dashed border-ink-300 p-8 text-center">
+      <div
+        onClick={() => inputRef.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragEnter={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          setDragging(false);
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          const files = Array.from(e.dataTransfer.files ?? []);
+          files.forEach((f) => f && onFile(f));
+        }}
+        className={`bg-white rounded-2xl border-2 border-dashed p-8 text-center cursor-pointer transition-colors ${
+          dragging ? "border-sky-400 bg-sky-50/50" : "border-ink-300"
+        }`}
+      >
         <input
           ref={inputRef}
           type="file"
@@ -110,7 +134,10 @@ export default function MediaPage() {
                 <>
                   Drop files here or{" "}
                   <button
-                    onClick={() => inputRef.current?.click()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      inputRef.current?.click();
+                    }}
                     className="text-sky-600 hover:text-sky-700 font-semibold"
                   >
                     browse

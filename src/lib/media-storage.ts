@@ -60,7 +60,7 @@ export function bucketName(): string {
 
 let sb: SupabaseClient | null = null;
 
-function getSupabase(): SupabaseClient {
+export function getSupabase(): SupabaseClient {
   if (!sb) {
     sb = createClient(
       process.env.SUPABASE_URL as string,

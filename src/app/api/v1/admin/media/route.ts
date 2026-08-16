@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
-import { query, nextId } from "@/lib/db";
+import { query, queryOne, nextId } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, validationError, paginate } from "@/lib/http";
 import { handleError } from "@/lib/route-helpers";
@@ -22,14 +22,19 @@ export async function GET(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
     const perPage = Math.max(1, Number(url.searchParams.get("per_page")) || PAGE_SIZE_MEDIA);
+    const search = url.searchParams.get("search")?.trim() ?? "";
 
-    const totalRow = await query<{ n: number }>(
-      "SELECT COUNT(*)::int AS n FROM media"
+    const where = search ? " WHERE filename ILIKE $1" : "";
+    const params: unknown[] = search ? [`%${search}%`] : [];
+
+    const totalRow = await queryOne<{ n: number }>(
+      `SELECT COUNT(*)::int AS n FROM media${where}`,
+      params
     );
-    const total = Number(totalRow[0]?.n ?? 0);
+    const total = Number(totalRow?.n ?? 0);
     const rows = await query(
-      "SELECT * FROM media ORDER BY id DESC LIMIT $1 OFFSET $2",
-      [perPage, (page - 1) * perPage]
+      `SELECT * FROM media${where} ORDER BY id DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+      [...params, perPage, (page - 1) * perPage]
     );
 
     const data = rows.map(mediaRowWithUrl);

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { getToken, subscribeToken } from "@/lib/api";
 import Sidebar from "@/components/admin/Sidebar";
 import Topbar from "@/components/admin/Topbar";
+import { DashboardRangeProvider } from "@/components/admin/admin-context";
 
 const subscribeNoop = () => () => {};
 const getClientHydrated = () => true;
@@ -41,14 +42,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="h-screen w-full overflow-hidden flex bg-[#f8fafc] text-ink-900 font-sans antialiased">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Topbar />
-        <main className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-[1400px] mx-auto">{children}</div>
-        </main>
+    <DashboardRangeProvider>
+      <div className="h-screen w-full overflow-hidden flex bg-[#f8fafc] text-ink-900 font-sans antialiased">
+        <Sidebar />
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          <Topbar />
+          <main className="flex-1 overflow-y-auto p-8">
+            <div className="max-w-[1400px] mx-auto">{children}</div>
+          </main>
+        </div>
       </div>
-    </div>
+    </DashboardRangeProvider>
   );
 }

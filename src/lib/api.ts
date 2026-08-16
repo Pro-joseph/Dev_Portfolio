@@ -115,6 +115,29 @@ export const http = {
           : {}),
       },
     }),
+  download: async (path: string, options?: ApiOptions): Promise<Blob> => {
+    const token = getToken();
+    const headers: Record<string, string> = {
+      Accept: "text/csv,application/octet-stream",
+    };
+    if (options?.auth !== false && token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    const response = await fetch(`${API_URL}${path}`, {
+      headers,
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      let data: unknown = null;
+      try {
+        data = await response.json();
+      } catch {
+        /* non-JSON error body */
+      }
+      throw new ApiError(response.status, data);
+    }
+    return response.blob();
+  },
 };
 
 export function requireLogin(admin = true): void {

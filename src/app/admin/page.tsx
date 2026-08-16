@@ -3,14 +3,13 @@
 import useSWR from "swr";
 import Link from "next/link";
 import { http } from "@/lib/api";
-import { DashboardStats } from "@/lib/types";
+import { DashboardStats, SystemStatus } from "@/lib/types";
 import { PROJECT_STATUS_LABELS } from "@/lib/enums";
+import { useDashboardRange } from "@/components/admin/admin-context";
 import {
   Area,
   AreaChart,
   CartesianGrid,
-  Line,
-  LineChart,
   RadialBar,
   RadialBarChart,
   ResponsiveContainer,
@@ -47,8 +46,15 @@ function Spark({ data, color }: { data: number[]; color: string }) {
 }
 
 export default function AdminDashboardPage() {
-  const { data, isLoading } = useSWR<DashboardStats>("/admin/dashboard/stats", (key: string) =>
-    http.get<DashboardStats>(key, { auth: true })
+  const { range } = useDashboardRange();
+
+  const { data, isLoading } = useSWR<DashboardStats>(
+    `/admin/dashboard/stats?days=${range}`,
+    (key: string) => http.get<DashboardStats>(key, { auth: true })
+  );
+
+  const { data: health } = useSWR<SystemStatus>("/admin/system/status", (key: string) =>
+    http.get<SystemStatus>(key, { auth: true })
   );
 
   if (isLoading || !data) {
@@ -61,12 +67,8 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const series = data.views_series?.slice(-12) ?? [];
+  const series = data.views_series ?? [];
   const sparkData = series.map((s) => s.views);
-  const pulse = series.map((s, i) => ({
-    i,
-    load: s.views / (series[0]?.views || 1) * 62,
-  }));
 
   const storage = data.media_storage ?? { used_bytes: 0, quota_bytes: 1, breakdown: { images: 0, documents: 0, video: 0, other: 0 } };
   const storagePct = storage.quota_bytes ? Math.round((storage.used_bytes / storage.quota_bytes) * 100) : 0;
@@ -76,6 +78,15 @@ export default function AdminDashboardPage() {
     { name: "Video", value: storage.breakdown.video, color: "#0ea5e9" },
     { name: "Documents", value: storage.breakdown.documents, color: "#0f172a" },
     { name: "Images", value: storage.breakdown.images, color: "#f43f5e" },
+  ];
+
+  const storageHealthy = !health || health.storage.status !== "error";
+  const checklist = [
+    { label: "Portfolio content is live", done: data.published_projects > 0 && !!data.active_resume },
+    { label: "Recent projects are published", done: data.published_projects > 0 },
+    { label: "Certifications up to date", done: data.total_certifications > 0 },
+    { label: "Resume is active & linked", done: !!data.active_resume },
+    { label: "Reply to pending messages", done: data.unread_messages === 0 },
   ];
 
   return (
@@ -89,12 +100,12 @@ export default function AdminDashboardPage() {
             <p className="text-[13px] text-ink-300">Total Portfolio Views</p>
             <p className="text-[42px] font-semibold tracking-tight mt-1">{fmt(data.total_views)}</p>
             <p className="text-[13px] text-emerald-400 font-medium flex items-center gap-1 mt-1">
-              <PiCaretUp className="text-[15px]" /> {data.views_delta} vs last month
+              <PiCaretUp className="text-[15px]" /> {data.views_delta} vs previous {range} days
             </p>
           </div>
           <div className="flex gap-3">
             <Link
-              href="/admin/projects"
+              href="/admin/projects?new=1"
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-sky-500 text-white text-[13.5px] font-medium hover:bg-sky-400 transition-colors"
             >
               <PiPlus className="text-[16px]" /> New Project
@@ -109,7 +120,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="font-semibold tracking-tight">Project Views</h3>
-              <p className="text-[12px] text-ink-400 mt-0.5">Last 12 days across all projects</p>
+              <p className="text-[12px] text-ink-400 mt-0.5">Last {range} days across all projects</p>
             </div>
             <div className="flex items-center gap-1.5 text-[12px] font-medium">
               <span className="w-2.5 h-2.5 rounded-full bg-sky-500" />
@@ -125,7 +136,7 @@ export default function AdminDashboardPage() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} minTickGap={20} />
               <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={40} />
               <Tooltip
                 cursor={{ stroke: "#e2e8f0" }}
@@ -138,25 +149,50 @@ export default function AdminDashboardPage() {
 
         <div className="bg-white rounded-2xl border border-ink-200 p-6">
           <h3 className="font-semibold tracking-tight">System Status</h3>
-          <p className="text-[12px] text-ink-400 mt-0.5 mb-5">API latency · all healthy</p>
-          <ResponsiveContainer width="100%" height={230}>
-            <LineChart data={pulse} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
-              <defs>
-                <linearGradient id="pulseFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.25} />
-                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey="i" hide />
-              <YAxis hide domain={[0, 100]} />
-              <Area type="monotone" dataKey="load" stroke="#22c55e" strokeWidth={2.5} fill="url(#pulseFill)" />
-              <Line type="monotone" dataKey="load" stroke="#22c55e" strokeWidth={0} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-          <div className="mt-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[12.5px] font-medium text-emerald-700">All systems operational</span>
+          <p className="text-[12px] text-ink-400 mt-0.5 mb-5">Live checks</p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-ink-50">
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${health?.db.ok === false ? "bg-coral" : "bg-emerald-500"}`} />
+                <span className="text-[13px] font-medium text-ink-700">Database</span>
+              </div>
+              <span className="text-[12.5px] text-ink-500">
+                {health ? `${health.db.latency_ms}ms` : "…"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-ink-50">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    health?.storage.status === "ok"
+                      ? "bg-emerald-500"
+                      : health?.storage.status === "error"
+                        ? "bg-coral"
+                        : "bg-ink-300"
+                  }`}
+                />
+                <span className="text-[13px] font-medium text-ink-700">Storage</span>
+              </div>
+              <span className="text-[12.5px] text-ink-500">
+                {health
+                  ? health.storage.status === "ok"
+                    ? `${health.storage.latency_ms}ms`
+                    : health.storage.status === "error"
+                      ? "error"
+                      : "not configured"
+                  : "…"}
+              </span>
+            </div>
+          </div>
+          <div className={`mt-4 flex items-center gap-2 px-3 py-2 rounded-lg ${storageHealthy ? "bg-emerald-50" : "bg-coral/10"}`}>
+            <span className={`w-2 h-2 rounded-full ${storageHealthy ? "bg-emerald-500" : "bg-coral"} ${storageHealthy ? "animate-pulse" : ""}`} />
+            <span className={`text-[12.5px] font-medium ${storageHealthy ? "text-emerald-700" : "text-coral"}`}>
+              {health
+                ? health.ok && health.storage.status !== "error"
+                  ? "All systems operational"
+                  : "Degraded"
+                : "Checking…"}
+            </span>
           </div>
         </div>
       </div>
@@ -261,13 +297,7 @@ export default function AdminDashboardPage() {
             <h3 className="font-semibold tracking-tight">CMS Activity & Launch Checklist</h3>
             <p className="text-[12px] text-ink-400 mt-0.5 mb-4">Today&rsquo;s progress</p>
             <div className="space-y-3.5">
-              {[
-                { label: "Portfolio content is live", done: true },
-                { label: "Recent projects are published", done: true },
-                { label: "Certifications up to date", done: data.recent_projects.length > 0 },
-                { label: "Resume is active & linked", done: !!data.active_resume },
-                { label: "Reply to pending messages", done: data.unread_messages === 0 },
-              ].map((item) => (
+              {checklist.map((item) => (
                 <div key={item.label} className="flex items-center gap-3">
                   {item.done ? (
                     <PiCheckCircle className="text-emerald-500 text-[18px] shrink-0" />

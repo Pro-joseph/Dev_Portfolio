@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
+import { useSearchParams } from "next/navigation";
 import { http, ApiError } from "@/lib/api";
 import { getResourceConfig, FieldDef } from "@/lib/admin-config";
 import { Paginated } from "@/lib/types";
@@ -69,7 +70,19 @@ function initialValue(field: FieldDef, row?: Row): unknown {
 }
 
 export default function ResourcePage({ resourceKey }: { resourceKey: string }) {
+  return (
+    <Suspense fallback={null}>
+      <ResourcePageBody resourceKey={resourceKey} />
+    </Suspense>
+  );
+}
+
+function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
   const config = getResourceConfig(resourceKey);
+  const searchParams = useSearchParams();
+  const newParam = searchParams.get("new");
+  const editParam = searchParams.get("edit");
+  const debounceRef = useRef<number | null>(null);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -126,21 +139,55 @@ export default function ResourcePage({ resourceKey }: { resourceKey: string }) {
 
   const dismissToast = (id: number) => setToasts((t) => t.filter((x) => x.id !== id));
 
-  const openCreate = () => {
+  const openCreate = useCallback(() => {
     const init: Record<string, unknown> = {};
     (config?.fields ?? []).forEach((f) => (init[f.name] = initialValue(f)));
     setValues(init);
     setErrors({});
     setCreating(true);
-  };
+  }, [config]);
 
-  const openEdit = (row: Row) => {
-    const init: Record<string, unknown> = {};
-    (config?.fields ?? []).forEach((f) => (init[f.name] = initialValue(f, row)));
-    setValues(init);
-    setErrors({});
-    setEditing(row);
-  };
+  const openEdit = useCallback(
+    (row: Row) => {
+      const init: Record<string, unknown> = {};
+      (config?.fields ?? []).forEach((f) => (init[f.name] = initialValue(f, row)));
+      setValues(init);
+      setErrors({});
+      setEditing(row);
+    },
+    [config]
+  );
+
+  useEffect(
+    () => () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!config) return;
+    if (newParam === "1") {
+      const t = window.setTimeout(() => openCreate(), 0);
+      return () => window.clearTimeout(t);
+    }
+    if (editParam) {
+      let cancelled = false;
+      (async () => {
+        try {
+          const res = await http.get<{ data: Row }>(`${config.path}/${editParam}`, {
+            auth: true,
+          });
+          if (!cancelled) openEdit(res.data);
+        } catch {
+          /* record not found */
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }
+  }, [config, newParam, editParam, openCreate, openEdit]);
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
@@ -229,7 +276,8 @@ export default function ResourcePage({ resourceKey }: { resourceKey: string }) {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                window.setTimeout(() => {
+                if (debounceRef.current) window.clearTimeout(debounceRef.current);
+                debounceRef.current = window.setTimeout(() => {
                   setDebouncedSearch(e.target.value);
                   setPage(1);
                 }, 300);
