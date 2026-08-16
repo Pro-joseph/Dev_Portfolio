@@ -20,6 +20,7 @@ import {
   PiChatsCircle,
   PiShareNetwork,
   PiGearSix,
+  PiIdentificationBadge,
   PiSignOut,
   PiInfinity,
 } from "react-icons/pi";
@@ -36,6 +37,7 @@ const NAV = [
   { href: "/admin/certifications", label: "Certifications", icon: PiCertificate },
   { href: "/admin/testimonials", label: "Testimonials", icon: PiChatsCircle },
   { href: "/admin/social-links", label: "Social Links", icon: PiShareNetwork },
+  { href: "/admin/profile", label: "Profile", icon: PiIdentificationBadge },
   { href: "/admin/site-settings", label: "Settings", icon: PiGearSix },
 ];
 

@@ -12,11 +12,13 @@ export default function AvatarPicker({
   avatarUrl,
   initials,
   size = 36,
+  direction = "up",
   onChanged,
 }: {
   avatarUrl: string | null;
   initials: string;
   size?: number;
+  direction?: "up" | "down";
   onChanged: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -114,7 +116,11 @@ export default function AvatarPicker({
       {open && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => !busy && setOpen(false)} />
-          <div className="absolute z-40 bottom-full left-0 mb-3 w-64 bg-white rounded-xl border border-ink-200 shadow-xl p-4">
+          <div
+            className={`absolute z-40 w-64 bg-white rounded-xl border border-ink-200 shadow-xl p-4 ${
+              direction === "up" ? "bottom-full left-0 mb-3" : "top-full left-0 mt-3"
+            }`}
+          >
             <div className="flex items-center justify-between mb-3">
               <p className="text-[13px] font-semibold">Profile photo</p>
               <button

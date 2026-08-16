@@ -3,6 +3,7 @@ import path from "node:path";
 import os from "node:os";
 import { resetDb } from "@/lib/db";
 import { POST as loginPost } from "@/app/api/v1/auth/login/route";
+import { POST as changePasswordPost } from "@/app/api/v1/auth/change-password/route";
 import { GET as statsGet } from "@/app/api/v1/admin/dashboard/stats/route";
 import { GET as exportGet } from "@/app/api/v1/admin/dashboard/export/route";
 import { GET as statusGet } from "@/app/api/v1/admin/system/status/route";
@@ -220,5 +221,83 @@ describe("author avatar setting", () => {
     site = await siteGet();
     settings = (await body(site)).settings as Record<string, unknown>;
     expect(settings.author_avatar == null).toBe(true);
+  });
+});
+
+// ------------------------------------------------------------ change password
+
+describe("change password", () => {
+  const pwRequest = (overrides: Record<string, unknown> = {}) =>
+    jsonRequest("/api/v1/auth/change-password", {
+      method: "POST",
+      headers: jsonAuth(token),
+      body: JSON.stringify({
+        current_password: "password",
+        new_password: "newpassword123",
+        new_password_confirmation: "newpassword123",
+        ...overrides,
+      }),
+    });
+
+  it("changes the password and invalidates the old one", async () => {
+    const res = await changePasswordPost(pwRequest());
+    expect(res.status).toBe(200);
+    expect((await body(res)).ok).toBe(true);
+
+    const oldLogin = await loginPost(
+      jsonRequest("/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "admin@josephlab.dev", password: "password" }),
+      })
+    );
+    expect(oldLogin.status).toBe(422);
+
+    const newLogin = await loginPost(
+      jsonRequest("/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "admin@josephlab.dev", password: "newpassword123" }),
+      })
+    );
+    expect(newLogin.status).toBe(200);
+  });
+
+  it("rejects an incorrect current password", async () => {
+    const res = await changePasswordPost(pwRequest({ current_password: "wrong" }));
+    expect(res.status).toBe(422);
+    const errs = (await body(res)).errors as Record<string, string[]>;
+    expect(errs.current_password).toBeDefined();
+  });
+
+  it("rejects a mismatched confirmation", async () => {
+    const res = await changePasswordPost(
+      pwRequest({ new_password_confirmation: "different" })
+    );
+    expect(res.status).toBe(422);
+    const errs = (await body(res)).errors as Record<string, string[]>;
+    expect(errs.new_password_confirmation).toBeDefined();
+  });
+
+  it("rejects a short new password", async () => {
+    const res = await changePasswordPost(pwRequest({ new_password: "short", new_password_confirmation: "short" }));
+    expect(res.status).toBe(422);
+    const errs = (await body(res)).errors as Record<string, string[]>;
+    expect(errs.new_password).toBeDefined();
+  });
+
+  it("requires authentication", async () => {
+    const res = await changePasswordPost(
+      jsonRequest("/api/v1/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          current_password: "password",
+          new_password: "newpassword123",
+          new_password_confirmation: "newpassword123",
+        }),
+      })
+    );
+    expect(res.status).toBe(401);
   });
 });
