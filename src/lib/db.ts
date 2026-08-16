@@ -126,6 +126,7 @@ function getPg() {
     pg = postgres(DATABASE_URL, {
       max: 1,
       idle_timeout: 20,
+      connect_timeout: 15,
       ssl: pgSslConfig(),
     });
   }
@@ -328,8 +329,17 @@ function buildInsert(table: SeedTable, rows: unknown[]): [string, unknown[]][] {
 
 async function applySchema(): Promise<void> {
   if (USE_POSTGRES) {
-    const raw = readFileSync(path.join(DATA_DIR, "schema.postgres.sql"), "utf8");
-    await getPg().unsafe(raw);
+    // Run the schema one statement at a time: Supabase's pgbouncer transaction
+    // pooler can hang on a multi-statement simple query, so a single
+    // `unsafe(raw)` here stalls (and can leave a stuck connection that
+    // eventually exhausts the pooler slot limit).
+    const raw = readFileSync(path.join(DATA_DIR, "schema.postgres.sql"), "utf8")
+      .replace(/--[^\n]*/g, "");
+    for (const stmt of raw.split(";")) {
+      const s = stmt.trim();
+      if (!s) continue;
+      await getPg().unsafe(s);
+    }
     return;
   }
   applySqliteSchema(getSqlite());
@@ -339,11 +349,23 @@ const SEED_FLAG_KEY = "_seed_complete";
 const SEED_FLAG_ID = 999999001;
 
 async function seedDb() {
+  // Check the completion flag before applying the schema: the live DB is
+  // already seeded, so cold serverless starts must not re-run the CREATE TABLE
+  // script over the pooler (that's what stalled requests and exhausted the
+  // pooler connections). A fresh DB errors on the flag lookup and falls
+  // through to schema + seed below.
+  let seeded = false;
+  try {
+    const flag = await exec("SELECT value FROM site_settings WHERE key = $1", [
+      SEED_FLAG_KEY,
+    ]);
+    seeded = flag.length === 1 && Boolean(flag[0]?.value);
+  } catch {
+    seeded = false;
+  }
+  if (seeded) return;
+
   await applySchema();
-  const flag = await exec("SELECT value FROM site_settings WHERE key = $1", [
-    SEED_FLAG_KEY,
-  ]);
-  if (flag.length && flag[0]?.value) return;
   const data = loadSeedData();
   for (const table of INSERT_ORDER) {
     const rowsForTable = data[table];
