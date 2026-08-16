@@ -13,7 +13,16 @@ const DATA_DIR = path.join(process.cwd(), "data");
  */
 const DATABASE_URL = (process.env.DATABASE_URL || process.env.POSTGRES_URL || "").trim();
 
-const USE_POSTGRES = Boolean(DATABASE_URL);
+/**
+ * During `next build`, static generation runs the root layout's
+ * `loadSiteSettings()` for every prerendered page. Reaching the remote
+ * Postgres pooler from the build machine is slow enough to blow the 60s
+ * per-page limit, so we fall back to the fast in-memory SQLite seed at build
+ * time. At runtime NEXT_PHASE is unset and Postgres is used as usual.
+ */
+const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
+
+const USE_POSTGRES = Boolean(DATABASE_URL) && !IS_BUILD;
 
 if (
   process.env.VERCEL === "1" &&
