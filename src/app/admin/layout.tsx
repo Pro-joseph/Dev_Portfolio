@@ -6,22 +6,31 @@ import { getToken, subscribeToken } from "@/lib/api";
 import Sidebar from "@/components/admin/Sidebar";
 import Topbar from "@/components/admin/Topbar";
 
+const subscribeNoop = () => () => {};
+const getClientHydrated = () => true;
+const getServerHydrated = () => false;
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const hydrated = useSyncExternalStore(
+    subscribeNoop,
+    getClientHydrated,
+    getServerHydrated
+  );
   const token = useSyncExternalStore(subscribeToken, getToken, () => null);
 
   useEffect(() => {
-    if (!token) {
+    if (hydrated && !token) {
       router.replace("/admin/login");
     }
-  }, [token, router]);
+  }, [hydrated, token, router]);
 
   if (pathname.startsWith("/admin/login")) {
     return <>{children}</>;
   }
 
-  if (!token) {
+  if (!hydrated || !token) {
     return (
       <div className="h-screen w-full bg-[#f8fafc] flex items-center justify-center">
         <div className="w-9 h-9 rounded-lg bg-ink-900 text-white flex items-center justify-center animate-pulse">
