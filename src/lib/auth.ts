@@ -1,9 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { queryOne } from "./db";
-
-const JWT_SECRET =
-  process.env.JWT_SECRET || "dev-secret-change-me";
+import { jwtSecret } from "./config";
 
 const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
@@ -19,6 +17,7 @@ function base64url(input: Buffer | string): string {
 }
 
 export function signToken(user: { id: number; role: string }): string {
+  const secret = jwtSecret();
   const header = base64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const now = Math.floor(Date.now() / 1000);
   const payload: TokenPayload = {
@@ -28,17 +27,18 @@ export function signToken(user: { id: number; role: string }): string {
     exp: now + TOKEN_TTL_SECONDS,
   };
   const body = base64url(JSON.stringify(payload));
-  const signature = createHmac("sha256", JWT_SECRET)
+  const signature = createHmac("sha256", secret)
     .update(`${header}.${body}`)
     .digest("base64url");
   return `${header}.${body}.${signature}`;
 }
 
 export function verifyToken(token: string): TokenPayload | null {
+  const secret = jwtSecret();
   const parts = token.split(".");
   if (parts.length !== 3) return null;
   const [header, body, signature] = parts;
-  const expected = createHmac("sha256", JWT_SECRET)
+  const expected = createHmac("sha256", secret)
     .update(`${header}.${body}`)
     .digest("base64url");
 

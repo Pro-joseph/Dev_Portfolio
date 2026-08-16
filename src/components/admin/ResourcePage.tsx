@@ -14,16 +14,18 @@ import {
   EmptyState,
 } from "@/components/admin/ui";
 import { Field } from "@/components/admin/FormFields";
+import { PAGE_SIZE_OPTIONS, PAGE_SIZE_ADMIN } from "@/lib/config";
+import { DEFAULT_PROJECT_STATUS } from "@/lib/enums";
 import { PiMagnifyingGlass, PiPlus, PiPencilSimple, PiTrash } from "react-icons/pi";
 
 type Row = Record<string, unknown>;
 
 const OPTION_ENDPOINTS: Record<string, string> = {
-  skills: "/admin/skills?per_page=100",
-  categories: "/admin/skill-categories?per_page=100",
-  media: "/admin/media?per_page=100",
-  pages: "/admin/pages?per_page=100",
-  menus: "/admin/menu-items?per_page=100",
+  skills: `/admin/skills?per_page=${PAGE_SIZE_OPTIONS}`,
+  categories: `/admin/skill-categories?per_page=${PAGE_SIZE_OPTIONS}`,
+  media: `/admin/media?per_page=${PAGE_SIZE_OPTIONS}`,
+  pages: `/admin/pages?per_page=${PAGE_SIZE_OPTIONS}`,
+  menus: `/admin/menu-items?per_page=${PAGE_SIZE_OPTIONS}`,
 };
 
 const OPTION_LABELS: Record<string, string> = {
@@ -41,7 +43,7 @@ function initialValue(field: FieldDef, row?: Row): unknown {
     if (field.type === "boolean") {
       return ["is_visible", "is_published"].includes(field.name) ? true : false;
     }
-    if (field.name === "status") return "published";
+    if (field.name === "status") return DEFAULT_PROJECT_STATUS;
     return "";
   }
 
@@ -79,7 +81,7 @@ export default function ResourcePage({ resourceKey }: { resourceKey: string }) {
   const [saving, setSaving] = useState(false);
   const [toasts, setToasts] = useState<{ id: number; message: string; type: "success" | "error" }[]>([]);
 
-  const query = `${config?.path}?per_page=15&page=${page}${
+  const query = `${config?.path}?per_page=${PAGE_SIZE_ADMIN}&page=${page}${
     debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ""
   }`;
 

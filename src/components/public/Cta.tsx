@@ -1,6 +1,14 @@
 import LogoSlider from "./LogoSlider";
 
-export default function Cta({ email, techNames }: { email?: string; techNames: string[] }) {
+export default function Cta({
+  email,
+  techNames,
+  available = true,
+}: {
+  email?: string | null;
+  techNames: string[];
+  available?: boolean;
+}) {
   return (
     <section id="contact" className="py-32 px-6 bg-primary text-white overflow-hidden relative">
       <div
@@ -12,10 +20,12 @@ export default function Cta({ email, techNames }: { email?: string; techNames: s
         }}
       />
       <div className="container mx-auto text-center mb-20 relative">
-        <p className="inline-flex items-center gap-2 mb-6 text-xs font-mono font-bold uppercase tracking-[0.2em] text-white/50">
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          Available for select engagements
-        </p>
+        {available && (
+          <p className="inline-flex items-center gap-2 mb-6 text-xs font-mono font-bold uppercase tracking-[0.2em] text-white/50">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            Available for select engagements
+          </p>
+        )}
         <h2 className="font-heading text-4xl md:text-6xl lg:text-8xl font-bold mb-10 leading-[0.95] tracking-tight max-w-5xl mx-auto">
           Let&rsquo;s build something extraordinary together.
         </h2>

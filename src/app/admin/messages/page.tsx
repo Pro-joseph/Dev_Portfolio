@@ -3,6 +3,7 @@
 import { useState } from "react";
 import useSWR from "swr";
 import { http } from "@/lib/api";
+import { PAGE_SIZE_LISTS } from "@/lib/config";
 import { Paginated } from "@/lib/types";
 import { Badge, Button, Modal, Spinner, Toast, EmptyState } from "@/components/admin/ui";
 import { PiEnvelope, PiEnvelopeOpen, PiTrash, PiWarning } from "react-icons/pi";
@@ -24,7 +25,7 @@ export default function MessagesPage() {
   const [toasts, setToasts] = useState<{ id: number; message: string; type: "success" | "error" }[]>([]);
 
   const { data, isLoading, mutate } = useSWR<Paginated<Message>>(
-    "/admin/contact-messages?per_page=50",
+    `/admin/contact-messages?per_page=${PAGE_SIZE_LISTS}`,
     (key: string) => http.get<Paginated<Message>>(key, { auth: true })
   );
 

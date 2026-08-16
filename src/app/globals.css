@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@theme inline {
+@theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
   --font-heading: var(--font-hanken), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -8,6 +8,7 @@
   --color-primary: #0f172a;
   --color-secondary: #64748b;
   --color-accent: #4f46e5;
+  --color-accent-hover: color-mix(in srgb, var(--color-accent) 82%, #000);
   --color-surface: #ffffff;
   --color-elevated: #f8fafc;
   --color-card: #f1f5f9;

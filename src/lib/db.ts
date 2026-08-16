@@ -276,6 +276,27 @@ const PK_COLUMNS: Partial<Record<SeedTable, string[]>> = {
   project_skill: ["project_id", "skill_id"],
 };
 
+const BOOLEAN_COLUMNS: Partial<Record<SeedTable, string[]>> = {
+  social_links: ["is_visible"],
+  pages: ["is_published"],
+  menu_items: ["open_in_new_tab", "is_visible"],
+  resumes: ["is_active"],
+  skills: ["is_visible"],
+  projects: ["is_featured"],
+  certifications: ["is_visible"],
+  testimonials: ["is_visible"],
+  contact_messages: ["is_read"],
+};
+
+function seedCell(table: SeedTable, col: string, value: unknown): unknown {
+  if (value === undefined || value === null) return value;
+  if (BOOLEAN_COLUMNS[table]?.includes(col) && (value === 0 || value === 1 || value === "0" || value === "1")) {
+    return value === 1 || value === "1";
+  }
+  if (typeof value === "object") return JSON.stringify(value);
+  return value;
+}
+
 function buildInsert(table: SeedTable, rows: unknown[]): [string, unknown[]][] {
   if (!rows.length) return [];
   const cols = Object.keys(rows[0] as Record<string, unknown>);
@@ -287,10 +308,7 @@ function buildInsert(table: SeedTable, rows: unknown[]): [string, unknown[]][] {
     const placeholders = cols.map((_, i) => `$${offset + i + 1}`).join(", ");
     rowGroup.push(`(${placeholders})`);
     for (const c of cols) {
-      const v = (row as Record<string, unknown>)[c];
-      if (v === undefined) valuesList.push(null);
-      else if (typeof v === "object" && v !== null) valuesList.push(JSON.stringify(v));
-      else valuesList.push(v);
+      valuesList.push(seedCell(table, c, (row as Record<string, unknown>)[c]));
     }
     offset += cols.length;
   }

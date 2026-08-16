@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { http, clearToken } from "@/lib/api";
 import { DashboardStats } from "@/lib/types";
+import { getSiteSettings } from "@/lib/site-settings";
 import {
   PiSquaresFourFill,
   PiCube,
@@ -44,6 +45,18 @@ export default function Sidebar() {
     "/admin/dashboard/stats",
     (key: string) => http.get<DashboardStats>(key, { auth: true })
   );
+  const { data: site } = useSWR<{ settings: Record<string, unknown> }>(
+    "/site",
+    (key: string) => http.get<{ settings: Record<string, unknown> }>(key)
+  );
+  const siteSettings = getSiteSettings({ settings: site?.settings ?? {} });
+  const brand = siteSettings.site_title;
+  const initials = siteSettings.author_name
+    .split(/\s+/)
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   const logout = async () => {
     try {
@@ -61,7 +74,7 @@ export default function Sidebar() {
         <div className="w-9 h-9 rounded-lg bg-ink-900 flex items-center justify-center text-white">
           <PiInfinity className="text-xl" />
         </div>
-        <span className="font-semibold text-[15px] tracking-tight">JosephLab</span>
+        <span className="font-semibold text-[15px] tracking-tight">{brand}</span>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
@@ -112,10 +125,10 @@ export default function Sidebar() {
         </button>
         <div className="flex items-center gap-3 px-2 py-2 mt-1 rounded-lg">
           <div className="w-9 h-9 rounded-full bg-ink-900 text-white flex items-center justify-center font-semibold text-sm">
-            YJ
+            {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-medium truncate">Youssef Jdira</p>
+            <p className="text-[13px] font-medium truncate">{siteSettings.author_name}</p>
             <p className="text-[11px] text-ink-400 truncate">Admin</p>
           </div>
         </div>

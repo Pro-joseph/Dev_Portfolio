@@ -4,6 +4,7 @@ import useSWR from "swr";
 import Link from "next/link";
 import { http } from "@/lib/api";
 import { DashboardStats } from "@/lib/types";
+import { PROJECT_STATUS_LABELS } from "@/lib/enums";
 import {
   Area,
   AreaChart,
@@ -248,7 +249,7 @@ export default function AdminDashboardPage() {
                         : "bg-ink-100 text-ink-500"
                   }`}
                 >
-                  {p.status}
+                  {PROJECT_STATUS_LABELS[p.status] ?? p.status}
                 </span>
               </div>
             ))}

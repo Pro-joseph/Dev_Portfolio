@@ -13,6 +13,7 @@ import {
   testimonialsValidator,
 } from "./resource-validators";
 import type { Validator } from "./validators";
+import { PROJECT_MORPH } from "./enums";
 
 function withValidator(
   validator: Validator,
@@ -63,7 +64,7 @@ async function applyProjectRelations(id: number, payload: Record<string, unknown
     for (const [index, mid] of mediaIds.entries()) {
       await query(
         `UPDATE media SET mediable_type = $1, mediable_id = $2, collection = $3 WHERE id = $4`,
-        ["App\\Models\\Project", id, index === 0 ? "cover" : "gallery", Number(mid)]
+        [PROJECT_MORPH, id, index === 0 ? "cover" : "gallery", Number(mid)]
       );
     }
   }

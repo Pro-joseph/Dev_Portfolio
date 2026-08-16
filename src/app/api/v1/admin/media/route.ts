@@ -12,17 +12,16 @@ import {
   uploadRoot,
   uploadRelPath,
 } from "@/lib/media-storage";
+import { ALLOWED_MEDIA_REGEX, mediaMaxBytes, PAGE_SIZE_MEDIA } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
-
-const ALLOWED_MIME = /^(image\/(jpeg|png|gif|webp|svg\+xml)|image\/svg|application\/pdf|video\/mp4)$/;
 
 export async function GET(request: Request): Promise<Response> {
   try {
     await requireAdmin(request);
     const url = new URL(request.url);
     const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
-    const perPage = Math.max(1, Number(url.searchParams.get("per_page")) || 24);
+    const perPage = Math.max(1, Number(url.searchParams.get("per_page")) || PAGE_SIZE_MEDIA);
 
     const totalRow = await query<{ n: number }>(
       "SELECT COUNT(*)::int AS n FROM media"
@@ -51,10 +50,10 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     const mime = file.type || "application/octet-stream";
-    if (!ALLOWED_MIME.test(mime)) {
+    if (!ALLOWED_MEDIA_REGEX.test(mime)) {
       return validationError({ file: ["The file must be a file of type: jpg, jpeg, png, gif, webp, svg, pdf, mp4."] });
     }
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > mediaMaxBytes()) {
       return validationError({ file: ["The file must not be greater than 10240 kilobytes."] });
     }
 

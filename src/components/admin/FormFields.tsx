@@ -3,6 +3,7 @@
 import { FieldDef } from "@/lib/admin-config";
 import { PiPlus, PiTrash } from "react-icons/pi";
 import { ProjectLinkType } from "@/lib/types";
+import { LINK_TYPES } from "@/lib/enums";
 
 interface FieldProps {
   field: FieldDef;
@@ -59,7 +60,7 @@ function LinksEditor({
             value={link.type}
             onChange={(e) => update(index, { type: e.target.value as ProjectLinkType })}
           >
-            {["github", "demo", "docs", "video", "other"].map((t) => (
+            {LINK_TYPES.map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
           </select>

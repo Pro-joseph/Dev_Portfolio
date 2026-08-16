@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { json, paginate } from "@/lib/http";
 import { handleError } from "@/lib/route-helpers";
 import { castRow as cast } from "@/lib/admin-crud";
+import { PAGE_SIZE_ADMIN } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export async function GET(request: Request): Promise<Response> {
     await requireAdmin(request);
     const url = new URL(request.url);
     const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
-    const perPage = Math.max(1, Number(url.searchParams.get("per_page")) || 20);
+    const perPage = Math.max(1, Number(url.searchParams.get("per_page")) || PAGE_SIZE_ADMIN);
 
     const totalRow = await queryOne<{ n: number }>(
       "SELECT COUNT(*)::int AS n FROM contact_messages"

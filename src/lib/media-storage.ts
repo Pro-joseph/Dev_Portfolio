@@ -1,5 +1,6 @@
 import path from "node:path";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { mediaBucket, UPLOADS_REL_DIR } from "./config";
 
 /**
  * Storage root for media uploads. Configure via MEDIA_UPLOAD_DIR (relative
@@ -9,7 +10,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  */
 export function uploadRoot(): string {
   const configured = process.env.MEDIA_UPLOAD_DIR?.trim();
-  if (!configured) return path.join(process.cwd(), "public", "uploads");
+  if (!configured) return path.join(process.cwd(), "public", UPLOADS_REL_DIR);
   return path.isAbsolute(configured)
     ? configured
     : path.join(/* turbopackIgnore: true */ process.cwd(), configured);
@@ -22,7 +23,7 @@ export function uploadRoot(): string {
  */
 export function uploadRelPath(storedName: string): string {
   const configured = process.env.MEDIA_UPLOAD_DIR?.trim();
-  if (!configured) return `uploads/${storedName}`;
+  if (!configured) return `${UPLOADS_REL_DIR}/${storedName}`;
   const normalized = configured.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
   const segments = normalized.split("/");
   const publicIndex = segments.indexOf("public");
@@ -54,7 +55,7 @@ export function supabaseEnabled(): boolean {
 }
 
 export function bucketName(): string {
-  return process.env.SUPABASE_STORAGE_BUCKET?.trim() || "media";
+  return mediaBucket();
 }
 
 let sb: SupabaseClient | null = null;

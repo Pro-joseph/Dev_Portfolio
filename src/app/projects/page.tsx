@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { getProjectListItems } from "@/lib/resources";
+import { loadSiteSettings } from "@/lib/site-config";
+import { PAGE_SIZE_LISTS } from "@/lib/config";
 import SubNav from "@/components/public/SubNav";
 import Link from "next/link";
 import { FaLongArrowAltRight } from "react-icons/fa";
@@ -12,11 +14,14 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function ProjectsPage() {
-  const data = await getProjectListItems({ perPage: 50 });
+  const [data, settings] = await Promise.all([
+    getProjectListItems({ perPage: PAGE_SIZE_LISTS }),
+    loadSiteSettings(),
+  ]);
 
   return (
     <>
-      <SubNav label="Back to Portfolio" />
+      <SubNav label="Back to Portfolio" authorName={settings.author_name} />
       <main className="pt-32 pb-24 px-6">
         <div className="container mx-auto max-w-5xl">
           <header className="mb-16">

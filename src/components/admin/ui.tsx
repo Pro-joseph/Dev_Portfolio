@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect } from "react";
 import { PiX, PiCheck, PiWarning, PiSpinnerGap } from "react-icons/pi";
+import { PROJECT_STATUS_LABELS } from "@/lib/enums";
 
 export function Spinner({ className = "", size }: { className?: string; size?: number }) {
   return (
@@ -64,7 +65,8 @@ export function StatusBadge({ status }: { status: string }) {
     draft: "amber",
     archived: "slate",
   };
-  return <Badge tone={tone[status] ?? "slate"}>{status}</Badge>;
+  const label = PROJECT_STATUS_LABELS[status as keyof typeof PROJECT_STATUS_LABELS] ?? status;
+  return <Badge tone={tone[status] ?? "slate"}>{label}</Badge>;
 }
 
 export function Modal({

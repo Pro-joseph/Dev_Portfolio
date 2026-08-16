@@ -4,9 +4,12 @@ import { useRef, useState } from "react";
 import useSWR from "swr";
 import Image from "next/image";
 import { http } from "@/lib/api";
+import { ALLOWED_MEDIA, MEDIA_MAX_BYTES, PAGE_SIZE_OPTIONS } from "@/lib/config";
 import { Paginated } from "@/lib/types";
 import { Spinner, Toast, EmptyState } from "@/components/admin/ui";
 import { PiUploadSimple, PiCopy, PiTrash, PiCheck, PiFile } from "react-icons/pi";
+
+const MAX_MB = Math.round(MEDIA_MAX_BYTES / (1024 * 1024));
 
 interface MediaItem {
   id: number;
@@ -29,7 +32,7 @@ export default function MediaPage() {
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
   const { data, isLoading, mutate } = useSWR<Paginated<MediaItem>>(
-    "/admin/media?per_page=100",
+    `/admin/media?per_page=${PAGE_SIZE_OPTIONS}`,
     (key: string) => http.get<Paginated<MediaItem>>(key, { auth: true })
   );
 
@@ -92,7 +95,7 @@ export default function MediaPage() {
           ref={inputRef}
           type="file"
           className="hidden"
-          accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml,application/pdf,video/mp4"
+          accept={ALLOWED_MEDIA.join(",")}
           onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
         />
         <div className="flex flex-col items-center gap-3">
@@ -115,7 +118,7 @@ export default function MediaPage() {
                 </>
               )}
             </p>
-            <p className="text-[12px] text-ink-400 mt-0.5">Images, PDFs, videos · up to 10 MB</p>
+            <p className="text-[12px] text-ink-400 mt-0.5">Images, PDFs, videos · up to {MAX_MB} MB</p>
           </div>
         </div>
       </div>

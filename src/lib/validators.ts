@@ -1,3 +1,5 @@
+import { PROJECT_STATUS, LINK_TYPES, SETTING_TYPES, CERT_TYPES } from "./enums";
+
 export type ValidationResult =
   | { ok: true; data: Record<string, unknown> }
   | { ok: false; errors: Record<string, string[]> };
@@ -5,10 +7,10 @@ export type ValidationResult =
 export type Validator = (body: Record<string, unknown>, id?: number) => ValidationResult;
 
 export const ENUMS = {
-  projectStatus: ["draft", "published", "archived"],
-  linkType: ["github", "demo", "docs", "video", "other"],
-  settingType: ["string", "text", "boolean", "json"],
-  certType: ["education", "certification"],
+  projectStatus: [...PROJECT_STATUS],
+  linkType: [...LINK_TYPES],
+  settingType: [...SETTING_TYPES],
+  certType: [...CERT_TYPES],
 };
 
 function missing(value: unknown): boolean {

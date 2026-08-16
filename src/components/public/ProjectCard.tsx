@@ -1,4 +1,5 @@
 import { Project } from "@/lib/types";
+import { PROJECT_STATUS_LABELS } from "@/lib/enums";
 import Link from "next/link";
 import Image from "next/image";
 import { FaArrowRight } from "react-icons/fa";
@@ -52,7 +53,7 @@ export default function ProjectCard({
         </div>
         <div className="mt-auto pt-8 flex items-center justify-between">
           <span className="text-xs font-bold tracking-widest uppercase text-secondary">
-            {project.status === "published" ? "Live" : project.status}
+            {PROJECT_STATUS_LABELS[project.status] ?? project.status}
           </span>
           <span className="flex items-center gap-2 text-sm font-bold text-accent opacity-0 translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
             View case study <FaArrowRight className="text-xs" />

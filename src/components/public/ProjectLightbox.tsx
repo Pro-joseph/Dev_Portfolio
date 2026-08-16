@@ -7,9 +7,10 @@ import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 
 interface Props {
   images: Media[];
+  siteTitle?: string;
 }
 
-export default function ProjectLightbox({ images }: Props) {
+export default function ProjectLightbox({ images, siteTitle = "JosephLab" }: Props) {
   const [active, setActive] = useState<number | null>(null);
   const wheelLock = useRef(0);
 
@@ -53,7 +54,7 @@ export default function ProjectLightbox({ images }: Props) {
             className="block w-full h-full cursor-zoom-in"
             aria-label={`Open ${images[0].alt_text ?? "project image"} in lightbox`}
           >
-            <Image className="w-full h-full object-cover" src={images[0].url ?? ""} alt={images[0].alt_text ?? "JosephLab project image"} width={1280} height={720} sizes="(max-width: 768px) 100vw, 66vw" />
+            <Image className="w-full h-full object-cover" src={images[0].url ?? ""} alt={images[0].alt_text ?? `${siteTitle} project image`} width={1280} height={720} sizes="(max-width: 768px) 100vw, 66vw" />
           </button>
         </div>
         <div className="md:col-span-4 grid grid-rows-2 gap-6">
@@ -65,7 +66,7 @@ export default function ProjectLightbox({ images }: Props) {
                 className="block w-full h-full cursor-zoom-in"
                 aria-label={`Open ${image.alt_text ?? "project image"} in lightbox`}
               >
-                <Image className="w-full h-full object-cover" src={image.url ?? ""} alt={image.alt_text ?? "JosephLab project image"} width={640} height={640} sizes="(max-width: 768px) 100vw, 33vw" />
+                <Image className="w-full h-full object-cover" src={image.url ?? ""} alt={image.alt_text ?? `${siteTitle} project image`} width={640} height={640} sizes="(max-width: 768px) 100vw, 33vw" />
               </button>
             </div>
           ))}
@@ -117,7 +118,7 @@ export default function ProjectLightbox({ images }: Props) {
           <Image
             className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
             src={current.url ?? ""}
-            alt={current.alt_text ?? "JosephLab project image"}
+            alt={current.alt_text ?? `${siteTitle} project image`}
             width={1920}
             height={1080}
             sizes="100vw"

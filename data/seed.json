@@ -76,7 +76,7 @@
     {
       "id": 8,
       "key": "hero_image",
-      "value": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_9e24dbd5ce_9e25a387ca2cf719.png",
+      "value": "https://qgzjmmfxtgetbvldtizb.supabase.co/storage/v1/object/public/media/seed/hero_image",
       "type": "string",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -102,7 +102,7 @@
       "url": "https://github.com/Pro-joseph",
       "icon": "fa-brands fa-github",
       "order_index": 0,
-      "is_visible": 1
+      "is_visible": true
     },
     {
       "id": 2,
@@ -110,7 +110,7 @@
       "url": "https://www.linkedin.com/in/youssef-jdira-85b113167/",
       "icon": "fa-brands fa-linkedin",
       "order_index": 1,
-      "is_visible": 1
+      "is_visible": true
     },
     {
       "id": 3,
@@ -118,7 +118,7 @@
       "url": "https://twitter.com/josephlab",
       "icon": "fa-brands fa-x-twitter",
       "order_index": 2,
-      "is_visible": 0
+      "is_visible": false
     },
     {
       "id": 4,
@@ -126,7 +126,7 @@
       "url": "deve.youssef@gmail.com",
       "icon": "fa-solid fa-envelope",
       "order_index": 3,
-      "is_visible": 1
+      "is_visible": true
     }
   ],
   "menu_items": [
@@ -136,9 +136,9 @@
       "label": "Projects",
       "page_id": null,
       "external_url": "#projects",
-      "open_in_new_tab": 0,
+      "open_in_new_tab": false,
       "order_index": 0,
-      "is_visible": 1
+      "is_visible": true
     },
     {
       "id": 2,
@@ -146,9 +146,9 @@
       "label": "Skills",
       "page_id": null,
       "external_url": "#skills",
-      "open_in_new_tab": 0,
+      "open_in_new_tab": false,
       "order_index": 1,
-      "is_visible": 1
+      "is_visible": true
     },
     {
       "id": 3,
@@ -156,19 +156,19 @@
       "label": "Blog",
       "page_id": null,
       "external_url": "#blog",
-      "open_in_new_tab": 0,
+      "open_in_new_tab": false,
       "order_index": 2,
-      "is_visible": 1
+      "is_visible": true
     },
     {
       "id": 4,
       "parent_id": null,
       "label": "Contact",
       "page_id": null,
-      "external_url": "contact",
-      "open_in_new_tab": 0,
+      "external_url": "/#contact",
+      "open_in_new_tab": false,
       "order_index": 3,
-      "is_visible": 1
+      "is_visible": true
     }
   ],
   "pages": [],
@@ -178,7 +178,7 @@
       "label": "MON CV",
       "language": "Fr",
       "media_id": 20,
-      "is_active": 1,
+      "is_active": true,
       "created_at": "2026-08-11T20:05:40.000Z",
       "updated_at": "2026-08-12T15:08:44.000Z"
     },
@@ -187,7 +187,7 @@
       "label": "My cv",
       "language": "En",
       "media_id": 21,
-      "is_active": 0,
+      "is_active": false,
       "created_at": "2026-08-12T15:08:09.000Z",
       "updated_at": "2026-08-12T15:08:38.000Z"
     }
@@ -195,8 +195,8 @@
   "media": [
     {
       "id": 1,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_a97d8defad_2694cc03a08462bf.png",
+      "disk": "supabase",
+      "path": "seed/gen_a97d8defad_2694cc03a08462bf.png",
       "filename": "gen_a97d8defad_2694cc03a08462bf.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -210,8 +210,8 @@
     },
     {
       "id": 2,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_f686fc69e6_c25de1d2d3b052a6.png",
+      "disk": "supabase",
+      "path": "seed/gen_f686fc69e6_c25de1d2d3b052a6.png",
       "filename": "gen_f686fc69e6_c25de1d2d3b052a6.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -225,8 +225,8 @@
     },
     {
       "id": 3,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_526c33065e_8f3376d8de7c9bf2.png",
+      "disk": "supabase",
+      "path": "seed/gen_526c33065e_8f3376d8de7c9bf2.png",
       "filename": "gen_526c33065e_8f3376d8de7c9bf2.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -240,8 +240,8 @@
     },
     {
       "id": 4,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_26dd24d570_84ea69ddb7248c1c.png",
+      "disk": "supabase",
+      "path": "seed/gen_26dd24d570_84ea69ddb7248c1c.png",
       "filename": "gen_26dd24d570_84ea69ddb7248c1c.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -255,8 +255,8 @@
     },
     {
       "id": 5,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_11ea30e065_d829c32a3626d7b1.png",
+      "disk": "supabase",
+      "path": "seed/gen_11ea30e065_d829c32a3626d7b1.png",
       "filename": "gen_11ea30e065_d829c32a3626d7b1.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -270,8 +270,8 @@
     },
     {
       "id": 6,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_ed119e12be_b85c54e011116eef.png",
+      "disk": "supabase",
+      "path": "seed/gen_ed119e12be_b85c54e011116eef.png",
       "filename": "gen_ed119e12be_b85c54e011116eef.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -285,8 +285,8 @@
     },
     {
       "id": 7,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_290aab57e2_de2a531c8a7fd4ac.png",
+      "disk": "supabase",
+      "path": "seed/gen_290aab57e2_de2a531c8a7fd4ac.png",
       "filename": "gen_290aab57e2_de2a531c8a7fd4ac.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -300,8 +300,8 @@
     },
     {
       "id": 8,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_86939eb441_a6785ae55923bf0d.png",
+      "disk": "supabase",
+      "path": "seed/gen_86939eb441_a6785ae55923bf0d.png",
       "filename": "gen_86939eb441_a6785ae55923bf0d.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -315,8 +315,8 @@
     },
     {
       "id": 9,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_376ac989b7_738b8d2269ed9eae.png",
+      "disk": "supabase",
+      "path": "seed/gen_376ac989b7_738b8d2269ed9eae.png",
       "filename": "gen_376ac989b7_738b8d2269ed9eae.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -330,8 +330,8 @@
     },
     {
       "id": 10,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_c0444bf740_771526f40dfbe373.png",
+      "disk": "supabase",
+      "path": "seed/gen_c0444bf740_771526f40dfbe373.png",
       "filename": "gen_c0444bf740_771526f40dfbe373.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -345,8 +345,8 @@
     },
     {
       "id": 11,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_6bdcf1ab58_e42a6b4f0c22bcbf.png",
+      "disk": "supabase",
+      "path": "seed/gen_6bdcf1ab58_e42a6b4f0c22bcbf.png",
       "filename": "gen_6bdcf1ab58_e42a6b4f0c22bcbf.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -360,8 +360,8 @@
     },
     {
       "id": 12,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_84e86ca772_b9f8e660a5b56c80.png",
+      "disk": "supabase",
+      "path": "seed/gen_84e86ca772_b9f8e660a5b56c80.png",
       "filename": "gen_84e86ca772_b9f8e660a5b56c80.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -375,8 +375,8 @@
     },
     {
       "id": 13,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_f318bb59a4_85671cc68fc6b8e4.png",
+      "disk": "supabase",
+      "path": "seed/gen_f318bb59a4_85671cc68fc6b8e4.png",
       "filename": "gen_f318bb59a4_85671cc68fc6b8e4.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -390,8 +390,8 @@
     },
     {
       "id": 14,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_b05f1fcb3b_27f12dd866a83889.png",
+      "disk": "supabase",
+      "path": "seed/gen_b05f1fcb3b_27f12dd866a83889.png",
       "filename": "gen_b05f1fcb3b_27f12dd866a83889.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -405,8 +405,8 @@
     },
     {
       "id": 15,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_b05f1fcb3b_5b38b28f65abf90c.png",
+      "disk": "supabase",
+      "path": "seed/gen_b05f1fcb3b_5b38b28f65abf90c.png",
       "filename": "gen_b05f1fcb3b_5b38b28f65abf90c.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -420,8 +420,8 @@
     },
     {
       "id": 16,
-      "disk": "url",
-      "path": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_b05f1fcb3b_15bb496fd741e532.png",
+      "disk": "supabase",
+      "path": "seed/gen_b05f1fcb3b_15bb496fd741e532.png",
       "filename": "gen_b05f1fcb3b_15bb496fd741e532.png",
       "mime_type": "image/png",
       "size_kb": 0,
@@ -435,8 +435,8 @@
     },
     {
       "id": 17,
-      "disk": "url",
-      "path": "https://josephlab.dev/cv/joseph_jdira_cv_2024.pdf",
+      "disk": "public",
+      "path": "uploads/0JJ6zmJ4i5dzx9AtqQmzekgbLBCIgyPnMaKfutNA.pdf",
       "filename": "Joseph_CV_2024.pdf",
       "mime_type": "application/pdf",
       "size_kb": 210,
@@ -508,7 +508,7 @@
       "icon": "rust",
       "proficiency": 81,
       "order_index": 0,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -520,7 +520,7 @@
       "icon": "go",
       "proficiency": 77,
       "order_index": 1,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -532,7 +532,7 @@
       "icon": "python",
       "proficiency": 89,
       "order_index": 2,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -544,7 +544,7 @@
       "icon": "laravel",
       "proficiency": 93,
       "order_index": 3,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -556,7 +556,7 @@
       "icon": "postgresql",
       "proficiency": 91,
       "order_index": 4,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:10:33.000Z"
     },
@@ -568,7 +568,7 @@
       "icon": "redis",
       "proficiency": 75,
       "order_index": 5,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -580,7 +580,7 @@
       "icon": "grpc",
       "proficiency": 91,
       "order_index": 6,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:10:46.000Z"
     },
@@ -592,7 +592,7 @@
       "icon": "graphql",
       "proficiency": 80,
       "order_index": 7,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:09:50.000Z"
     },
@@ -604,7 +604,7 @@
       "icon": "typescript",
       "proficiency": 91,
       "order_index": 0,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -616,7 +616,7 @@
       "icon": "react",
       "proficiency": 97,
       "order_index": 1,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -628,7 +628,7 @@
       "icon": "next.js",
       "proficiency": 89,
       "order_index": 2,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -640,7 +640,7 @@
       "icon": "tailwind-css",
       "proficiency": 91,
       "order_index": 3,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -652,7 +652,7 @@
       "icon": "webgl",
       "proficiency": 97,
       "order_index": 4,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:11:02.000Z"
     },
@@ -664,7 +664,7 @@
       "icon": "docker",
       "proficiency": 82,
       "order_index": 0,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -676,7 +676,7 @@
       "icon": "kubernetes",
       "proficiency": 96,
       "order_index": 1,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:09:33.000Z"
     },
@@ -688,7 +688,7 @@
       "icon": "terraform",
       "proficiency": 87,
       "order_index": 2,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -700,7 +700,7 @@
       "icon": "ci/cd",
       "proficiency": 91,
       "order_index": 3,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -712,7 +712,7 @@
       "icon": "aws",
       "proficiency": 90,
       "order_index": 4,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
@@ -724,7 +724,7 @@
       "icon": "gcp",
       "proficiency": 95,
       "order_index": 5,
-      "is_visible": 1,
+      "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     }
@@ -738,7 +738,7 @@
       "summary": "An enterprise-grade SaaS infrastructure designed for high-availability distributed systems.",
       "description": "## The Challenge\n\nExisting solutions struggled with real-time state synchronization across multiple regions, leading to high latency for global users. The goal was a system that maintains sub-100ms response times with strict data consistency.\n\n## Key Features\n\n- Real-time delta-sync reducing bandwidth by 60%\n- Zero-trust mTLS + JWT auth at every microservice boundary\n- Native Prometheus + OpenTelemetry observability\n- Custom HPA controllers based on request latency",
       "status": "published",
-      "is_featured": 1,
+      "is_featured": true,
       "client": "Nexus Inc.",
       "role_on_project": "Lead Systems Architect",
       "started_on": "2023-09-01T00:00:00.000Z",
@@ -756,7 +756,7 @@
       "summary": "Data infrastructure platform for petabyte-scale analytics pipelines.",
       "description": "A distributed compute engine built on Kubernetes that orchestrates batch and streaming workloads across global regions.\n\n## Highlights\n\n- Custom scheduling atop K8s for cost-efficient batch jobs\n- Exactly-once semantics via idempotent state stores\n- Terabyte-scale ingestion at 40GB/s sustained throughput",
       "status": "published",
-      "is_featured": 1,
+      "is_featured": true,
       "client": "Atlas Labs",
       "role_on_project": "Distributed Systems Engineer",
       "started_on": "2022-11-01T00:00:00.000Z",
@@ -774,7 +774,7 @@
       "summary": "Security tooling for secrets management and zero-trust access control.",
       "description": "Cipher Vault centralizes secrets management with hardware-backed key encryption, audit logging, and fine-grained access policies.\n\n## Highlights\n\n- KMS-backed envelope encryption\n- Rego-based access policy engine\n- Full audit trail with tamper-evident logs",
       "status": "published",
-      "is_featured": 1,
+      "is_featured": true,
       "client": "Cipher Security",
       "role_on_project": "Security Architect",
       "started_on": "2023-01-15T00:00:00.000Z",
@@ -792,7 +792,7 @@
       "summary": "AI/ML platform for generative image workflows.",
       "description": "A full AI/ML web application that orchestrates GPU inference pipelines and serves generations through a fast Next.js frontend.",
       "status": "published",
-      "is_featured": 0,
+      "is_featured": false,
       "client": null,
       "role_on_project": "Full-stack Engineer",
       "started_on": "2024-03-01T00:00:00.000Z",
@@ -810,7 +810,7 @@
       "summary": "Real-time analytics for decentralized finance protocols.",
       "description": "Streams on-chain data and renders live dashboards with sub-second freshness for protocol teams.",
       "status": "published",
-      "is_featured": 0,
+      "is_featured": false,
       "client": null,
       "role_on_project": "Backend Engineer",
       "started_on": "2023-06-01T00:00:00.000Z",
@@ -828,7 +828,7 @@
       "summary": "Mobile habit tracker with offline-first sync.",
       "description": "Cross-platform mobile app built on a sync engine that works offline-first.",
       "status": "draft",
-      "is_featured": 0,
+      "is_featured": false,
       "client": null,
       "role_on_project": "Mobile Engineer",
       "started_on": "2024-05-01T00:00:00.000Z",
@@ -846,7 +846,7 @@
       "summary": "Headless e-commerce platform with instant search.",
       "description": "Headless commerce backend with a blazing-fast search layer and full inventory orchestration.",
       "status": "published",
-      "is_featured": 0,
+      "is_featured": false,
       "client": "Shopwave",
       "role_on_project": "Full-stack Engineer",
       "started_on": "2023-03-01T00:00:00.000Z",
@@ -864,7 +864,7 @@
       "summary": "Est explicabo Proi",
       "description": "Doloremque eum deser",
       "status": "published",
-      "is_featured": 0,
+      "is_featured": false,
       "client": "Culpa quos eum et in",
       "role_on_project": "Enim laboriosam dol",
       "started_on": "1984-09-16T00:00:00.000Z",
@@ -880,7 +880,7 @@
       "id": 1,
       "project_id": 1,
       "label": "Live Demo",
-      "url": "https://nexus.example.com",
+      "url": "#",
       "type": "demo",
       "order_index": 0
     },
@@ -896,7 +896,7 @@
       "id": 3,
       "project_id": 2,
       "label": "Case Study",
-      "url": "https://atlas.example.com/case-study",
+      "url": "#",
       "type": "docs",
       "order_index": 0
     },
@@ -912,7 +912,7 @@
       "id": 5,
       "project_id": 3,
       "label": "Live Demo",
-      "url": "https://cipher.example.com",
+      "url": "#",
       "type": "demo",
       "order_index": 0
     },
@@ -920,7 +920,7 @@
       "id": 6,
       "project_id": 3,
       "label": "Documentation",
-      "url": "https://docs.cipher.example.com",
+      "url": "#",
       "type": "docs",
       "order_index": 1
     },
@@ -936,7 +936,7 @@
       "id": 8,
       "project_id": 4,
       "label": "Live Demo",
-      "url": "https://canvas.example.com",
+      "url": "#",
       "type": "demo",
       "order_index": 0
     },
@@ -944,7 +944,7 @@
       "id": 9,
       "project_id": 5,
       "label": "Live Demo",
-      "url": "https://defi.example.com",
+      "url": "#",
       "type": "demo",
       "order_index": 0
     },
@@ -952,7 +952,7 @@
       "id": 10,
       "project_id": 7,
       "label": "Live Demo",
-      "url": "https://shopwave.example.com",
+      "url": "#",
       "type": "demo",
       "order_index": 0
     },
@@ -1136,7 +1136,7 @@
       "verify_url": null,
       "description": "Focused on Core Software Engineering principles, Data Structures, and Database Management Systems.",
       "order_index": 1,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:18:39.000Z"
     },
@@ -1152,7 +1152,7 @@
       "verify_url": "https://www.credly.com",
       "description": "Expertise in designing distributed systems on AWS, cost optimization, and multi-tier architecture deployment.",
       "order_index": 2,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:18:30.000Z"
     },
@@ -1168,7 +1168,7 @@
       "verify_url": "https://www.cncf.io",
       "description": "Proficiency in managing containerized workloads, clusters, networking, and security at production scale.",
       "order_index": 3,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:18:27.000Z"
     },
@@ -1184,7 +1184,7 @@
       "verify_url": "https://www.enterprisedb.com",
       "description": "Advanced database management, query optimization, high-availability clusters, and performance tuning.",
       "order_index": 4,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:18:22.000Z"
     },
@@ -1200,7 +1200,7 @@
       "verify_url": "https://www.comptia.org",
       "description": "Foundational knowledge in network security, risk management, threat mitigation, and cryptography.",
       "order_index": 5,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:18:18.000Z"
     }
@@ -1213,7 +1213,7 @@
       "role": "CTO, TechCorp",
       "avatar_media_id": 14,
       "order_index": 0,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:14:01.000Z"
     },
@@ -1224,7 +1224,7 @@
       "role": "VP Engineering, DataFlow",
       "avatar_media_id": 15,
       "order_index": 1,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:13:56.000Z"
     },
@@ -1235,7 +1235,7 @@
       "role": "Director, CloudScale",
       "avatar_media_id": 16,
       "order_index": 2,
-      "is_visible": 0,
+      "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-12T15:13:52.000Z"
     }
@@ -1247,7 +1247,7 @@
       "email": "alicia@startup.io",
       "subject": "Consulting inquiry",
       "message": "We are looking for a systems architect to help scale our platform. Are you available for a short engagement next quarter?",
-      "is_read": 1,
+      "is_read": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T18:57:46.000Z"
     },
@@ -1257,7 +1257,7 @@
       "email": "priya@agency.co",
       "subject": "Contract role",
       "message": "We have a 6-month contract for a Laravel/PostgreSQL specialist. Open to discussing.",
-      "is_read": 1,
+      "is_read": true,
       "created_at": "2026-08-11T15:55:53.000Z",
       "updated_at": "2026-08-11T15:55:53.000Z"
     }

@@ -1,4 +1,5 @@
 import { getSiteData, getProjectsFull, getSkillCategories, getTestimonialsData } from "@/lib/resources";
+import { getSiteSettings } from "@/lib/site-config";
 import Image from "next/image";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
@@ -33,17 +34,17 @@ export default async function HomePage() {
   const skillCategories = skills;
   const techNames = skillCategories.flatMap((c) => c.skills.map((s) => s.name)).slice(0, 12);
   const totalSkills = skillCategories.reduce((n, c) => n + c.skills.length, 0);
-  const settings = site.settings as {
-    site_tagline?: string;
-    site_description?: string;
-    author_role?: string;
-    hero_image?: string;
-    contact_email?: string;
-  };
+  const settings = getSiteSettings(site);
+  const available = settings.announcement_enabled;
 
   return (
     <>
-      <Nav resumeUrl={site.resume?.url} />
+      <Nav
+        siteTitle={settings.site_title}
+        authorName={settings.author_name}
+        menu={site.menu}
+        resumeUrl={site.resume?.url}
+      />
 
       {/* Hero */}
       <header className="relative min-h-screen pt-32 pb-16 px-6 flex flex-col justify-center overflow-hidden">
@@ -60,29 +61,29 @@ export default async function HomePage() {
               </Reveal>
               <Reveal delay={80}>
                 <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.02] tracking-tight mb-8">
-                  {settings.site_tagline ??
-                    "Engineering robust digital systems from the database up"}
+                  {settings.site_tagline}
                 </h1>
               </Reveal>
               <Reveal delay={160}>
                 <p className="text-lg md:text-xl text-secondary max-w-2xl mb-12 leading-relaxed">
-                  {settings.site_description ??
-                    "Full-stack developer with extensive experience in backend systems, databases, and software architecture."}
+                  {settings.site_description}
                 </p>
               </Reveal>
               <Reveal delay={240}>
                 <div className="flex flex-wrap items-center gap-6">
                   <a
                     href="#projects"
-                    className="group inline-flex items-center gap-3 bg-accent text-white px-8 py-4 rounded-xl font-bold tracking-widest uppercase text-sm hover:bg-indigo-700 hover:-translate-y-0.5 transition-all shadow-lg shadow-accent/20"
+                    className="group inline-flex items-center gap-3 bg-accent text-white px-8 py-4 rounded-xl font-bold tracking-widest uppercase text-sm hover:bg-accent-hover hover:-translate-y-0.5 transition-all shadow-lg shadow-accent/20"
                   >
                     View My Work
                     <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
                   </a>
-                  <div className="flex items-center gap-2 font-mono text-xs text-secondary uppercase tracking-widest">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    Open to work
-                  </div>
+                  {available && (
+                    <div className="flex items-center gap-2 font-mono text-xs text-secondary uppercase tracking-widest">
+                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      Open to work
+                    </div>
+                  )}
                 </div>
               </Reveal>
             </div>
@@ -93,7 +94,7 @@ export default async function HomePage() {
                     <Image
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       src={settings.hero_image}
-                      alt="JosephLab abstract software dashboard"
+                      alt={`${settings.site_title} abstract software dashboard`}
                       width={960}
                       height={540}
                       sizes="(max-width: 1024px) 100vw, 42vw"
@@ -101,7 +102,7 @@ export default async function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent pointer-events-none" />
                     <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-surface/80 backdrop-blur-md px-4 py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest text-secondary">
                       <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                      environment: production
+                      environment: {process.env.VERCEL_ENV ?? process.env.NODE_ENV}
                     </div>
                   </div>
                 </Reveal>
@@ -116,7 +117,7 @@ export default async function HomePage() {
                 { label: "Featured Projects", value: String(featuredProjects.length).padStart(2, "0") },
                 { label: "Skill Categories", value: String(skillCategories.length).padStart(2, "0") },
                 { label: "Technologies", value: String(totalSkills).padStart(2, "0") },
-                { label: "Status", value: "OPEN" },
+                { label: "Status", value: available ? "OPEN" : "BUSY" },
               ].map((stat) => (
                 <div key={stat.label} className="bg-elevated py-6 px-6 flex flex-col gap-1">
                   <span className="font-mono text-2xl font-bold text-primary">{stat.value}</span>
@@ -175,7 +176,7 @@ export default async function HomePage() {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <Gallery images={galleryImages} />
+            <Gallery images={galleryImages} siteTitle={settings.site_title} />
           </Reveal>
         </div>
       </section>
@@ -220,7 +221,7 @@ export default async function HomePage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-secondary">STATUS</span>
-                    <span className="text-green-600">OPEN TO WORK</span>
+                    <span className="text-green-600">{available ? "OPEN TO WORK" : "NOT AVAILABLE"}</span>
                   </div>
                 </div>
               </div>
@@ -260,10 +261,15 @@ export default async function HomePage() {
 
       {/* CTA */}
       <Reveal>
-        <Cta email={settings.contact_email} techNames={techNames} />
+        <Cta email={settings.contact_email} techNames={techNames} available={available} />
       </Reveal>
 
-      <Footer socialLinks={site.social_links} />
+      <Footer
+        socialLinks={site.social_links}
+        siteTitle={settings.site_title}
+        authorName={settings.author_name}
+        tagline={settings.site_description}
+      />
     </>
   );
 }

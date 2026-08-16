@@ -12,7 +12,13 @@ const SPANS = [
   "md:col-span-1 md:row-span-1",
 ];
 
-export default function Gallery({ images }: { images: Media[] }) {
+export default function Gallery({
+  images,
+  siteTitle = "JosephLab",
+}: {
+  images: Media[];
+  siteTitle?: string;
+}) {
   const [active, setActive] = useState<number | null>(null);
 
   const close = useCallback(() => setActive(null), []);
@@ -57,7 +63,7 @@ export default function Gallery({ images }: { images: Media[] }) {
             <Image
               className="w-full h-full min-h-64 object-cover transition-transform duration-700 group-hover:scale-110"
               src={image.url ?? ""}
-              alt={image.alt_text ?? "JosephLab systems gallery"}
+              alt={image.alt_text ?? `${siteTitle} gallery`}
               width={640}
               height={800}
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -108,7 +114,7 @@ export default function Gallery({ images }: { images: Media[] }) {
           <Image
             className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
             src={current.url ?? ""}
-            alt={current.alt_text ?? "JosephLab systems gallery"}
+            alt={current.alt_text ?? `${siteTitle} gallery`}
             width={1920}
             height={1080}
             sizes="100vw"

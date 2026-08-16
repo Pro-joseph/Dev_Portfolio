@@ -1,5 +1,13 @@
 import { ReactNode } from "react";
 import { Badge, StatusBadge } from "@/components/admin/ui";
+import {
+  PROJECT_STATUS,
+  PROJECT_STATUS_LABELS,
+  CERT_TYPES,
+  CERT_TYPE_LABELS,
+  SETTING_TYPES,
+  SETTING_TYPE_LABELS,
+} from "./enums";
 
 export type FieldType =
   | "text"
@@ -64,9 +72,7 @@ export const RESOURCES: ResourceConfig[] = [
       { name: "slug", label: "Slug", type: "text", help: "Leave blank to auto-generate from title", cols: "md:col-span-2" },
       { name: "summary", label: "Summary", type: "textarea", cols: "md:col-span-2" },
       { name: "description", label: "Description (markdown)", type: "textarea", cols: "md:col-span-2" },
-      { name: "status", label: "Status", type: "select", required: true, options: [
-        { value: "draft", label: "Draft" }, { value: "published", label: "Published" }, { value: "archived", label: "Archived" },
-      ] },
+      { name: "status", label: "Status", type: "select", required: true, options: PROJECT_STATUS.map((s) => ({ value: s, label: PROJECT_STATUS_LABELS[s] })) },
       { name: "is_featured", label: "Featured", type: "boolean" },
       { name: "client", label: "Client", type: "text" },
       { name: "role_on_project", label: "Role on project", type: "text" },
@@ -199,9 +205,7 @@ export const RESOURCES: ResourceConfig[] = [
       { key: "issuer", label: "Issuer" },
     ],
     fields: [
-      { name: "type", label: "Type", type: "select", required: true, options: [
-        { value: "education", label: "Education" }, { value: "certification", label: "Certification" },
-      ] },
+      { name: "type", label: "Type", type: "select", required: true, options: CERT_TYPES.map((t) => ({ value: t, label: CERT_TYPE_LABELS[t] })) },
       { name: "title", label: "Title", type: "text", required: true, cols: "md:col-span-2" },
       { name: "issuer", label: "Issuer", type: "text" },
       { name: "period", label: "Period (e.g. 2018 - 2021)", type: "text" },
@@ -245,9 +249,7 @@ export const RESOURCES: ResourceConfig[] = [
     fields: [
       { name: "key", label: "Key", type: "text", required: true },
       { name: "value", label: "Value", type: "text" },
-      { name: "type", label: "Type", type: "select", required: true, options: [
-        { value: "string", label: "String" }, { value: "text", label: "Text" }, { value: "boolean", label: "Boolean" }, { value: "json", label: "JSON" },
-      ] },
+      { name: "type", label: "Type", type: "select", required: true, options: SETTING_TYPES.map((t) => ({ value: t, label: SETTING_TYPE_LABELS[t] })) },
     ],
   },
 ];

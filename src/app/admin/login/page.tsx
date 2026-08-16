@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PiInfinity, PiSpinner, PiWarningCircle } from "react-icons/pi";
 import { http, setToken } from "@/lib/api";
@@ -11,6 +11,17 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [brand, setBrand] = useState("JosephLab");
+
+  useEffect(() => {
+    http
+      .get<{ settings: Record<string, unknown> }>("/site")
+      .then((site) => {
+        const title = site.settings.site_title;
+        if (typeof title === "string" && title.trim()) setBrand(title.trim());
+      })
+      .catch(() => {});
+  }, []);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -43,7 +54,7 @@ export default function AdminLoginPage() {
             <PiInfinity className="text-2xl" />
           </div>
           <div>
-            <h1 className="font-semibold text-lg tracking-tight">JosephLab</h1>
+            <h1 className="font-semibold text-lg tracking-tight">{brand}</h1>
             <p className="text-xs text-ink-500 -mt-0.5">Admin Console</p>
           </div>
         </div>
@@ -60,7 +71,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@josephlab.dev"
+                placeholder="you@example.com"
                 autoComplete="email"
                 className="w-full px-3.5 py-2.5 rounded-lg border border-ink-300 focus:border-sky-400 focus:ring-2 focus:ring-sky-100 text-[14px] outline-none transition-all"
               />
@@ -101,9 +112,11 @@ export default function AdminLoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-[12px] text-ink-400 mt-6">
-          Demo: admin@josephlab.dev / password
-        </p>
+        {process.env.NODE_ENV !== "production" && (
+          <p className="text-center text-[12px] text-ink-400 mt-6">
+            Demo: admin@josephlab.dev / password
+          </p>
+        )}
       </div>
     </div>
   );

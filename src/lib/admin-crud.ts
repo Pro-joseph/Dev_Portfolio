@@ -2,6 +2,8 @@ import { query, queryOne, nextId } from "./db";
 import { mediaPublicUrl } from "./media-storage";
 import { uniqueSlug } from "./slug";
 import { json, validationError, notFound, paginate } from "./http";
+import { PROJECT_MORPH } from "./enums";
+import { PAGE_SIZE_ADMIN } from "./config";
 
 // ------------------------------------------------------------- casts
 
@@ -187,7 +189,7 @@ const relationLoaders: Record<string, RelationLoader> = {
         [id]
       ),
       query<Record<string, unknown>>(
-        `SELECT m.* FROM media m WHERE m.mediable_type = 'App\\Models\\Project' AND m.mediable_id = $1 ORDER BY m.order_index`,
+        `SELECT m.* FROM media m WHERE m.mediable_type = '${PROJECT_MORPH}' AND m.mediable_id = $1 ORDER BY m.order_index`,
         [id]
       ),
     ]);
@@ -339,7 +341,7 @@ async function loadRow(crud: Crud, row: Record<string, unknown>): Promise<Record
 export async function crudIndex(crud: Crud, request: Request): Promise<Response> {
   const url = new URL(request.url);
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
-  const perPage = Math.max(1, Number(url.searchParams.get("per_page")) || 20);
+  const perPage = Math.max(1, Number(url.searchParams.get("per_page")) || PAGE_SIZE_ADMIN);
   const search = url.searchParams.get("search")?.trim() ?? "";
 
   let where = "";

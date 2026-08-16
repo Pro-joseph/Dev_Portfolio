@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProjectBySlugTyped } from "@/lib/resources";
+import { loadSiteSettings } from "@/lib/site-config";
+import { PROJECT_STATUS_LABELS } from "@/lib/enums";
 import SubNav from "@/components/public/SubNav";
 import Markdown from "@/components/public/Markdown";
 import ProjectLightbox from "@/components/public/ProjectLightbox";
@@ -25,7 +27,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
-  const project = await getProjectBySlugTyped(slug);
+  const [project, settings] = await Promise.all([
+    getProjectBySlugTyped(slug),
+    loadSiteSettings(),
+  ]);
   if (!project) notFound();
 
   const demoLink = project.links.find((l) => l.type === "demo");
@@ -37,7 +42,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <>
-      <SubNav />
+      <SubNav authorName={settings.author_name} />
 
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-6">
@@ -92,7 +97,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
           {images.length > 0 && (
             <div className="mb-24">
-              <ProjectLightbox images={images} />
+              <ProjectLightbox images={images} siteTitle={settings.site_title} />
             </div>
           )}
 
@@ -148,7 +153,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${project.status === "published" ? "bg-green-500" : "bg-amber-400"}`} />
                     <span className="text-sm font-medium capitalize">
-                      {project.status === "published" ? "In Production" : project.status}
+                      {PROJECT_STATUS_LABELS[project.status] ?? project.status}
                     </span>
                   </div>
                 </div>

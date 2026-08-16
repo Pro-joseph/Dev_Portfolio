@@ -1,5 +1,7 @@
 import { query, queryOne } from "./db";
 import { mediaPublicUrl } from "./media-storage";
+import { PROJECT_MORPH } from "./enums";
+import { PAGE_SIZE_PUBLIC } from "./config";
 import type {
   Certification,
   Project,
@@ -161,7 +163,7 @@ async function loadProjectRelations(
       [id]
     ),
     query<MediaRow>(
-      "SELECT * FROM media WHERE mediable_type = 'App\\Models\\Project' AND mediable_id = $1 ORDER BY order_index",
+      "SELECT * FROM media WHERE mediable_type = '" + PROJECT_MORPH + "' AND mediable_id = $1 ORDER BY order_index",
       [id]
     ),
   ]);
@@ -245,7 +247,7 @@ export async function buildProjectListBatched(
     query<MediaRow & { project_id: number }>(
       `SELECT m.*, m.mediable_id AS project_id
        FROM media m
-       WHERE m.mediable_type = 'App\\Models\\Project' AND m.mediable_id = ANY($1::int[])
+       WHERE m.mediable_type = '${PROJECT_MORPH}' AND m.mediable_id = ANY($1::int[])
        ORDER BY m.order_index`,
       [ids]
     ),
@@ -302,7 +304,7 @@ function castSetting(row: SiteSettingsRow): unknown {
   const value = row.value;
   switch (row.type) {
     case "boolean":
-      return value === "1" || value === "true" || value === "1" || String(value) === "1";
+      return value === "1" || value === "true";
     case "json":
       try {
         return typeof value === "string" ? JSON.parse(value) : value;
@@ -412,7 +414,7 @@ export async function loadProjectList(q: ProjectListQuery): Promise<{
   perPage: number;
   page: number;
 }> {
-  const perPage = Math.max(1, q.perPage || 12);
+  const perPage = Math.max(1, q.perPage || PAGE_SIZE_PUBLIC);
   const page = Math.max(1, q.page || 1);
 
   const conditions: string[] = ["status = 'published'"];

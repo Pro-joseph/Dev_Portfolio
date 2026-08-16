@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCertificationsData } from "@/lib/resources";
+import { loadSiteSettings } from "@/lib/site-config";
 import { Certification } from "@/lib/types";
 import SubNav from "@/components/public/SubNav";
 import { certIcon } from "@/lib/icons";
@@ -17,14 +18,17 @@ function certIconFor(cert: Certification) {
 }
 
 export default async function CertificationsPage() {
-  const data = await getCertificationsData();
+  const [data, settings] = await Promise.all([
+    getCertificationsData(),
+    loadSiteSettings(),
+  ]);
 
   const education = data.filter((c) => c.type === "education");
   const certifications = data.filter((c) => c.type === "certification");
 
   return (
     <>
-      <SubNav />
+      <SubNav authorName={settings.author_name} />
 
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-6 max-w-5xl">
