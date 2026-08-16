@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import postgres from "postgres";
+import { Pool } from "pg";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -43,7 +43,7 @@ if (
  *    (disable -> off; verify-* -> verify; require/prefer/allow -> require).
  *  - with no sslmode, default to require for remote hosts and off for localhost.
  */
-function pgSslConfig(): boolean | "verify-full" | "require" {
+function pgSslConfig(): boolean | { rejectUnauthorized: boolean } {
   const override = process.env.DATABASE_SSL?.trim().toLowerCase();
   if (override === "false" || override === "disable" || override === "0") {
     return false;
@@ -52,17 +52,19 @@ function pgSslConfig(): boolean | "verify-full" | "require" {
     const url = new URL(DATABASE_URL);
     const sslmode = url.searchParams.get("sslmode");
     if (sslmode === "disable") return false;
-    if (sslmode === "verify-full" || sslmode === "verify-ca") return "verify-full";
+    if (sslmode === "verify-full" || sslmode === "verify-ca") {
+      return { rejectUnauthorized: true };
+    }
     if (sslmode === "require" || sslmode === "prefer" || sslmode === "allow") {
-      return "require";
+      return { rejectUnauthorized: false };
     }
     const host = url.hostname;
     if (host === "localhost" || host === "127.0.0.1" || host.endsWith(".local")) {
       return false;
     }
-    return "require";
+    return { rejectUnauthorized: false };
   } catch {
-    return "require";
+    return { rejectUnauthorized: false };
   }
 }
 
@@ -119,18 +121,28 @@ function normalizeRow(raw: Record<string, unknown>): Record<string, unknown> {
 
 // ---------------------------------------------------------------- postgres
 
-let pg: ReturnType<typeof postgres> | null = null;
+let pgPool: Pool | null = null;
 
-function getPg() {
-  if (!pg) {
-    pg = postgres(DATABASE_URL, {
+function getPg(): Pool {
+  if (!pgPool) {
+    pgPool = new Pool({
+      connectionString: DATABASE_URL,
+      // One connection per instance; pg queues concurrent queries on it
+      // sequentially (no pipelining), which is what Supavisor's transaction
+      // pooler expects from serverless runtimes.
       max: 1,
-      idle_timeout: 20,
-      connect_timeout: 15,
+      connectionTimeoutMillis: 15_000,
+      idleTimeoutMillis: 30_000,
+      // Server-side + client-side caps so a query can never hang a connection
+      // forever: a stuck query cancels after 20s and the pooler slot is freed.
+      statement_timeout: 20_000,
+      query_timeout: 25_000,
       ssl: pgSslConfig(),
     });
+    // Keep a stray idle-client error from crashing the serverless instance.
+    pgPool.on("error", () => {});
   }
-  return pg;
+  return pgPool;
 }
 
 // ---------------------------------------------------------------- sqlite
@@ -217,12 +229,9 @@ async function exec(
   params: unknown[] = []
 ): Promise<Record<string, unknown>[]> {
   if (USE_POSTGRES) {
-    const bind = params.map((p) => (p === undefined ? null : p)) as never[];
-    const rows = (await getPg().unsafe(text, bind)) as Record<
-      string,
-      unknown
-    >[];
-    return rows.map((r) => normalizeRow(r));
+    const bind = params.map((p) => (p === undefined ? null : p));
+    const res = await getPg().query(text, bind);
+    return (res.rows as Record<string, unknown>[]).map(normalizeRow);
   }
   const conn = getSqlite();
   const { sql, params: bind } = translateSql(text, params);
@@ -235,8 +244,8 @@ async function exec(
 
 async function run(text: string, params: unknown[] = []): Promise<void> {
   if (USE_POSTGRES) {
-    const bind = params.map((p) => (p === undefined ? null : p)) as never[];
-    await getPg().unsafe(text, bind);
+    const bind = params.map((p) => (p === undefined ? null : p));
+    await getPg().query(text, bind);
     return;
   }
   const conn = getSqlite();
@@ -338,7 +347,7 @@ async function applySchema(): Promise<void> {
     for (const stmt of raw.split(";")) {
       const s = stmt.trim();
       if (!s) continue;
-      await getPg().unsafe(s);
+      await getPg().query(s);
     }
     return;
   }
