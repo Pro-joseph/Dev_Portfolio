@@ -8,6 +8,14 @@ import { GET as exportGet } from "@/app/api/v1/admin/dashboard/export/route";
 import { GET as statusGet } from "@/app/api/v1/admin/system/status/route";
 import { GET as mediaGet, POST as mediaPost } from "@/app/api/v1/admin/media/route";
 import { GET as messagesGet } from "@/app/api/v1/admin/contact-messages/route";
+import {
+  POST as siteSettingsPost,
+} from "@/app/api/v1/admin/site-settings/route";
+import {
+  PUT as siteSettingsUpdatePut,
+  DELETE as siteSettingsDeleteDel,
+} from "@/app/api/v1/admin/site-settings/[id]/route";
+import { GET as siteGet } from "@/app/api/v1/site/route";
 
 process.env.MEDIA_UPLOAD_DIR = path.join(os.tmpdir(), "dashboard-test-media");
 
@@ -16,6 +24,10 @@ function jsonRequest(url: string, init?: RequestInit): Request {
 }
 
 const auth = (token: string) => ({ Authorization: `Bearer ${token}` });
+const jsonAuth = (token: string) => ({
+  "Content-Type": "application/json",
+  ...auth(token),
+});
 
 async function body(res: Response): Promise<Record<string, unknown>> {
   return (await res.json()) as Record<string, unknown>;
@@ -163,5 +175,50 @@ describe("contact messages search", () => {
       jsonRequest("/api/v1/admin/contact-messages?search=zzzz-not-there", { headers: auth(token) })
     );
     expect((await body(miss)).data as unknown[]).toHaveLength(0);
+  });
+});
+
+// ------------------------------------------------------------ author avatar
+
+describe("author avatar setting", () => {
+  it("upserts author_avatar and exposes it via /site", async () => {
+    const created = await siteSettingsPost(
+      jsonRequest("/api/v1/admin/site-settings", {
+        method: "POST",
+        headers: jsonAuth(token),
+        body: JSON.stringify({ key: "author_avatar", value: "/uploads/me.png", type: "string" }),
+      })
+    );
+    expect(created.status).toBe(201);
+    const id = ((await body(created)).data as { id: number }).id;
+
+    let site = await siteGet();
+    expect(site.status).toBe(200);
+    let settings = (await body(site)).settings as Record<string, unknown>;
+    expect(settings.author_avatar).toBe("/uploads/me.png");
+
+    const updated = await siteSettingsUpdatePut(
+      jsonRequest(`/api/v1/admin/site-settings/${id}`, {
+        method: "PUT",
+        headers: jsonAuth(token),
+        body: JSON.stringify({ key: "author_avatar", value: "/uploads/me2.png", type: "string" }),
+      }),
+      { params: Promise.resolve({ id: String(id) }) }
+    );
+    expect(updated.status).toBe(200);
+
+    site = await siteGet();
+    settings = (await body(site)).settings as Record<string, unknown>;
+    expect(settings.author_avatar).toBe("/uploads/me2.png");
+
+    const del = await siteSettingsDeleteDel(
+      jsonRequest(`/api/v1/admin/site-settings/${id}`, { method: "DELETE", headers: auth(token) }),
+      { params: Promise.resolve({ id: String(id) }) }
+    );
+    expect(del.status).toBe(200);
+
+    site = await siteGet();
+    settings = (await body(site)).settings as Record<string, unknown>;
+    expect(settings.author_avatar == null).toBe(true);
   });
 });

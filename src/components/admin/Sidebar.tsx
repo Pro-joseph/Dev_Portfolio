@@ -6,6 +6,7 @@ import useSWR from "swr";
 import { http, clearToken } from "@/lib/api";
 import { DashboardStats } from "@/lib/types";
 import { getSiteSettings } from "@/lib/site-settings";
+import AvatarPicker from "@/components/admin/AvatarPicker";
 import {
   PiSquaresFourFill,
   PiCube,
@@ -45,7 +46,7 @@ export default function Sidebar() {
     "/admin/dashboard/stats",
     (key: string) => http.get<DashboardStats>(key, { auth: true })
   );
-  const { data: site } = useSWR<{ settings: Record<string, unknown> }>(
+  const { data: site, mutate: mutateSite } = useSWR<{ settings: Record<string, unknown> }>(
     "/site",
     (key: string) => http.get<{ settings: Record<string, unknown> }>(key)
   );
@@ -124,9 +125,11 @@ export default function Sidebar() {
           <span className="text-[13.5px]">Log out</span>
         </button>
         <div className="flex items-center gap-3 px-2 py-2 mt-1 rounded-lg">
-          <div className="w-9 h-9 rounded-full bg-ink-900 text-white flex items-center justify-center font-semibold text-sm">
-            {initials}
-          </div>
+          <AvatarPicker
+            avatarUrl={siteSettings.author_avatar}
+            initials={initials}
+            onChanged={() => mutateSite()}
+          />
           <div className="flex-1 min-w-0">
             <p className="text-[13px] font-medium truncate">{siteSettings.author_name}</p>
             <p className="text-[11px] text-ink-400 truncate">Admin</p>

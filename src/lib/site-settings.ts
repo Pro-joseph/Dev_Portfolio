@@ -7,6 +7,7 @@ export interface SiteSettings {
   contact_email: string | null;
   accent_color: string | null;
   hero_image: string | null;
+  author_avatar: string | null;
   announcement_enabled: boolean;
   seo: { twitter?: string; locale?: string } | null;
 }
@@ -25,6 +26,7 @@ export function getSiteSettings(site: { settings: Record<string, unknown> }): Si
     contact_email: (s.contact_email as string) ?? null,
     accent_color: (s.accent_color as string) ?? null,
     hero_image: (s.hero_image as string) ?? null,
+    author_avatar: (s.author_avatar as string) ?? null,
     announcement_enabled: Boolean(s.announcement_enabled),
     seo: (s.seo as { twitter?: string; locale?: string } | null) ?? null,
   };

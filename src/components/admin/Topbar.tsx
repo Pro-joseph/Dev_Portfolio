@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { http } from "@/lib/api";
-import { User, DashboardStats } from "@/lib/types";
+import { DashboardStats } from "@/lib/types";
+import { getSiteSettings } from "@/lib/site-settings";
 import { useDashboardRange, DashboardRange } from "@/components/admin/admin-context";
 import CommandPalette from "@/components/admin/CommandPalette";
 import {
@@ -28,9 +30,17 @@ export default function Topbar() {
   const [rangeOpen, setRangeOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
 
-  const { data } = useSWR<User>("/auth/me", (key: string) =>
-    http.get<{ data: User }>(key, { auth: true }).then((r) => r.data)
+  const { data: site } = useSWR<{ settings: Record<string, unknown> }>(
+    "/site",
+    (key: string) => http.get<{ settings: Record<string, unknown> }>(key)
   );
+  const siteSettings = getSiteSettings({ settings: site?.settings ?? {} });
+  const avatarInitials = siteSettings.author_name
+    .split(" ")
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   const { data: stats } = useSWR<DashboardStats>(
     "/admin/dashboard/stats",
@@ -146,13 +156,18 @@ export default function Topbar() {
             )}
           </button>
 
-          <div className="w-9 h-9 rounded-full bg-ink-900 text-white flex items-center justify-center font-semibold text-sm">
-            {(data?.name ?? "YJ")
-              .split(" ")
-              .map((p) => p[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase()}
+          <div className="w-9 h-9 rounded-full bg-ink-900 text-white overflow-hidden ring-2 ring-white flex items-center justify-center font-semibold text-sm shrink-0">
+            {siteSettings.author_avatar ? (
+              <Image
+                src={siteSettings.author_avatar}
+                alt="Profile"
+                width={36}
+                height={36}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              avatarInitials
+            )}
           </div>
         </div>
       </header>
