@@ -61,8 +61,9 @@ describe("GET /site", () => {
     expect(settings.seo).toEqual({ twitter: "@josephlab", locale: "en" });
     expect(data.menu).toEqual(expect.any(Array));
     expect((data.menu as unknown[]).length).toBeGreaterThan(0);
-    const resume = data.resume as { id: number; label: string; language: string; url: string };
+    const resume = data.resume as { id: number; label: string; language: string; filename: string; url: string };
     expect(resume.label).toBe("MON CV");
+    expect(resume.filename).toBe("YOUSSEF_JDIRA_CV_FR.pdf");
     expect(resume.url).toMatch(/^\/uploads\//);
     const socials = data.social_links as { platform: string }[];
     expect(socials.map((s) => s.platform)).toEqual(

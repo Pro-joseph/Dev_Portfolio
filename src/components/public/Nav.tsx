@@ -6,9 +6,10 @@ interface NavProps {
   authorName?: string;
   menu?: MenuEntry[];
   resumeUrl?: string | null;
+  resumeFilename?: string | null;
 }
 
-export default function Nav({ siteTitle, authorName, menu = [], resumeUrl }: NavProps) {
+export default function Nav({ siteTitle, authorName, menu = [], resumeUrl, resumeFilename }: NavProps) {
   const brand = authorName || siteTitle || "Youssef Jdira";
   const items = menu.length > 0 ? menu : DEFAULT_MENU;
 
@@ -52,8 +53,7 @@ export default function Nav({ siteTitle, authorName, menu = [], resumeUrl }: Nav
       {resumeUrl ? (
         <a
           href={resumeUrl}
-          download
-          target="_blank"
+          download={resumeFilename || true}
           rel="noreferrer"
           className="group relative overflow-hidden bg-primary text-white px-6 py-2 rounded-full text-xs font-bold tracking-widest hover:bg-gray-800 transition-colors"
         >

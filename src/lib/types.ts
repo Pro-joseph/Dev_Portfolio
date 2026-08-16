@@ -130,6 +130,7 @@ export interface ResumeEntry {
   id: number;
   label: string;
   language: string;
+  filename: string;
   url: string;
 }
 

@@ -38,12 +38,13 @@ describe.skipIf(!enabled)("resume download", () => {
       const res = await resumesActiveGet();
       expect(res.status).toBe(200);
       const { data } = (await res.json()) as {
-        data: { id: number; label: string; url: string };
+        data: { id: number; label: string; filename: string; url: string };
       };
       expect(data.id).toBe(resumeId);
       expect(data.label).toBe("SMOKE CV");
+      expect(data.filename).toBe("smoke-cv.pdf");
       expect(data.url).toMatch(/^https:\/\/.+\.supabase\.co/);
-      expect(data.url).toContain("?download=");
+      expect(data.url).toContain("?download=smoke-cv.pdf");
 
       const dl = await fetch(data.url);
       expect(dl.ok).toBe(true);

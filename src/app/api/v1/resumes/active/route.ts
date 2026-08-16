@@ -11,9 +11,11 @@ export async function GET(): Promise<Response> {
     language: string;
     media_disk: string;
     media_path: string;
+    media_filename: string;
   }>(
     `SELECT r.id AS resume_id, r.label, r.language,
-            m.disk AS media_disk, m.path AS media_path
+            m.disk AS media_disk, m.path AS media_path,
+            m.filename AS media_filename
      FROM resumes r
      JOIN media m ON m.id = r.media_id
      WHERE r.is_active = true
@@ -31,7 +33,12 @@ export async function GET(): Promise<Response> {
       id: row.resume_id,
       label: row.label,
       language: row.language,
-      url: resumeDownloadUrl({ disk: row.media_disk, path: row.media_path }),
+      filename: row.media_filename,
+      url: resumeDownloadUrl({
+        disk: row.media_disk,
+        path: row.media_path,
+        filename: row.media_filename,
+      }),
     },
   });
 }

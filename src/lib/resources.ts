@@ -98,11 +98,16 @@ export function mediaUrl(row: { disk: string; path: string }): string {
  * send a Content-Disposition attachment via the `download` query param, so
  * clicking the button downloads the file instead of opening it in the tab.
  */
-export function resumeDownloadUrl(row: { disk: string; path: string }): string {
+export function resumeDownloadUrl(row: {
+  disk: string;
+  path: string;
+  filename?: string | null;
+}): string {
   const url = mediaUrl(row);
   if (row.disk === "supabase") {
     const sep = url.includes("?") ? "&" : "?";
-    return `${url}${sep}download=`;
+    const name = row.filename ? encodeURIComponent(row.filename) : "";
+    return `${url}${sep}download=${name}`;
   }
   return url;
 }
@@ -332,9 +337,10 @@ async function loadSiteData(): Promise<{
     query<MenuItemRow>(
       "SELECT * FROM menu_items WHERE is_visible = true ORDER BY order_index"
     ),
-    query<{ resume_id: number; label: string; language: string; media_disk: string; media_path: string }>(
+    query<{ resume_id: number; label: string; language: string; media_disk: string; media_path: string; media_filename: string }>(
       `SELECT r.id AS resume_id, r.label, r.language,
-              m.disk AS media_disk, m.path AS media_path
+              m.disk AS media_disk, m.path AS media_path,
+              m.filename AS media_filename
        FROM resumes r
        JOIN media m ON m.id = r.media_id
        WHERE r.is_active = true
@@ -378,7 +384,12 @@ async function loadSiteData(): Promise<{
         id: resumes[0].resume_id,
         label: resumes[0].label,
         language: resumes[0].language,
-        url: resumeDownloadUrl({ disk: resumes[0].media_disk, path: resumes[0].media_path }),
+        filename: resumes[0].media_filename,
+        url: resumeDownloadUrl({
+          disk: resumes[0].media_disk,
+          path: resumes[0].media_path,
+          filename: resumes[0].media_filename,
+        }),
       }
     : null;
 

@@ -44,6 +44,7 @@ export default async function HomePage() {
         authorName={settings.author_name}
         menu={site.menu}
         resumeUrl={site.resume?.url}
+        resumeFilename={site.resume?.filename}
       />
 
       {/* Hero */}
