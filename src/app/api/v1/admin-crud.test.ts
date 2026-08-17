@@ -697,6 +697,49 @@ describe("media library", () => {
   });
 });
 
+describe("slug normalization", () => {
+  it("canonicalizes a manually-provided slug on create", async () => {
+    const res = await projectsPost(
+      jsonRequest("/api/v1/admin/projects", {
+        method: "POST",
+        headers: jsonAuth(token),
+        body: JSON.stringify({
+          title: "ThreadForge API",
+          slug: "ThreadForge ",
+          status: "published",
+          locale: "en",
+        }),
+      })
+    );
+    expect(res.status).toBe(201);
+    const data = (await body(res)).data as { slug: string };
+    expect(data.slug).toBe("threadforge");
+  });
+
+  it("canonicalizes a manually-provided slug on update", async () => {
+    const created = await projectsPost(
+      jsonRequest("/api/v1/admin/projects", {
+        method: "POST",
+        headers: jsonAuth(token),
+        body: JSON.stringify({ title: "Slug Updater", status: "published", locale: "en" }),
+      })
+    );
+    const { id } = (await body(created)).data as { id: number };
+
+    const updated = await projectUpdatePut(
+      jsonRequest(`/api/v1/admin/projects/${id}`, {
+        method: "PUT",
+        headers: jsonAuth(token),
+        body: JSON.stringify({ title: "Slug Updater", slug: "My Slug ", status: "published", locale: "en" }),
+      }),
+      { params: Promise.resolve({ id: String(id) }) }
+    );
+    expect(updated.status).toBe(200);
+    const data = (await body(updated)).data as { slug: string };
+    expect(data.slug).toBe("my-slug");
+  });
+});
+
 describe("contact messages", () => {
   it("lists, marks read, deletes", async () => {
     const list = await messagesGet(jsonRequest("/api/v1/admin/contact-messages", { headers: auth(token) }));

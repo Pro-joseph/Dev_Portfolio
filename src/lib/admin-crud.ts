@@ -314,16 +314,19 @@ async function ensureSlug(
 ): Promise<Record<string, unknown>> {
   if (!crud.hasSlug) return payload;
   const data = { ...payload };
-  if (!data.slug || !String(data.slug).trim()) {
-    const source = crud.slugSource ?? "title";
-    if (data[source] && String(data[source]).trim()) {
-      data.slug = await uniqueSlug(
-        crud.table,
-        String(data[source]),
-        ignoreId,
-        data.locale ? String(data.locale) : null
-      );
-    }
+  const source = crud.slugSource ?? "title";
+  const base = data.slug && String(data.slug).trim()
+    ? String(data.slug)
+    : data[source] && String(data[source]).trim()
+      ? String(data[source])
+      : "";
+  if (base) {
+    data.slug = await uniqueSlug(
+      crud.table,
+      base,
+      ignoreId,
+      data.locale ? String(data.locale) : null
+    );
   }
   return data;
 }
