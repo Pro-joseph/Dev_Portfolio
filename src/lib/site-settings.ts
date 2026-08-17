@@ -1,5 +1,5 @@
 export interface SeoSettings {
-  twitter?: string;
+  linkedin?: string;
   locale?: string;
   author?: string;
   keywords?: string;

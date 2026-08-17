@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeLocale, twitterHandle } from "@/lib/seo";
+import { normalizeLocale, linkedinUrl } from "@/lib/seo";
 
 describe("normalizeLocale", () => {
   it("maps short codes to BCP-47", () => {
@@ -20,14 +20,18 @@ describe("normalizeLocale", () => {
   });
 });
 
-describe("twitterHandle", () => {
-  it("strips the leading @", () => {
-    expect(twitterHandle("@josephlab")).toBe("josephlab");
+describe("linkedinUrl", () => {
+  it("accepts a valid LinkedIn profile URL", () => {
+    expect(linkedinUrl("https://www.linkedin.com/in/youssef-jdira-85b113167/")).toBe(
+      "https://www.linkedin.com/in/youssef-jdira-85b113167/"
+    );
+    expect(linkedinUrl("  https://linkedin.com/in/john  ".trim())).toBe("https://linkedin.com/in/john");
   });
 
-  it("returns undefined for empty values", () => {
-    expect(twitterHandle(undefined)).toBeUndefined();
-    expect(twitterHandle("")).toBeUndefined();
-    expect(twitterHandle("@")).toBeUndefined();
+  it("returns undefined for empty or invalid values", () => {
+    expect(linkedinUrl(undefined)).toBeUndefined();
+    expect(linkedinUrl(null)).toBeUndefined();
+    expect(linkedinUrl("")).toBeUndefined();
+    expect(linkedinUrl("not a url")).toBeUndefined();
   });
 });

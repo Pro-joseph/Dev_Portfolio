@@ -59,7 +59,7 @@ describe("GET /site", () => {
     expect(settings.site_title).toBe("JosephLab");
     expect(settings.announcement_enabled).toBe(false);
     expect(settings.seo).toEqual({
-      twitter: "@josephlab",
+      linkedin: "https://www.linkedin.com/in/youssef-jdira-85b113167/",
       locale: "en_US",
       author: "Youssef Jdira",
       keywords: "full-stack developer, systems architect, portfolio, laravel, postgresql",

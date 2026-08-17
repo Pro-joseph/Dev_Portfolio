@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Hanken_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { loadSiteSettings } from "@/lib/site-config";
-import { normalizeLocale, twitterHandle } from "@/lib/seo";
+import { normalizeLocale, linkedinUrl } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const settings = await loadSiteSettings();
     const seo = settings.seo;
     const locale = normalizeLocale(seo?.locale);
-    const handle = twitterHandle(seo?.twitter);
+    const authorUrl = linkedinUrl(seo?.linkedin);
     const cardImage = settings.og_image ?? settings.hero_image;
     const ogTitle = `${settings.site_title} | ${settings.author_name}`;
 
@@ -38,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
       },
       description: settings.site_description,
       keywords: seo?.keywords || undefined,
-      authors: seo?.author ? [{ name: seo.author }] : undefined,
+      authors: seo?.author ? [{ name: seo.author, ...(authorUrl ? { url: authorUrl } : {}) }] : undefined,
       alternates: seo?.canonical ? { canonical: seo.canonical } : undefined,
       openGraph: {
         type: "website",
@@ -57,14 +57,6 @@ export async function generateMetadata(): Promise<Metadata> {
               },
             ]
           : [],
-      },
-      twitter: {
-        card: cardImage ? "summary_large_image" : "summary",
-        site: handle,
-        creator: handle,
-        title: ogTitle,
-        description: settings.site_description,
-        images: cardImage ? [{ url: cardImage, alt: `${settings.site_title} — ${settings.author_name}` }] : undefined,
       },
     };
   } catch {

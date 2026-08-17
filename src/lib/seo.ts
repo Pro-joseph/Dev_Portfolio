@@ -18,8 +18,8 @@ export function normalizeLocale(locale?: string | null): string {
   return "en_US";
 }
 
-/** Strips the leading "@" from a Twitter/X handle for twitter:site/creator. */
-export function twitterHandle(twitter?: string | null): string | undefined {
-  const raw = twitter?.trim().replace(/^@+/, "") || "";
-  return raw || undefined;
+/** Validates a LinkedIn profile URL for the rel=author link. */
+export function linkedinUrl(url?: string | null): string | undefined {
+  const raw = url?.trim() || "";
+  return /^https?:\/\/.+/i.test(raw) ? raw : undefined;
 }

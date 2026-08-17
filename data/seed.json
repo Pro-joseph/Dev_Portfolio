@@ -90,7 +90,7 @@
     {
       "id": 10,
       "key": "seo",
-      "value": "{\"twitter\":\"@josephlab\",\"locale\":\"en_US\",\"author\":\"Youssef Jdira\",\"keywords\":\"full-stack developer, systems architect, portfolio, laravel, postgresql\",\"canonical\":\"https://www.josephlab.dev\"}",
+      "value": "{\"linkedin\":\"https://www.linkedin.com/in/youssef-jdira-85b113167/\",\"locale\":\"en_US\",\"author\":\"Youssef Jdira\",\"keywords\":\"full-stack developer, systems architect, portfolio, laravel, postgresql\",\"canonical\":\"https://www.josephlab.dev\"}",
       "type": "json",
       "updated_at": "2026-08-11T15:55:53.000Z"
     },
