@@ -202,7 +202,12 @@ async function loadProjectRelations(
       [id]
     ),
     query<MediaRow>(
-      "SELECT * FROM media WHERE mediable_type = '" + PROJECT_MORPH + "' AND mediable_id = $1 ORDER BY order_index",
+      `SELECT * FROM media
+       WHERE mediable_type = '${PROJECT_MORPH}'
+         AND mediable_id IN (
+           SELECT id FROM projects WHERE slug = (SELECT slug FROM projects WHERE id = $1)
+         )
+       ORDER BY order_index`,
       [id]
     ),
   ]);
@@ -286,7 +291,12 @@ export async function buildProjectListBatched(
     query<MediaRow & { project_id: number }>(
       `SELECT m.*, m.mediable_id AS project_id
        FROM media m
-       WHERE m.mediable_type = '${PROJECT_MORPH}' AND m.mediable_id = ANY($1::int[])
+       WHERE m.mediable_type = '${PROJECT_MORPH}'
+         AND m.mediable_id IN (
+           SELECT id FROM projects WHERE slug IN (
+             SELECT slug FROM projects WHERE id = ANY($1::int[])
+           )
+         )
        ORDER BY m.order_index`,
       [ids]
     ),
@@ -294,7 +304,9 @@ export async function buildProjectListBatched(
 
   const linksByProject = new Map<number, ProjectLinkRow[]>();
   const skillsByProject = new Map<number, SkillRow[]>();
-  const mediaByProject = new Map<number, MediaRow[]>();
+  const mediaBySlug = new Map<string, MediaRow[]>();
+  const idToSlug = new Map<number, string>();
+  for (const p of rows) idToSlug.set(p.id, String(p.slug));
   for (const l of links) {
     const list = linksByProject.get(l.project_id) ?? [];
     list.push(l);
@@ -306,15 +318,17 @@ export async function buildProjectListBatched(
     skillsByProject.set(s.project_id, list);
   }
   for (const m of media) {
-    const list = mediaByProject.get(m.project_id) ?? [];
+    const slug = idToSlug.get(m.project_id);
+    if (!slug) continue;
+    const list = mediaBySlug.get(slug) ?? [];
     list.push(m);
-    mediaByProject.set(m.project_id, list);
+    mediaBySlug.set(slug, list);
   }
 
   return rows.map((project) => {
     const links = linksByProject.get(project.id) ?? [];
     const skills = skillsByProject.get(project.id) ?? [];
-    const media = mediaByProject.get(project.id) ?? [];
+    const media = mediaBySlug.get(String(project.slug)) ?? [];
     const cover = media.find((m) => m.collection === "cover") ?? media[0] ?? null;
     return { project, links, skills, media, cover };
   });

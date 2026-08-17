@@ -188,7 +188,12 @@ const relationLoaders: Record<string, RelationLoader> = {
         [id]
       ),
       query<Record<string, unknown>>(
-        `SELECT m.* FROM media m WHERE m.mediable_type = '${PROJECT_MORPH}' AND m.mediable_id = $1 ORDER BY m.order_index`,
+        `SELECT m.* FROM media m
+         WHERE m.mediable_type = '${PROJECT_MORPH}'
+           AND m.mediable_id IN (
+             SELECT id FROM projects WHERE slug = (SELECT slug FROM projects WHERE id = $1)
+           )
+         ORDER BY m.order_index`,
         [id]
       ),
     ]);
@@ -294,6 +299,8 @@ export interface Crud {
     payload: Record<string, unknown>,
     existing: Record<string, unknown>
   ) => Promise<void>;
+  /** Run just before the row is deleted. */
+  beforeDestroy?: (row: Record<string, unknown>) => Promise<void>;
 }
 
 type ValidationResult =
@@ -494,6 +501,7 @@ export async function crudDestroy(crud: Crud, id: number): Promise<Response> {
     [id]
   );
   if (!existing) return notFound();
+  if (crud.beforeDestroy) await crud.beforeDestroy(existing);
   await query(`DELETE FROM ${crud.table} WHERE id = $1`, [id]);
   return json({ message: "Deleted." });
 }

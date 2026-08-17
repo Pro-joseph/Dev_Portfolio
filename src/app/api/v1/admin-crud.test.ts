@@ -562,6 +562,107 @@ describe("project relations sync", () => {
   });
 });
 
+describe("project media shared across locale twins", () => {
+  type TwinProject = {
+    id: number;
+    slug: string;
+    media: { id: number }[];
+    cover: { id: number } | null;
+  };
+
+  async function createTwin(locale: string, media_ids: number[]): Promise<TwinProject> {
+    const res = await projectsPost(
+      jsonRequest("/api/v1/admin/projects", {
+        method: "POST",
+        headers: jsonAuth(token),
+        body: JSON.stringify({
+          title: "Twin Project",
+          status: "published",
+          locale,
+          media_ids,
+        }),
+      })
+    );
+    expect(res.status).toBe(201);
+    return (await body(res)).data as TwinProject;
+  }
+
+  async function showTwin(id: number): Promise<TwinProject> {
+    const res = await projectShowGet(
+      jsonRequest(`/api/v1/admin/projects/${id}`, { headers: auth(token) }),
+      { params: Promise.resolve({ id: String(id) }) }
+    );
+    expect(res.status).toBe(200);
+    return (await body(res)).data as TwinProject;
+  }
+
+  it("both locales see the same images, whichever twin owns them", async () => {
+    const en = await createTwin("en", [1, 2]);
+    const fr = await createTwin("fr", [1, 2]);
+    expect(fr.slug).toBe(en.slug);
+
+    // creating the FR twin must NOT strip the EN twin's images
+    const enAfter = await showTwin(en.id);
+    expect(enAfter.media.map((m) => m.id)).toEqual([1, 2]);
+    const frAfter = await showTwin(fr.id);
+    expect(frAfter.media.map((m) => m.id)).toEqual([1, 2]);
+  });
+
+  it("editing one twin's images updates both", async () => {
+    const en = await createTwin("en", [1, 2]);
+    const fr = await createTwin("fr", [1, 2]);
+
+    const res = await projectUpdatePut(
+      jsonRequest(`/api/v1/admin/projects/${en.id}`, {
+        method: "PUT",
+        headers: jsonAuth(token),
+        body: JSON.stringify({
+          title: "Twin Project",
+          status: "published",
+          locale: "en",
+          media_ids: [2, 3],
+        }),
+      }),
+      { params: Promise.resolve({ id: String(en.id) }) }
+    );
+    expect(res.status).toBe(200);
+
+    expect((await showTwin(en.id)).media.map((m) => m.id)).toEqual([2, 3]);
+    expect((await showTwin(fr.id)).media.map((m) => m.id)).toEqual([2, 3]);
+  });
+
+  it("deleting one twin keeps images for the other", async () => {
+    const en = await createTwin("en", [1, 2]);
+    const fr = await createTwin("fr", [1, 2]);
+
+    const del = await projectDeleteDel(
+      jsonRequest(`/api/v1/admin/projects/${en.id}`, { method: "DELETE", headers: auth(token) }),
+      { params: Promise.resolve({ id: String(en.id) }) }
+    );
+    expect(del.status).toBe(200);
+
+    expect((await showTwin(fr.id)).media.map((m) => m.id)).toEqual([1, 2]);
+  });
+
+  it("deleting the only twin detaches its media", async () => {
+    const en = await createTwin("en", [1, 2]);
+
+    const del = await projectDeleteDel(
+      jsonRequest(`/api/v1/admin/projects/${en.id}`, { method: "DELETE", headers: auth(token) }),
+      { params: Promise.resolve({ id: String(en.id) }) }
+    );
+    expect(del.status).toBe(200);
+
+    const list = await mediaGet(jsonRequest("/api/v1/admin/media?per_page=100", { headers: auth(token) }));
+    const rows = ((await body(list)).data as { id: number; mediable_id: number | null; mediable_type: string | null }[]);
+    for (const id of [1, 2]) {
+      const row = rows.find((r) => r.id === id);
+      expect(row?.mediable_id).toBeNull();
+      expect(row?.mediable_type).toBeNull();
+    }
+  });
+});
+
 // ------------------------------------------------------- media + messages
 
 describe("media library", () => {

@@ -1,4 +1,4 @@
-import { query, nextId } from "./db";
+import { query, queryOne, nextId } from "./db";
 import { type Crud } from "./admin-crud";
 import {
   projectsValidator,
@@ -62,7 +62,10 @@ async function applyProjectRelations(id: number, payload: Record<string, unknown
     const mediaIds = (payload.media_ids as number[] | undefined) ?? [];
     await query(
       `UPDATE media SET mediable_type = NULL, mediable_id = NULL, collection = NULL
-       WHERE mediable_type = $1 AND mediable_id = $2`,
+       WHERE mediable_type = $1
+         AND mediable_id IN (
+           SELECT id FROM projects WHERE slug = (SELECT slug FROM projects WHERE id = $2)
+         )`,
       [PROJECT_MORPH, id]
     );
     for (const [index, mid] of mediaIds.entries()) {
@@ -103,6 +106,26 @@ export const crudDefs: Record<string, Crud> = {
     virtualFields: ["skill_ids", "media_ids", "links"],
     afterInsert: (id, payload) => applyProjectRelations(id, payload),
     afterUpdate: (id, payload) => applyProjectRelations(id, payload),
+    beforeDestroy: async (row) => {
+      const id = Number(row.id);
+      const slug = String(row.slug ?? "");
+      const sibling = await queryOne<{ id: number }>(
+        `SELECT id FROM projects WHERE slug = $1 AND id <> $2 ORDER BY id LIMIT 1`,
+        [slug, id]
+      );
+      if (sibling) {
+        await query(
+          `UPDATE media SET mediable_id = $1 WHERE mediable_type = $2 AND mediable_id = $3`,
+          [sibling.id, PROJECT_MORPH, id]
+        );
+      } else {
+        await query(
+          `UPDATE media SET mediable_type = NULL, mediable_id = NULL, collection = NULL
+           WHERE mediable_type = $1 AND mediable_id = $2`,
+          [PROJECT_MORPH, id]
+        );
+      }
+    },
   },
   pages: {
     table: "pages",
