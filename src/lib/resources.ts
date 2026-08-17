@@ -397,8 +397,9 @@ async function loadSiteData(locale: string = DEFAULT_LOCALE): Promise<{
        FROM resumes r
        JOIN media m ON m.id = r.media_id
        WHERE r.is_active = true
-       ORDER BY r.created_at DESC
-       LIMIT 1`
+       ORDER BY (LOWER(r.language) = $1) DESC, r.created_at DESC
+       LIMIT 1`,
+      [locale]
     ),
   ]);
 
