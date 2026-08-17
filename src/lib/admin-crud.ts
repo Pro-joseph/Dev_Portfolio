@@ -73,7 +73,6 @@ const TABLE_CASTS: Record<string, Record<string, CastKind>> = {
   },
   skills: {
     skill_category_id: "int",
-    proficiency: "int",
     order_index: "int",
     is_visible: "bool",
     created_at: "datetime",
@@ -174,7 +173,7 @@ type RelationLoader = (
   row: Record<string, unknown>
 ) => Promise<Record<string, unknown>>;
 
-const SKILL_QUERY = `SELECT s.id, s.skill_category_id, s.name, s.slug, s.icon, s.proficiency, s.order_index, s.is_visible, s.created_at, s.updated_at FROM skills s`;
+const SKILL_QUERY = `SELECT s.id, s.skill_category_id, s.name, s.slug, s.icon, s.order_index, s.is_visible, s.created_at, s.updated_at FROM skills s`;
 
 const relationLoaders: Record<string, RelationLoader> = {
   projects: async (row) => {

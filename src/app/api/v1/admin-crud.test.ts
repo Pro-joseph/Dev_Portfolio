@@ -223,8 +223,8 @@ describe("admin CRUD — every resource", () => {
       update: skillUpdatePut,
       destroy: skillDeleteDel,
       path: "/api/v1/admin/skills",
-      createBody: { name: "CRUD Skill", proficiency: 90 },
-      updateBody: { name: "CRUD Skill", proficiency: 50 },
+      createBody: { name: "CRUD Skill" },
+      updateBody: { name: "CRUD Skill" },
     });
   });
 
@@ -461,7 +461,7 @@ describe("auth + guards", () => {
       jsonRequest("/api/v1/admin/skills", {
         method: "POST",
         headers: jsonAuth(token),
-        body: JSON.stringify({ proficiency: 100 }),
+        body: JSON.stringify({ icon: "x" }),
       })
     );
     expect(res.status).toBe(422);

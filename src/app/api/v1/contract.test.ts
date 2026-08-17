@@ -58,7 +58,14 @@ describe("GET /site", () => {
     const settings = data.settings as Record<string, unknown>;
     expect(settings.site_title).toBe("JosephLab");
     expect(settings.announcement_enabled).toBe(false);
-    expect(settings.seo).toEqual({ twitter: "@josephlab", locale: "en" });
+    expect(settings.seo).toEqual({
+      twitter: "@josephlab",
+      locale: "en_US",
+      author: "Youssef Jdira",
+      keywords: "full-stack developer, systems architect, portfolio, laravel, postgresql",
+      canonical: "https://www.josephlab.dev",
+    });
+    expect(settings.og_image).toBeNull();
     expect(data.menu).toEqual(expect.any(Array));
     expect((data.menu as unknown[]).length).toBeGreaterThan(0);
     const resume = data.resume as { id: number; label: string; language: string; filename: string; url: string };
@@ -81,8 +88,8 @@ describe("GET /skills", () => {
     const first = data[0] as { id: number; name: string; skills: unknown[] };
     expect(typeof first.id).toBe("number");
     expect(Array.isArray(first.skills)).toBe(true);
-    const skill = (first.skills as { name: string; proficiency: number }[])[0];
-    expect(typeof skill.proficiency).toBe("number");
+    const skill = (first.skills as { name: string }[])[0];
+    expect(typeof skill.name).toBe("string");
   });
 });
 

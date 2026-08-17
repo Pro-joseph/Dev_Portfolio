@@ -21,23 +21,10 @@ export default function SkillCard({ category }: { category: SkillCategory }) {
           {category.name.slice(0, 3).toUpperCase()}
         </span>
       </div>
-      <ul className="space-y-3 text-secondary font-mono text-sm">
+      <ul className="space-y-2.5 text-secondary font-mono text-sm">
         {category.skills.map((skill) => (
-          <li key={skill.id}>
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-primary font-medium">{skill.name}</span>
-              {skill.proficiency != null && (
-                <span className="text-secondary/50 text-xs">{skill.proficiency}%</span>
-              )}
-            </div>
-            {skill.proficiency != null && (
-              <div className="h-1.5 rounded-full bg-elevated overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-accent/70 group-hover:bg-accent transition-colors"
-                  style={{ width: `${skill.proficiency}%` }}
-                />
-              </div>
-            )}
+          <li key={skill.id} className="flex items-center gap-2">
+            <span className="text-primary font-medium">{skill.name}</span>
           </li>
         ))}
       </ul>

@@ -35,7 +35,6 @@ export interface SkillRow {
   name: string;
   slug: string;
   icon: string | null;
-  proficiency: number | null;
   order_index: number;
 }
 
@@ -136,7 +135,6 @@ export function skillResource(row: SkillRow): Record<string, unknown> {
     name: row.name,
     slug: row.slug,
     icon: row.icon,
-    proficiency: row.proficiency,
     order_index: row.order_index,
   };
 }
@@ -160,7 +158,7 @@ async function loadProjectRelations(
       [id]
     ),
     query<SkillRow>(
-      `SELECT s.id, s.name, s.slug, s.icon, s.proficiency, s.order_index
+      `SELECT s.id, s.name, s.slug, s.icon, s.order_index
        FROM skills s
        JOIN project_skill ps ON ps.skill_id = s.id
        WHERE ps.project_id = $1
@@ -242,7 +240,7 @@ export async function buildProjectListBatched(
       [ids]
     ),
     query<SkillRow & { project_id: number }>(
-      `SELECT s.id, s.name, s.slug, s.icon, s.proficiency, s.order_index, ps.project_id
+      `SELECT s.id, s.name, s.slug, s.icon, s.order_index, ps.project_id
        FROM skills s
        JOIN project_skill ps ON ps.skill_id = s.id
        WHERE ps.project_id = ANY($1::int[])
@@ -482,7 +480,7 @@ export async function loadSkillCategories(): Promise<Record<string, unknown>[]> 
   return Promise.all(
     categories.map(async (cat) => {
       const skills = await query<SkillRow>(
-        "SELECT id, name, slug, icon, proficiency, order_index FROM skills WHERE skill_category_id = $1 AND is_visible = true ORDER BY order_index",
+        "SELECT id, name, slug, icon, order_index FROM skills WHERE skill_category_id = $1 AND is_visible = true ORDER BY order_index",
         [cat.id]
       );
       return {

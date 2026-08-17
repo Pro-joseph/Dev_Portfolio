@@ -1,3 +1,11 @@
+export interface SeoSettings {
+  twitter?: string;
+  locale?: string;
+  author?: string;
+  keywords?: string;
+  canonical?: string;
+}
+
 export interface SiteSettings {
   site_title: string;
   site_tagline: string;
@@ -8,8 +16,9 @@ export interface SiteSettings {
   accent_color: string | null;
   hero_image: string | null;
   author_avatar: string | null;
+  og_image: string | null;
   announcement_enabled: boolean;
-  seo: { twitter?: string; locale?: string } | null;
+  seo: SeoSettings | null;
 }
 
 export function getSiteSettings(site: { settings: Record<string, unknown> }): SiteSettings {
@@ -27,7 +36,8 @@ export function getSiteSettings(site: { settings: Record<string, unknown> }): Si
     accent_color: (s.accent_color as string) ?? null,
     hero_image: (s.hero_image as string) ?? null,
     author_avatar: (s.author_avatar as string) ?? null,
+    og_image: (s.og_image as string) ?? null,
     announcement_enabled: Boolean(s.announcement_enabled),
-    seo: (s.seo as { twitter?: string; locale?: string } | null) ?? null,
+    seo: (s.seo as SeoSettings | null) ?? null,
   };
 }

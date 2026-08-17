@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Hanken_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { loadSiteSettings } from "@/lib/site-config";
+import { normalizeLocale, twitterHandle } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,25 +25,46 @@ const hanken = Hanken_Grotesk({
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const settings = await loadSiteSettings();
+    const seo = settings.seo;
+    const locale = normalizeLocale(seo?.locale);
+    const handle = twitterHandle(seo?.twitter);
+    const cardImage = settings.og_image ?? settings.hero_image;
+    const ogTitle = `${settings.site_title} | ${settings.author_name}`;
+
     return {
       title: {
         default: `${settings.site_title} | ${settings.author_name} — ${settings.author_role}`,
         template: `%s | ${settings.site_title}`,
       },
       description: settings.site_description,
+      keywords: seo?.keywords || undefined,
+      authors: seo?.author ? [{ name: seo.author }] : undefined,
+      alternates: seo?.canonical ? { canonical: seo.canonical } : undefined,
       openGraph: {
         type: "website",
-        locale: settings.seo?.locale ?? "en_US",
+        locale,
         siteName: settings.site_title,
-        title: `${settings.site_title} | ${settings.author_name}`,
+        title: ogTitle,
         description: settings.site_description,
-        images: settings.hero_image ? [{ url: settings.hero_image }] : [],
+        url: seo?.canonical || undefined,
+        images: cardImage
+          ? [
+              {
+                url: cardImage,
+                width: 1200,
+                height: 630,
+                alt: `${settings.site_title} — ${settings.author_name}`,
+              },
+            ]
+          : [],
       },
       twitter: {
-        card: "summary_large_image",
-        title: `${settings.site_title} | ${settings.author_name}`,
+        card: cardImage ? "summary_large_image" : "summary",
+        site: handle,
+        creator: handle,
+        title: ogTitle,
         description: settings.site_description,
-        images: settings.hero_image ? [settings.hero_image] : [],
+        images: cardImage ? [{ url: cardImage, alt: `${settings.site_title} — ${settings.author_name}` }] : undefined,
       },
     };
   } catch {
@@ -60,17 +82,20 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  let locale = "en";
   let accent: string | null = null;
   try {
     const settings = await loadSiteSettings();
+    locale = normalizeLocale(settings.seo?.locale).split("_")[0];
     accent = settings.accent_color;
   } catch {
+    locale = "en";
     accent = null;
   }
 
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${inter.variable} ${jetbrainsMono.variable} ${hanken.variable} antialiased`}
       style={accent ? ({ "--color-accent": accent } as React.CSSProperties) : undefined}
     >

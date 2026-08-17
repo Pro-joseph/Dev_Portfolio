@@ -125,7 +125,6 @@ export const crudDefs: Record<string, Crud> = {
       "slug",
       "skill_category_id",
       "icon",
-      "proficiency",
       "order_index",
       "is_visible",
     ]),

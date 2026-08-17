@@ -14,7 +14,6 @@ export interface Skill {
   name: string;
   slug: string;
   icon: string | null;
-  proficiency: number | null;
   order_index: number;
 }
 

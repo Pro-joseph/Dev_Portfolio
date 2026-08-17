@@ -77,7 +77,6 @@ const NUMERIC_KEYS = new Set([
   "id",
   "size_kb",
   "order_index",
-  "proficiency",
   "views_count",
   "total",
   "n",

@@ -93,13 +93,11 @@ export const RESOURCES: ResourceConfig[] = [
     columns: [
       { key: "name", label: "Name", render: (r) => <span className="font-medium">{String(r.name)}</span> },
       { key: "skill_category_id", label: "Category ID" },
-      { key: "proficiency", label: "Proficiency", render: (r) => (r.proficiency != null ? `${r.proficiency}%` : "—") },
       { key: "is_visible", label: "Visible", render: (r) => (r.is_visible ? <Badge tone="green">Yes</Badge> : <Badge tone="slate">No</Badge>) },
     ],
     fields: [
       { name: "name", label: "Name", type: "text", required: true },
       { name: "skill_category_id", label: "Category", type: "select", optionsKey: "categories" },
-      { name: "proficiency", label: "Proficiency (0-100)", type: "number" },
       { name: "order_index", label: "Order", type: "number" },
       { name: "is_visible", label: "Visible", type: "boolean" },
     ],

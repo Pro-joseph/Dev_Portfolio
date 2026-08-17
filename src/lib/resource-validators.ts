@@ -24,7 +24,6 @@ export const skillsValidator: Validator = makeValidator(() => ({
   slug: {},
   skill_category_id: { numeric: true },
   icon: { max: 120 },
-  proficiency: { numeric: true },
   order_index: { numeric: true },
 }));
 
