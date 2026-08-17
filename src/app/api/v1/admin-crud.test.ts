@@ -339,6 +339,43 @@ describe("admin CRUD — every resource", () => {
     };
     expect(showData.description).toBe("A meaningful description.");
     expect(showData.issued_on).toBe("2024-05-01T00:00:00.000000Z");
+
+    const updated = await certificationUpdatePut(
+      jsonRequest(`/api/v1/admin/certifications/${createdData.id}`, {
+        method: "PUT",
+        headers: jsonAuth(token),
+        body: JSON.stringify({
+          type: "certification",
+          title: "Round Trip Cert Updated",
+          description: "An updated description.",
+          issued_on: "2025-02-10",
+        }),
+      }),
+      { params: Promise.resolve({ id: String(createdData.id) }) }
+    );
+    expect(updated.status).toBe(200);
+    const updatedData = (await body(updated)).data as {
+      title: string;
+      description: string | null;
+      issued_on: string | null;
+    };
+    expect(updatedData.title).toBe("Round Trip Cert Updated");
+    expect(updatedData.description).toBe("An updated description.");
+    expect(updatedData.issued_on).toBe("2025-02-10T00:00:00.000000Z");
+
+    const showAgain = await certificationShowGet(
+      jsonRequest(`/api/v1/admin/certifications/${createdData.id}`, { headers: auth(token) }),
+      { params: Promise.resolve({ id: String(createdData.id) }) }
+    );
+    expect(showAgain.status).toBe(200);
+    const showAgainData = (await body(showAgain)).data as {
+      title: string;
+      description: string | null;
+      issued_on: string | null;
+    };
+    expect(showAgainData.title).toBe("Round Trip Cert Updated");
+    expect(showAgainData.description).toBe("An updated description.");
+    expect(showAgainData.issued_on).toBe("2025-02-10T00:00:00.000000Z");
   });
 
   it("testimonials", async () => {

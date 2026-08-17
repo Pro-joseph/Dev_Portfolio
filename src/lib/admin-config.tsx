@@ -201,6 +201,17 @@ export const RESOURCES: ResourceConfig[] = [
       { key: "type", label: "Type", render: (r) => <Badge tone={r.type === "education" ? "sky" : "green"}>{String(r.type)}</Badge> },
       { key: "title", label: "Title", render: (r) => <span className="font-medium">{String(r.title)}</span> },
       { key: "issuer", label: "Issuer" },
+      {
+        key: "issued_on",
+        label: "Issued",
+        render: (r) => (r.issued_on ? String(r.issued_on).slice(0, 10) : <span className="text-slate-400">—</span>),
+      },
+      { key: "period", label: "Period" },
+      {
+        key: "description",
+        label: "Description",
+        render: (r) => (r.description ? <span className="block max-w-[220px] truncate">{String(r.description)}</span> : <span className="text-slate-400">—</span>),
+      },
     ],
     fields: [
       { name: "type", label: "Type", type: "select", required: true, options: CERT_TYPES.map((t) => ({ value: t, label: CERT_TYPE_LABELS[t] })) },
