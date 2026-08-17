@@ -121,25 +121,6 @@ export default async function HomePage({ params }: Props) {
             </div>
           </div>
 
-          {/* Quick stats strip */}
-          <Reveal delay={320}>
-            <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-line rounded-jumbo overflow-hidden border border-line">
-              {[
-                { label: t.hero.stats.featuredProjects, value: String(featuredProjects.length).padStart(2, "0") },
-                { label: t.hero.stats.skillCategories, value: String(skillCategories.length).padStart(2, "0") },
-                { label: t.hero.stats.technologies, value: String(totalSkills).padStart(2, "0") },
-                { label: t.hero.stats.status, value: available ? t.hero.statusOpen : t.hero.statusBusy },
-              ].map((stat) => (
-                <div key={stat.label} className="bg-elevated py-6 px-6 flex flex-col gap-1">
-                  <span className="font-mono text-2xl font-bold text-primary">{stat.value}</span>
-                  <span className="text-xs uppercase tracking-widest text-secondary font-semibold">
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-
           <div className="flex justify-center mt-14 text-secondary">
             <a href="#projects" aria-label={t.hero.scrollToProjects} className="animate-bounce">
               <FaChevronDown className="text-2xl" />
