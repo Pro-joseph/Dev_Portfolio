@@ -1,14 +1,17 @@
 "use client";
 
 import { FieldDef } from "@/lib/admin-config";
-import { PiPlus, PiTrash } from "react-icons/pi";
+import Image from "next/image";
+import { PiPlus, PiTrash, PiArrowUp, PiArrowDown, PiX } from "react-icons/pi";
 import { ProjectLinkType } from "@/lib/types";
 import { LINK_TYPES } from "@/lib/enums";
+
+export type Option = { value: string; label: string; url?: string };
 
 interface FieldProps {
   field: FieldDef;
   value: unknown;
-  options?: { value: string; label: string }[];
+  options?: Option[];
   onChange: (value: unknown) => void;
   error?: string;
 }
@@ -84,6 +87,124 @@ function LinksEditor({
   );
 }
 
+function MediaPicker({
+  options,
+  value,
+  onChange,
+}: {
+  options: Option[];
+  value: unknown;
+  onChange: (value: unknown) => void;
+}) {
+  const selected = Array.isArray(value) ? value.map(String) : [];
+
+  const toggle = (id: string) => {
+    if (selected.includes(id)) {
+      onChange(selected.filter((v) => v !== id));
+    } else {
+      onChange([...selected, id]);
+    }
+  };
+
+  const move = (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= selected.length) return;
+    const next = [...selected];
+    [next[index], next[target]] = [next[target], next[index]];
+    onChange(next);
+  };
+
+  const selectedOptions = selected
+    .map((id) => options.find((o) => o.value === id))
+    .filter((o): o is Option => Boolean(o));
+
+  const thumb = (o: Option) =>
+    o.url ? (
+      <Image src={o.url} alt={o.label} fill sizes="160px" className="object-cover" />
+    ) : (
+      <span className="w-full h-full bg-ink-50 flex items-center justify-center text-[10px] text-ink-400 px-1 text-center">
+        {o.label}
+      </span>
+    );
+
+  return (
+    <div className="flex flex-col gap-3">
+      {selectedOptions.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selectedOptions.map((o, i) => (
+            <div key={o.value} className="w-24">
+              <div className="relative aspect-video rounded-lg overflow-hidden ring-1 ring-ink-200">
+                {thumb(o)}
+                <span className="absolute top-1 left-1 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                  {i === 0 ? "COVER" : i + 1}
+                </span>
+              </div>
+              <div className="flex items-center justify-center gap-0.5 mt-1">
+                <button
+                  type="button"
+                  disabled={i === 0}
+                  onClick={() => move(i, -1)}
+                  aria-label="Move earlier"
+                  className="p-1 rounded text-ink-500 hover:bg-ink-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <PiArrowUp />
+                </button>
+                <button
+                  type="button"
+                  disabled={i === selected.length - 1}
+                  onClick={() => move(i, 1)}
+                  aria-label="Move later"
+                  className="p-1 rounded text-ink-500 hover:bg-ink-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <PiArrowDown />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggle(o.value)}
+                  aria-label="Remove"
+                  className="p-1 rounded text-coral hover:bg-coral/10"
+                >
+                  <PiX />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {options.length === 0 ? (
+        <p className="text-[11px] text-ink-400">No media yet — upload images in the Media section first.</p>
+      ) : (
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          {options.map((o) => {
+            const isSel = selected.includes(o.value);
+            return (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => toggle(o.value)}
+                title={o.label}
+                className={`relative aspect-video rounded-lg overflow-hidden ring-2 transition-all ${
+                  isSel ? "ring-sky-500" : "ring-ink-200 hover:ring-ink-400"
+                }`}
+              >
+                {thumb(o)}
+                {isSel && (
+                  <>
+                    <span className="absolute inset-0 bg-sky-500/20" />
+                    <span className="absolute top-1 left-1 bg-sky-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                      {selected.indexOf(o.value) + 1}
+                    </span>
+                  </>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Field({ field, value, options = [], onChange, error }: FieldProps) {
   const optWithNone = [{ value: "", label: "— None —" }, ...options];
 
@@ -153,7 +274,9 @@ export function Field({ field, value, options = [], onChange, error }: FieldProp
           </select>
         );
       case "multi":
-        return (
+        return field.picker === "media" ? (
+          <MediaPicker options={options} value={value} onChange={onChange} />
+        ) : (
           <div className="flex flex-wrap gap-2">
             {options.map((o) => {
               const selected = Array.isArray(value) && value.map(String).includes(String(o.value));

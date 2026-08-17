@@ -170,13 +170,14 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
   );
 
   const optionsData = useSWR(neededKeys.length ? ["options", optionQueries] : null, async () => {
-    const result: Record<string, { value: string; label: string }[]> = {};
+    const result: Record<string, { value: string; label: string; url?: string }[]> = {};
     for (const key of neededKeys) {
       const res = await http.get<Paginated<Row>>(OPTION_ENDPOINTS[key], { auth: true });
       const labelKey = OPTION_LABELS[key];
       result[key] = res.data.map((r) => ({
         value: String(r.id),
         label: String(r[labelKey] ?? r.id),
+        url: key === "media" ? String(r.url ?? "") : undefined,
       }));
     }
     return result;

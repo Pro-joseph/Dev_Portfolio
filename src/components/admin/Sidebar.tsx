@@ -23,6 +23,7 @@ import {
   PiIdentificationBadge,
   PiSignOut,
   PiInfinity,
+  PiGridFour,
 } from "react-icons/pi";
 
 const NAV = [
@@ -30,6 +31,7 @@ const NAV = [
   { href: "/admin/projects", label: "Projects", icon: PiCube },
   { href: "/admin/media", label: "Media", icon: PiImage },
   { href: "/admin/skills", label: "Skills", icon: PiMedal },
+  { href: "/admin/skill-categories", label: "Skill Categories", icon: PiGridFour },
   { href: "/admin/resumes", label: "Resumes", icon: PiFileText },
   { href: "/admin/pages", label: "Pages", icon: PiBrowser },
   { href: "/admin/menu-items", label: "Menu", icon: PiList },

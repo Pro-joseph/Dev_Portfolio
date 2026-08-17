@@ -441,6 +441,127 @@ describe("admin CRUD — every resource", () => {
   });
 });
 
+describe("project relations sync", () => {
+  type RelProject = {
+    id: number;
+    media: { id: number; collection: string; order_index: number }[];
+    skills: { id: number }[];
+    links: { label: string }[];
+    cover: { id: number } | null;
+  };
+
+  async function createRelProject(extra: Record<string, unknown> = {}): Promise<RelProject> {
+    const res = await projectsPost(
+      jsonRequest("/api/v1/admin/projects", {
+        method: "POST",
+        headers: jsonAuth(token),
+        body: JSON.stringify({
+          title: "Relation Project",
+          status: "published",
+          locale: "en",
+          ...extra,
+        }),
+      })
+    );
+    expect(res.status).toBe(201);
+    return (await body(res)).data as RelProject;
+  }
+
+  async function updateRelProject(
+    id: number,
+    extra: Record<string, unknown>
+  ): Promise<RelProject> {
+    const res = await projectUpdatePut(
+      jsonRequest(`/api/v1/admin/projects/${id}`, {
+        method: "PUT",
+        headers: jsonAuth(token),
+        body: JSON.stringify({ title: "Relation Project", status: "published", locale: "en", ...extra }),
+      }),
+      { params: Promise.resolve({ id: String(id) }) }
+    );
+    expect(res.status).toBe(200);
+    return (await body(res)).data as RelProject;
+  }
+
+  it("attaches media/skills/links on create with cover + order", async () => {
+    const project = await createRelProject({
+      media_ids: [1, 2, 3],
+      skill_ids: [1, 2],
+      links: [
+        { label: "Demo", url: "https://example.com/demo", type: "demo" },
+        { label: "GitHub", url: "https://github.com/x", type: "code" },
+      ],
+    });
+    expect(project.media.map((m) => m.id)).toEqual([1, 2, 3]);
+    expect(project.media[0].collection).toBe("cover");
+    expect(project.media[0].order_index).toBe(0);
+    expect(project.media[1].collection).toBe("gallery");
+    expect(project.cover?.id).toBe(1);
+    expect(project.skills.map((s) => s.id)).toEqual([1, 2]);
+    expect(project.links.map((l) => l.label)).toEqual(["Demo", "GitHub"]);
+  });
+
+  it("detaches deselected media and re-syncs skills/links on update", async () => {
+    const project = await createRelProject({
+      media_ids: [1, 2, 3],
+      skill_ids: [1, 2],
+      links: [
+        { label: "Demo", url: "https://example.com/demo", type: "demo" },
+        { label: "GitHub", url: "https://github.com/x", type: "code" },
+      ],
+    });
+
+    const updated = await updateRelProject(project.id, {
+      media_ids: [3, 1],
+      skill_ids: [2],
+      links: [{ label: "Demo", url: "https://example.com/demo", type: "demo" }],
+    });
+
+    // media id 2 was detached; reordered selection makes id 3 the cover
+    expect(updated.media.map((m) => m.id)).toEqual([3, 1]);
+    expect(updated.media[0].collection).toBe("cover");
+    expect(updated.media[0].order_index).toBe(0);
+    expect(updated.media[1].collection).toBe("gallery");
+    expect(updated.media[1].order_index).toBe(1);
+    expect(updated.cover?.id).toBe(3);
+    expect(updated.skills.map((s) => s.id)).toEqual([2]);
+    expect(updated.links.map((l) => l.label)).toEqual(["Demo"]);
+  });
+
+  it("clears all relations when the arrays are emptied", async () => {
+    const project = await createRelProject({
+      media_ids: [1, 2],
+      skill_ids: [1],
+      links: [{ label: "Demo", url: "https://example.com/demo", type: "demo" }],
+    });
+
+    const updated = await updateRelProject(project.id, {
+      media_ids: [],
+      skill_ids: [],
+      links: [],
+    });
+
+    expect(updated.media).toEqual([]);
+    expect(updated.cover).toBeNull();
+    expect(updated.skills).toEqual([]);
+    expect(updated.links).toEqual([]);
+  });
+
+  it("leaves relations untouched when their keys are absent from the payload", async () => {
+    const project = await createRelProject({
+      media_ids: [1, 2],
+      skill_ids: [1],
+      links: [{ label: "Demo", url: "https://example.com/demo", type: "demo" }],
+    });
+
+    const updated = await updateRelProject(project.id, { summary: "title-only touch" });
+
+    expect(updated.media.map((m) => m.id)).toEqual([1, 2]);
+    expect(updated.skills.map((s) => s.id)).toEqual([1]);
+    expect(updated.links.map((l) => l.label)).toEqual(["Demo"]);
+  });
+});
+
 // ------------------------------------------------------- media + messages
 
 describe("media library", () => {

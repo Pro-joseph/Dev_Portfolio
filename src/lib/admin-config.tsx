@@ -38,6 +38,8 @@ export interface FieldDef {
   required?: boolean;
   options?: { value: string; label: string }[];
   optionsKey?: string;
+  /** render a visual thumbnail gallery picker instead of text chips */
+  picker?: "media";
   placeholder?: string;
   help?: string;
   cols?: string;
@@ -97,7 +99,7 @@ export const RESOURCES: ResourceConfig[] = [
       { name: "order_index", label: "Order", type: "number" },
       { name: "views_count", label: "Views", type: "number" },
       { name: "skill_ids", label: "Skills", type: "multi", optionsKey: "skills", cols: "md:col-span-2" },
-      { name: "media_ids", label: "Gallery media (first = cover)", type: "multi", optionsKey: "media", cols: "md:col-span-2" },
+      { name: "media_ids", label: "Gallery media (first = cover)", type: "multi", optionsKey: "media", picker: "media", cols: "md:col-span-2" },
       { name: "links", label: "Links", type: "links", cols: "md:col-span-2" },
     ],
   },

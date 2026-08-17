@@ -47,11 +47,8 @@ const PROJECT_FIELDS = [
 ];
 
 async function applyProjectRelations(id: number, payload: Record<string, unknown>): Promise<void> {
-  const skillIds = (payload.skill_ids as number[] | undefined) ?? [];
-  const mediaIds = (payload.media_ids as number[] | undefined) ?? [];
-  const links = (payload.links as { id?: number; label: string; url: string; type?: string }[] | undefined) ?? [];
-
-  if (skillIds.length) {
+  if ("skill_ids" in payload) {
+    const skillIds = (payload.skill_ids as number[] | undefined) ?? [];
     await query("DELETE FROM project_skill WHERE project_id = $1", [id]);
     for (const sid of skillIds) {
       await query(
@@ -61,16 +58,23 @@ async function applyProjectRelations(id: number, payload: Record<string, unknown
     }
   }
 
-  if (mediaIds.length) {
+  if ("media_ids" in payload) {
+    const mediaIds = (payload.media_ids as number[] | undefined) ?? [];
+    await query(
+      `UPDATE media SET mediable_type = NULL, mediable_id = NULL, collection = NULL
+       WHERE mediable_type = $1 AND mediable_id = $2`,
+      [PROJECT_MORPH, id]
+    );
     for (const [index, mid] of mediaIds.entries()) {
       await query(
-        `UPDATE media SET mediable_type = $1, mediable_id = $2, collection = $3 WHERE id = $4`,
-        [PROJECT_MORPH, id, index === 0 ? "cover" : "gallery", Number(mid)]
+        `UPDATE media SET mediable_type = $1, mediable_id = $2, collection = $3, order_index = $4 WHERE id = $5`,
+        [PROJECT_MORPH, id, index === 0 ? "cover" : "gallery", index, Number(mid)]
       );
     }
   }
 
-  if (links.length) {
+  if ("links" in payload) {
+    const links = (payload.links as { id?: number; label: string; url: string; type?: string }[] | undefined) ?? [];
     await query("DELETE FROM project_links WHERE project_id = $1", [id]);
     for (const [index, link] of links.entries()) {
       const linkId = await nextId("project_links");
