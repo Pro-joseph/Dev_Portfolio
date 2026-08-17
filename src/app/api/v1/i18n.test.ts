@@ -6,13 +6,29 @@ import { GET as certsGet } from "@/app/api/v1/certifications/route";
 import { GET as testimonialsGet } from "@/app/api/v1/testimonials/route";
 import { GET as projectsGet } from "@/app/api/v1/projects/route";
 import { GET as projectShowGet } from "@/app/api/v1/projects/[slug]/route";
+import { GET as translationsGet } from "@/app/api/v1/admin/translations/route";
+import { GET as adminProjectsGet } from "@/app/api/v1/admin/projects/route";
+import { POST as loginPost } from "@/app/api/v1/auth/login/route";
 
-function jsonRequest(url: string): Request {
-  return new Request(`http://127.0.0.1:3001${url}`);
+function jsonRequest(url: string, init?: RequestInit): Request {
+  return new Request(`http://127.0.0.1:3001${url}`, init);
 }
 
 async function body(res: Response): Promise<unknown> {
   return res.json();
+}
+
+async function loginAsAdmin(): Promise<string> {
+  const res = await loginPost(
+    jsonRequest("/api/v1/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "admin@josephlab.dev", password: "password" }),
+    })
+  );
+  expect(res.status).toBe(200);
+  const data = (await body(res)) as { token: string };
+  return data.token;
 }
 
 beforeEach(async () => {
@@ -45,33 +61,52 @@ describe("GET /site", () => {
 });
 
 describe("GET /certifications", () => {
-  it("falls back to English rows when no French rows exist", async () => {
+  it("shows translated French certs plus untranslated English ones", async () => {
     const res = await certsGet(jsonRequest("/api/v1/certifications?locale=fr"));
     const { data } = (await body(res)) as {
-      data: { title: string; locale?: string }[];
+      data: { title: string; translation_key?: string }[];
     };
-    expect(data.length).toBeGreaterThan(0);
-  });
-
-  it("returns French rows for locale=fr", async () => {
-    const res = await certsGet(jsonRequest("/api/v1/certifications?locale=fr"));
-    const { data } = (await body(res)) as { data: { title: string }[] };
-    expect(data.map((c) => c.title)).toEqual(
+    const titles = data.map((c) => c.title);
+    expect(titles).toEqual(
       expect.arrayContaining([
         "Licence en génie logiciel",
         "Architecte de solutions certifié AWS",
+        "PostgreSQL Professional",
+        "CompTIA Security+",
       ])
     );
+    // English twins replaced by their French translations
+    expect(titles).not.toContain("B.Sc. in Software Engineering");
+    expect(titles).not.toContain("AWS Certified Solutions Architect");
+    expect(titles).not.toContain("Certified Kubernetes Administrator");
+    // each translation pair appears once
+    expect(titles.length).toBe(5);
+  });
+
+  it("returns the English rows for the default locale", async () => {
+    const res = await certsGet();
+    const { data } = (await body(res)) as { data: { title: string }[] };
+    const titles = data.map((c) => c.title);
+    expect(titles).toEqual(
+      expect.arrayContaining(["B.Sc. in Software Engineering", "AWS Certified Solutions Architect"])
+    );
+    expect(titles).not.toContain("Licence en génie logiciel");
   });
 });
 
 describe("GET /testimonials", () => {
-  it("returns French testimonials for locale=fr", async () => {
+  it("returns the French testimonial for locale=fr", async () => {
     const res = await testimonialsGet(
       jsonRequest("/api/v1/testimonials?locale=fr")
     );
-    const { data } = (await body(res)) as { data: { author: string }[] };
-    expect(data.map((t) => t.author)).toContain("Alex Morgan");
+    const { data } = (await body(res)) as {
+      data: { author: string; quote: string }[];
+    };
+    expect(data.length).toBe(1);
+    expect(data[0].author).toBe("Alex Morgan");
+    expect(data[0].quote).toBe(
+      "Un ingénieur exceptionnel qui a transformé notre infrastructure existante en une plateforme moderne et évolutive."
+    );
   });
 });
 
@@ -118,5 +153,41 @@ describe("GET /projects/[slug]", () => {
     expect(res.status).toBe(200);
     const { data } = (await body(res)) as { data: { title: string } };
     expect(data.title).toBe("Plateforme Nexus");
+  });
+});
+
+describe("admin translations + locale filter", () => {
+  it("pairs translation keys across locales", async () => {
+    const token = await loginAsAdmin();
+    const res = await translationsGet(
+      jsonRequest("/api/v1/admin/translations?resource=certifications", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    );
+    expect(res.status).toBe(200);
+    const { data } = (await body(res)) as {
+      data: { id: number; locale: string; translation_key: string }[];
+    };
+    const byKey = new Map(data.map((r) => [`${r.locale}:${r.translation_key}`, r]));
+    expect(byKey.has("fr:cert-2")).toBe(true);
+    expect(byKey.has("en:cert-2")).toBe(true);
+    expect(byKey.has("en:cert-5")).toBe(true);
+    expect(byKey.has("fr:cert-5")).toBe(false);
+  });
+
+  it("filters the admin projects list by locale", async () => {
+    const token = await loginAsAdmin();
+    const res = await adminProjectsGet(
+      jsonRequest("/api/v1/admin/projects?locale=fr&per_page=50", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    );
+    expect(res.status).toBe(200);
+    const { data } = (await body(res)) as {
+      data: { locale: string; title: string }[];
+    };
+    expect(data.length).toBeGreaterThan(0);
+    expect(data.every((p) => p.locale === "fr")).toBe(true);
+    expect(data.map((p) => p.title)).toContain("Plateforme Nexus");
   });
 });

@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import useSWR from "swr";
 import { useSearchParams } from "next/navigation";
 import { http, ApiError } from "@/lib/api";
-import { getResourceConfig, FieldDef } from "@/lib/admin-config";
+import { getResourceConfig, FieldDef, ResourceConfig } from "@/lib/admin-config";
 import { Paginated } from "@/lib/types";
 import {
   Button,
@@ -17,9 +17,33 @@ import {
 import { Field } from "@/components/admin/FormFields";
 import { PAGE_SIZE_OPTIONS, PAGE_SIZE_ADMIN } from "@/lib/config";
 import { DEFAULT_PROJECT_STATUS } from "@/lib/enums";
-import { PiMagnifyingGlass, PiPlus, PiPencilSimple, PiTrash } from "react-icons/pi";
+import { PiMagnifyingGlass, PiPlus, PiPencilSimple, PiTrash, PiTranslate } from "react-icons/pi";
 
 type Row = Record<string, unknown>;
+
+const OTHER_LOCALE: Record<string, string> = { en: "fr", fr: "en" };
+
+/** key resources (certs/testimonials/menu) pair by translation_key */
+const KEY_PREFIX: Record<string, string> = {
+  certifications: "cert",
+  testimonials: "test",
+  "menu-items": "menu",
+};
+
+function rowKey(config: ResourceConfig, row: Row): string {
+  if (config.key in KEY_PREFIX) {
+    return String(
+      row.translation_key ?? `${KEY_PREFIX[config.key]}-${row.id}`
+    );
+  }
+  return String(row.slug ?? "");
+}
+
+const LOCALE_FILTERS = [
+  { value: "", label: "All" },
+  { value: "en", label: "English" },
+  { value: "fr", label: "Français" },
+];
 
 const OPTION_ENDPOINTS: Record<string, string> = {
   skills: `/admin/skills?per_page=${PAGE_SIZE_OPTIONS}`,
@@ -86,6 +110,8 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [localeFilter, setLocaleFilter] = useState("");
+  const [translateKey, setTranslateKey] = useState<string | null>(null);
   const [editing, setEditing] = useState<Row | null>(null);
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<Row | null>(null);
@@ -95,12 +121,39 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
   const [toasts, setToasts] = useState<{ id: number; message: string; type: "success" | "error" }[]>([]);
 
   const query = `${config?.path}?per_page=${PAGE_SIZE_ADMIN}&page=${page}${
-    debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ""
-  }`;
+    localeFilter ? `&locale=${localeFilter}` : ""
+  }${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ""}`;
 
   const { data, isLoading, mutate } = useSWR<Paginated<Row>>(
     config ? query : null,
     (key: string) => http.get<Paginated<Row>>(key, { auth: true })
+  );
+
+  const { data: translations } = useSWR<{ data: { id: number; locale: string; slug?: string; translation_key?: string }[] }>(
+    config?.locales ? `/admin/translations?resource=${config.key}` : null,
+    (key: string) => http.get<{ data: { id: number; locale: string; slug?: string; translation_key?: string }[] }>(key, { auth: true })
+  );
+
+  const twinsByKey = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const t of translations?.data ?? []) {
+      const key = t.slug ?? t.translation_key;
+      if (!key) continue;
+      const set = map.get(key) ?? new Set<string>();
+      set.add(t.locale);
+      map.set(key, set);
+    }
+    return map;
+  }, [translations]);
+
+  const hasOtherLocale = useCallback(
+    (config: ResourceConfig, row: Row): boolean => {
+      const key = rowKey(config, row);
+      const locales = twinsByKey.get(key);
+      if (!locales) return false;
+      return locales.has(OTHER_LOCALE[String(row.locale ?? "en")] ?? "");
+    },
+    [twinsByKey]
   );
 
   const neededKeys = useMemo(
@@ -154,6 +207,28 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
       setValues(init);
       setErrors({});
       setEditing(row);
+    },
+    [config]
+  );
+
+  const openTranslate = useCallback(
+    (row: Row) => {
+      const init: Record<string, unknown> = {};
+      (config?.fields ?? []).forEach((f) => (init[f.name] = initialValue(f, row)));
+      init.locale = OTHER_LOCALE[String(row.locale ?? "en")] ?? "fr";
+      if (config?.key && config.key in KEY_PREFIX) {
+        const key = String(
+          row.translation_key ?? `${KEY_PREFIX[config.key]}-${row.id}`
+        );
+        init.translation_key = key;
+        setTranslateKey(key);
+      } else {
+        setTranslateKey(null);
+      }
+      setValues(init);
+      setErrors({});
+      setEditing(null);
+      setCreating(true);
     },
     [config]
   );
@@ -220,6 +295,7 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
           v == null && !f.required && f.type !== "boolean";
         if (!emptyOptional) payload[f.name] = v;
       });
+      if (translateKey) payload.translation_key = translateKey;
 
       if (editing) {
         await http.put(`${config.path}/${editing.id}`, payload, { auth: true });
@@ -230,6 +306,7 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
       }
       setCreating(false);
       setEditing(null);
+      setTranslateKey(null);
       await mutate();
     } catch (e) {
       if (e instanceof ApiError && e.data && typeof e.data === "object") {
@@ -270,6 +347,27 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {config.locales && (
+            <div className="flex items-center rounded-lg bg-ink-50 p-0.5">
+              {LOCALE_FILTERS.map((f) => (
+                <button
+                  key={f.value || "all"}
+                  type="button"
+                  onClick={() => {
+                    setLocaleFilter(f.value);
+                    setPage(1);
+                  }}
+                  className={`px-3 py-1.5 rounded-md text-[12px] font-medium transition-colors ${
+                    localeFilter === f.value
+                      ? "bg-white text-ink-800 shadow-sm"
+                      : "text-ink-400 hover:text-ink-600"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="relative w-[220px]">
             <PiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-[15px]" />
             <input
@@ -301,13 +399,16 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
               {config.columns.map((col) => (
                 <th key={col.key} className="font-medium px-6 py-3">{col.label}</th>
               ))}
+              {config.locales && (
+                <th className="font-medium px-6 py-3">Translation</th>
+              )}
               <th className="font-medium px-6 py-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="text-[13px] divide-y divide-ink-100">
             {isLoading && (
               <tr>
-                <td colSpan={config.columns.length + 1}>
+                <td colSpan={config.columns.length + (config.locales ? 1 : 0) + 1}>
                   <div className="flex justify-center py-16 text-ink-400">
                     <Spinner size={22} />
                   </div>
@@ -316,7 +417,7 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
             )}
             {!isLoading && data?.data.length === 0 && (
               <tr>
-                <td colSpan={config.columns.length + 1}>
+                <td colSpan={config.columns.length + (config.locales ? 1 : 0) + 1}>
                   <EmptyState message={`No ${config.title.toLowerCase()} found.`} />
                 </td>
               </tr>
@@ -329,7 +430,27 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
                       {col.render ? col.render(row) : String(row[col.key] ?? "—")}
                     </td>
                   ))}
+                  {config.locales && (
+                    <td className="px-6 py-3.5">
+                      {hasOtherLocale(config, row) ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-green-600">
+                          <PiTranslate size={13} /> {OTHER_LOCALE[String(row.locale ?? "en")] ?? "fr"} ✓
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-ink-400">Not translated</span>
+                      )}
+                    </td>
+                  )}
                   <td className="px-6 py-3.5 text-right whitespace-nowrap">
+                    {config.locales && (
+                      <button
+                        onClick={() => openTranslate(row)}
+                        className="text-ink-400 hover:text-sky-600 transition-colors mr-2"
+                        title={`Translate to ${OTHER_LOCALE[String(row.locale ?? "en")] ?? "fr"}`}
+                      >
+                        <PiTranslate size={16} />
+                      </button>
+                    )}
                     <button
                       onClick={() => openEdit(row)}
                       className="text-ink-400 hover:text-ink-700 transition-colors mr-2"
@@ -379,6 +500,7 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
         onClose={() => {
           setCreating(false);
           setEditing(null);
+          setTranslateKey(null);
         }}
         title={editing ? `Edit ${config.singular}` : `New ${config.singular}`}
         wide
@@ -389,6 +511,7 @@ function ResourcePageBody({ resourceKey }: { resourceKey: string }) {
               onClick={() => {
                 setCreating(false);
                 setEditing(null);
+                setTranslateKey(null);
               }}
             >
               Cancel

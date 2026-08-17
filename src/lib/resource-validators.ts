@@ -52,6 +52,7 @@ export const socialLinksValidator: Validator = makeValidator(() => ({
 export const menuItemsValidator: Validator = makeValidator(() => ({
   label: { required: true, max: 80 },
   locale: { required: true, in: ENUMS.locale },
+  translation_key: { max: 120 },
   parent_id: { numeric: true },
   page_id: { numeric: true },
   external_url: { max: 500 },
@@ -67,6 +68,7 @@ export const certificationsValidator: Validator = makeValidator(() => ({
   type: { required: true, in: ENUMS.certType },
   title: { required: true, max: 160 },
   locale: { required: true, in: ENUMS.locale },
+  translation_key: { max: 120 },
   issuer: { max: 160 },
   icon: { max: 120 },
   period: { max: 60 },
@@ -81,6 +83,7 @@ export const testimonialsValidator: Validator = makeValidator(() => ({
   quote: { required: true },
   author: { required: true, max: 120 },
   locale: { required: true, in: ENUMS.locale },
+  translation_key: { max: 120 },
   role: { max: 160 },
   avatar_media_id: { numeric: true },
   order_index: { numeric: true },

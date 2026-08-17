@@ -14,30 +14,33 @@ import type {
 
 // ------------------------------------------------------------ i18n helpers
 
-/** Rows are returned for the requested locale plus the default; prefer the
- *  requested locale and keep default rows whose slug has no localized twin. */
-export function pickByLocale<T extends { slug: string; locale?: string }>(
+/**
+ * Rows are returned for the requested locale plus the default; prefer the
+ * requested locale and keep default rows whose key has no localized twin.
+ * The key links a translation pair: a shared `slug` (projects, pages, skill
+ * categories) or a shared `translation_key` (certifications, testimonials,
+ * menu items).
+ */
+export function pickByLocale<T>(
   rows: T[],
-  locale: string
+  locale: string,
+  keyOf: (row: T) => string
 ): T[] {
-  const preferred = rows.filter((r) => r.locale === locale);
-  const slugs = new Set(preferred.map((r) => r.slug));
+  const preferred = rows.filter((r) => (r as { locale?: string }).locale === locale);
+  const keys = new Set(preferred.map(keyOf));
   const fallback = rows.filter(
-    (r) => r.locale !== locale && !slugs.has(r.slug)
+    (r) =>
+      (r as { locale?: string }).locale !== locale && !keys.has(keyOf(r))
   );
   return [...preferred, ...fallback];
 }
 
-/** Whole-list fallback: show the localized rows if any exist for the locale,
- *  otherwise the default-locale rows. */
-export function pickListByLocale<T extends { locale?: string }>(
-  rows: T[],
-  locale: string
-): T[] {
-  const localized = rows.filter((r) => r.locale === locale);
-  return localized.length > 0
-    ? localized
-    : rows.filter((r) => r.locale === DEFAULT_LOCALE || !r.locale);
+/** Effective pairing key: the translation_key if set, else `<prefix>-<id>`. */
+export function translationKeyOf(
+  row: { translation_key?: string | null; id: number },
+  prefix: string
+): string {
+  return row.translation_key ?? `${prefix}-${row.id}`;
 }
 
 function localeOr(slug: string, locale: string): string {
@@ -330,6 +333,7 @@ export interface MenuItemRow {
   parent_id: number | null;
   label: string;
   locale?: string;
+  translation_key?: string | null;
   page_id: number | null;
   external_url: string | null;
   open_in_new_tab: boolean;
@@ -392,8 +396,10 @@ async function loadSiteData(locale: string = DEFAULT_LOCALE): Promise<{
      WHERE (locale = $1 OR locale = '${DEFAULT_LOCALE}')`,
     [locale]
   );
-  const pageBySlug = new Map(pickByLocale(pages, locale).map((p) => [p.id, p.slug]));
-  const pickedMenu = pickListByLocale(menuItems, locale);
+  const pageBySlug = new Map(pickByLocale(pages, locale, (p) => p.slug).map((p) => [p.id, p.slug]));
+  const pickedMenu = pickByLocale(menuItems, locale, (m) =>
+    translationKeyOf(m, "menu")
+  );
   const pageByParent = new Map<number | null, MenuItemRow[]>();
   for (const item of pickedMenu) {
     const list = pageByParent.get(item.parent_id) ?? [];
@@ -497,7 +503,7 @@ export async function loadProjectList(
     [...params, perPage, (page - 1) * perPage]
   );
 
-  const picked = pickByLocale(rows, locale);
+  const picked = pickByLocale(rows, locale, (r) => r.slug);
   return { rows: picked, total, perPage, page };
 }
 
@@ -532,7 +538,7 @@ export async function loadSkillCategories(
     [locale]
   );
   return Promise.all(
-    pickByLocale(categories, locale).map(async (cat) => {
+    pickByLocale(categories, locale, (c) => c.slug).map(async (cat) => {
       const skills = await query<SkillRow>(
         "SELECT id, name, slug, icon, order_index FROM skills WHERE skill_category_id = $1 AND is_visible = true ORDER BY order_index",
         [cat.id]
@@ -558,7 +564,9 @@ export async function loadTestimonials(
     [locale]
   );
   return Promise.all(
-    pickListByLocale(testimonials, locale).map(async (t) => {
+    pickByLocale(testimonials, locale, (t) =>
+      translationKeyOf(t, "test")
+    ).map(async (t) => {
       const avatar = await queryOne<MediaRow>(
         "SELECT * FROM media WHERE id = $1",
         [t.avatar_media_id]
@@ -577,7 +585,9 @@ export async function loadCertifications(
      ORDER BY order_index`,
     [locale]
   );
-  return pickListByLocale(certifications, locale).map(certificationResource);
+  return pickByLocale(certifications, locale, (c) =>
+    translationKeyOf(c, "cert")
+  ).map(certificationResource);
 }
 
 // ---------------------------------------------------- typed page loaders
@@ -630,6 +640,8 @@ export interface CertificationRow {
   id: number;
   type: string;
   title: string;
+  locale?: string;
+  translation_key?: string | null;
   issuer: string | null;
   icon: string | null;
   period: string | null;
@@ -660,6 +672,8 @@ export interface TestimonialRow {
   id: number;
   quote: string;
   author: string;
+  locale?: string;
+  translation_key?: string | null;
   role: string | null;
   avatar_media_id: number | null;
 }

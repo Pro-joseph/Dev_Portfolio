@@ -87,6 +87,7 @@ export const crudDefs: Record<string, Crud> = {
   projects: {
     table: "projects",
     resource: "projects",
+    locales: true,
     searchable: ["title", "slug", "summary", "client"],
     hasSlug: true,
     slugSource: "title",
@@ -102,6 +103,7 @@ export const crudDefs: Record<string, Crud> = {
   pages: {
     table: "pages",
     resource: "pages",
+    locales: true,
     searchable: ["title", "slug"],
     hasSlug: true,
     slugSource: "title",
@@ -134,6 +136,7 @@ export const crudDefs: Record<string, Crud> = {
   "skill-categories": {
     table: "skill_categories",
     resource: "skill_categories",
+    locales: true,
     searchable: ["name", "slug"],
     hasSlug: true,
     slugSource: "name",
@@ -160,10 +163,12 @@ export const crudDefs: Record<string, Crud> = {
   "menu-items": {
     table: "menu_items",
     resource: "menu_items",
+    locales: true,
     searchable: ["label", "external_url"],
     prepare: withValidator(menuItemsValidator, [
       "label",
       "locale",
+      "translation_key",
       "parent_id",
       "page_id",
       "external_url",
@@ -181,11 +186,13 @@ export const crudDefs: Record<string, Crud> = {
   certifications: {
     table: "certifications",
     resource: "certifications",
+    locales: true,
     searchable: ["title", "issuer"],
     prepare: withValidator(certificationsValidator, [
       "type",
       "title",
       "locale",
+      "translation_key",
       "issuer",
       "icon",
       "issued_on",
@@ -200,11 +207,13 @@ export const crudDefs: Record<string, Crud> = {
   testimonials: {
     table: "testimonials",
     resource: "testimonials",
+    locales: true,
     searchable: ["author", "quote"],
     prepare: withValidator(testimonialsValidator, [
       "quote",
       "author",
       "locale",
+      "translation_key",
       "role",
       "avatar_media_id",
       "order_index",

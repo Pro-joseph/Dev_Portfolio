@@ -271,6 +271,8 @@ export interface Crud {
   searchable?: string[];
   hasSlug?: boolean;
   slugSource?: "title" | "name";
+  /** the table carries a `locale` column and can be filtered by it */
+  locales?: boolean;
   /** additional fields allowed in insert/update */
   fields?: string[];
   /**
@@ -347,6 +349,7 @@ export async function crudIndex(crud: Crud, request: Request): Promise<Response>
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
   const perPage = Math.max(1, Number(url.searchParams.get("per_page")) || PAGE_SIZE_ADMIN);
   const search = url.searchParams.get("search")?.trim() ?? "";
+  const locale = url.searchParams.get("locale")?.trim() ?? "";
 
   let where = "";
   const params: unknown[] = [];
@@ -357,6 +360,11 @@ export async function crudIndex(crud: Crud, request: Request): Promise<Response>
       .join(" OR ");
     params.push(`%${search}%`);
     where = ` WHERE (${ors})`;
+  }
+
+  if (crud.locales && locale) {
+    params.push(locale);
+    where = `${where ? where + " AND" : " WHERE"} locale = $${params.length}`;
   }
 
   const totalRow = await queryOne<{ n: number }>(

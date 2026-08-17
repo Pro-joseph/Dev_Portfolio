@@ -57,6 +57,8 @@ export interface ResourceConfig {
   columns: ColumnDef[];
   fields: FieldDef[];
   canCreate?: boolean;
+  /** records carry a `locale` column; show the language filter + translate action */
+  locales?: boolean;
 }
 
 const urlCell = (value: unknown) => {
@@ -72,6 +74,7 @@ export const RESOURCES: ResourceConfig[] = [
     title: "Projects",
     singular: "Project",
     path: "/admin/projects",
+    locales: true,
     columns: [
       { key: "title", label: "Project", render: (r) => <span className="font-medium">{String(r.title)}</span> },
       { key: "locale", label: "Lang", render: (r) => localeCell(r) },
@@ -120,6 +123,7 @@ export const RESOURCES: ResourceConfig[] = [
     title: "Skill Categories",
     singular: "Skill Category",
     path: "/admin/skill-categories",
+    locales: true,
     columns: [
       { key: "name", label: "Name", render: (r) => <span className="font-medium">{String(r.name)}</span> },
       { key: "locale", label: "Lang", render: (r) => localeCell(r) },
@@ -172,6 +176,7 @@ export const RESOURCES: ResourceConfig[] = [
     title: "Menu Items",
     singular: "Menu Item",
     path: "/admin/menu-items",
+    locales: true,
     columns: [
       { key: "label", label: "Label", render: (r) => <span className="font-medium">{String(r.label)}</span> },
       { key: "locale", label: "Lang", render: (r) => localeCell(r) },
@@ -194,6 +199,7 @@ export const RESOURCES: ResourceConfig[] = [
     title: "Pages",
     singular: "Page",
     path: "/admin/pages",
+    locales: true,
     columns: [
       { key: "title", label: "Title", render: (r) => <span className="font-medium">{String(r.title)}</span> },
       { key: "locale", label: "Lang", render: (r) => localeCell(r) },
@@ -216,6 +222,7 @@ export const RESOURCES: ResourceConfig[] = [
     title: "Certifications",
     singular: "Certification",
     path: "/admin/certifications",
+    locales: true,
     columns: [
       { key: "type", label: "Type", render: (r) => <Badge tone={r.type === "education" ? "sky" : "green"}>{String(r.type)}</Badge> },
       { key: "title", label: "Title", render: (r) => <span className="font-medium">{String(r.title)}</span> },
@@ -252,6 +259,7 @@ export const RESOURCES: ResourceConfig[] = [
     title: "Testimonials",
     singular: "Testimonial",
     path: "/admin/testimonials",
+    locales: true,
     columns: [
       { key: "author", label: "Author", render: (r) => <span className="font-medium">{String(r.author)}</span> },
       { key: "locale", label: "Lang", render: (r) => localeCell(r) },
