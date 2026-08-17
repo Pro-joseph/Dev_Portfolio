@@ -59,9 +59,9 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab", t }: 
             <Image className="w-full h-full object-cover" src={images[0].url ?? ""} alt={images[0].alt_text ?? `${siteTitle} ${t.lightbox.projectImageAltSuffix}`} width={1280} height={720} sizes="(max-width: 768px) 100vw, 66vw" />
           </button>
         </div>
-        <div className="md:col-span-4 grid grid-rows-2 gap-6">
+        <div className="md:col-span-4 grid md:grid-rows-2 gap-6">
           {images.slice(1, 3).map((image, i) => (
-            <div key={image.id ?? i} className="relative rounded-jumbo overflow-hidden border border-line shadow-lg">
+            <div key={image.id ?? i} className="relative rounded-jumbo overflow-hidden border border-line shadow-lg aspect-video md:aspect-auto">
               <button
                 type="button"
                 onClick={() => open(i + 1)}

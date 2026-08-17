@@ -55,7 +55,7 @@ export default function Gallery({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 md:h-[800px]">
+      <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 md:h-[800px]">
         {images.map((image, i) => (
           <button
             key={image.id ?? i}
