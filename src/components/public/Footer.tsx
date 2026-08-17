@@ -1,16 +1,20 @@
 import { SocialLink } from "@/lib/types";
 import { socialIcon } from "@/lib/icons";
+import type { Dictionary } from "@/lib/i18n";
+import LangSwitch from "./LangSwitch";
 
 export default function Footer({
   socialLinks,
   siteTitle = "JosephLab",
   authorName = "Youssef Jdira",
   tagline,
+  t,
 }: {
   socialLinks: SocialLink[];
   siteTitle?: string;
   authorName?: string;
   tagline?: string | null;
+  t: Dictionary;
 }) {
   return (
     <footer className="pt-0 pb-12 px-6 bg-elevated border-t border-line">
@@ -25,8 +29,7 @@ export default function Footer({
               {authorName}
             </h2>
             <p className="mt-6 text-secondary max-w-md leading-relaxed">
-              {tagline ??
-                "Systems architect building resilient backends and databases that scale from prototype to production."}
+              {tagline ?? t.footer.taglineFallback}
             </p>
           </div>
           <div className="w-full md:w-1/4 flex flex-col gap-3">
@@ -48,10 +51,13 @@ export default function Footer({
           </div>
         </div>
         <div className="flex flex-wrap justify-between items-center pt-12 border-t border-line text-secondary text-sm">
-          <p>© {new Date().getFullYear()} {authorName}. All rights reserved.</p>
-          <p className="mt-4 md:mt-0 font-mono text-xs uppercase tracking-widest">
-            Engineered in Munich
-          </p>
+          <p>© {new Date().getFullYear()} {authorName}. {t.footer.rights}</p>
+          <div className="mt-4 md:mt-0 flex items-center gap-6">
+            <p className="font-mono text-xs uppercase tracking-widest">
+              {t.footer.engineeredIn}
+            </p>
+            <LangSwitch ariaLabel={t.langSwitch.ariaLabel} />
+          </div>
         </div>
       </div>
     </footer>

@@ -8,7 +8,8 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Response> {
   const { slug } = await params;
-  const withRels = await loadProjectBySlug(slug);
+  const locale = new URL(request.url).searchParams.get("locale") ?? undefined;
+  const withRels = await loadProjectBySlug(slug, locale);
   if (!withRels) return notFound();
   return json({ data: projectResource(withRels) });
 }

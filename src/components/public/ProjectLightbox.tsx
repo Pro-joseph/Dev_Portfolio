@@ -4,13 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Media } from "@/lib/types";
 import Image from "next/image";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
+import type { Dictionary } from "@/lib/i18n";
 
 interface Props {
   images: Media[];
   siteTitle?: string;
+  t: Dictionary;
 }
 
-export default function ProjectLightbox({ images, siteTitle = "JosephLab" }: Props) {
+export default function ProjectLightbox({ images, siteTitle = "JosephLab", t }: Props) {
   const [active, setActive] = useState<number | null>(null);
   const wheelLock = useRef(0);
 
@@ -52,9 +54,9 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab" }: Pro
             type="button"
             onClick={() => open(0)}
             className="block w-full h-full cursor-zoom-in"
-            aria-label={`Open ${images[0].alt_text ?? "project image"} in lightbox`}
+            aria-label={`${images[0].alt_text ?? t.lightbox.projectImageAltSuffix} - ${t.lightbox.openInLightbox}`}
           >
-            <Image className="w-full h-full object-cover" src={images[0].url ?? ""} alt={images[0].alt_text ?? `${siteTitle} project image`} width={1280} height={720} sizes="(max-width: 768px) 100vw, 66vw" />
+            <Image className="w-full h-full object-cover" src={images[0].url ?? ""} alt={images[0].alt_text ?? `${siteTitle} ${t.lightbox.projectImageAltSuffix}`} width={1280} height={720} sizes="(max-width: 768px) 100vw, 66vw" />
           </button>
         </div>
         <div className="md:col-span-4 grid grid-rows-2 gap-6">
@@ -64,9 +66,9 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab" }: Pro
                 type="button"
                 onClick={() => open(i + 1)}
                 className="block w-full h-full cursor-zoom-in"
-                aria-label={`Open ${image.alt_text ?? "project image"} in lightbox`}
+                aria-label={`${image.alt_text ?? t.lightbox.projectImageAltSuffix} - ${t.lightbox.openInLightbox}`}
               >
-                <Image className="w-full h-full object-cover" src={image.url ?? ""} alt={image.alt_text ?? `${siteTitle} project image`} width={640} height={640} sizes="(max-width: 768px) 100vw, 33vw" />
+                <Image className="w-full h-full object-cover" src={image.url ?? ""} alt={image.alt_text ?? `${siteTitle} ${t.lightbox.projectImageAltSuffix}`} width={640} height={640} sizes="(max-width: 768px) 100vw, 33vw" />
               </button>
             </div>
           ))}
@@ -77,7 +79,7 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab" }: Pro
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Project image lightbox"
+          aria-label={t.lightbox.lightboxLabel}
           className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 md:p-8"
           onClick={close}
           onWheel={onWheel}
@@ -86,7 +88,7 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab" }: Pro
             type="button"
             onClick={close}
             className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
-            aria-label="Close lightbox"
+            aria-label={t.lightbox.close}
           >
             <FaTimes />
           </button>
@@ -98,7 +100,7 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab" }: Pro
               prev();
             }}
             className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
-            aria-label="Previous image"
+            aria-label={t.lightbox.prev}
           >
             <FaChevronLeft />
           </button>
@@ -110,7 +112,7 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab" }: Pro
               next();
             }}
             className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
-            aria-label="Next image"
+            aria-label={t.lightbox.next}
           >
             <FaChevronRight />
           </button>
@@ -118,7 +120,7 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab" }: Pro
           <Image
             className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
             src={current.url ?? ""}
-            alt={current.alt_text ?? `${siteTitle} project image`}
+            alt={current.alt_text ?? `${siteTitle} ${t.lightbox.projectImageAltSuffix}`}
             width={1920}
             height={1080}
             sizes="100vw"

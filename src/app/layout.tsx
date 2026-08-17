@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Hanken_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { loadSiteSettings } from "@/lib/site-config";
 import { normalizeLocale, linkedinUrl } from "@/lib/seo";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,11 +24,21 @@ const hanken = Hanken_Grotesk({
   display: "swap",
 });
 
+async function currentLocale(): Promise<Locale> {
+  try {
+    const store = await cookies();
+    const value = store.get("locale")?.value;
+    return isLocale(value) ? value : DEFAULT_LOCALE;
+  } catch {
+    return DEFAULT_LOCALE;
+  }
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const settings = await loadSiteSettings();
+    const settings = await loadSiteSettings(await currentLocale());
     const seo = settings.seo;
-    const locale = normalizeLocale(seo?.locale);
+    const locale = normalizeLocale(await currentLocale());
     const authorUrl = linkedinUrl(seo?.linkedin);
     const cardImage = settings.og_image ?? settings.hero_image;
     const ogTitle = `${settings.site_title} | ${settings.author_name}`;
@@ -74,14 +86,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  let locale = "en";
+  let locale: Locale = DEFAULT_LOCALE;
   let accent: string | null = null;
   try {
-    const settings = await loadSiteSettings();
-    locale = normalizeLocale(settings.seo?.locale).split("_")[0];
+    const settings = await loadSiteSettings(await currentLocale());
+    locale = await currentLocale();
     accent = settings.accent_color;
   } catch {
-    locale = "en";
+    locale = DEFAULT_LOCALE;
     accent = null;
   }
 

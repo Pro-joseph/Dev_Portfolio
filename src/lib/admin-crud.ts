@@ -308,7 +308,12 @@ async function ensureSlug(
   if (!data.slug || !String(data.slug).trim()) {
     const source = crud.slugSource ?? "title";
     if (data[source] && String(data[source]).trim()) {
-      data.slug = await uniqueSlug(crud.table, String(data[source]), ignoreId);
+      data.slug = await uniqueSlug(
+        crud.table,
+        String(data[source]),
+        ignoreId,
+        data.locale ? String(data.locale) : null
+      );
     }
   }
   return data;

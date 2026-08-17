@@ -34,6 +34,7 @@ const PROJECT_FIELDS = [
   "title",
   "slug",
   "status",
+  "locale",
   "summary",
   "description",
   "is_featured",
@@ -107,6 +108,7 @@ export const crudDefs: Record<string, Crud> = {
     prepare: withValidator(pagesValidator, [
       "title",
       "slug",
+      "locale",
       "content",
       "meta_title",
       "meta_description",
@@ -135,7 +137,7 @@ export const crudDefs: Record<string, Crud> = {
     searchable: ["name", "slug"],
     hasSlug: true,
     slugSource: "name",
-    prepare: withValidator(skillCategoriesValidator, ["name", "slug", "order_index"]),
+    prepare: withValidator(skillCategoriesValidator, ["name", "slug", "locale", "order_index"]),
   },
   resumes: {
     table: "resumes",
@@ -161,6 +163,7 @@ export const crudDefs: Record<string, Crud> = {
     searchable: ["label", "external_url"],
     prepare: withValidator(menuItemsValidator, [
       "label",
+      "locale",
       "parent_id",
       "page_id",
       "external_url",
@@ -182,6 +185,7 @@ export const crudDefs: Record<string, Crud> = {
     prepare: withValidator(certificationsValidator, [
       "type",
       "title",
+      "locale",
       "issuer",
       "icon",
       "issued_on",
@@ -200,6 +204,7 @@ export const crudDefs: Record<string, Crud> = {
     prepare: withValidator(testimonialsValidator, [
       "quote",
       "author",
+      "locale",
       "role",
       "avatar_media_id",
       "order_index",

@@ -12,8 +12,9 @@ export async function GET(request: Request): Promise<Response> {
   const search = url.searchParams.get("search")?.trim() ?? "";
   const perPage = Math.max(1, Number(url.searchParams.get("per_page")) || PAGE_SIZE_PUBLIC);
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
+  const locale = url.searchParams.get("locale") ?? undefined;
 
-  const { rows, total } = await loadProjectList({ featured, search, perPage, page });
+  const { rows, total } = await loadProjectList({ featured, search, perPage, page }, locale);
   const projects = await buildProjectListBatched(rows);
   const data = projects.map(projectListResource);
 

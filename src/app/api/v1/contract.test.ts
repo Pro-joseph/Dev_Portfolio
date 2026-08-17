@@ -333,6 +333,7 @@ describe("POST /admin/projects", () => {
         body: JSON.stringify({
           title: "Test Project",
           status: "draft",
+          locale: "en",
           skill_ids: [1, 2],
           media_ids: [1],
           links: [{ label: "GitHub", url: "https://github.com", type: "github" }],

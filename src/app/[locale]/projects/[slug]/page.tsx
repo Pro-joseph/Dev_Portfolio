@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProjectBySlugTyped } from "@/lib/resources";
 import { loadSiteSettings } from "@/lib/site-config";
-import { PROJECT_STATUS_LABELS } from "@/lib/enums";
+import { getDictionary } from "@/lib/i18n";
 import SubNav from "@/components/public/SubNav";
 import Markdown from "@/components/public/Markdown";
 import ProjectLightbox from "@/components/public/ProjectLightbox";
@@ -10,26 +10,28 @@ import Link from "next/link";
 import { FaExternalLinkAlt, FaGithub, FaCheck, FaChevronRight } from "react-icons/fa";
 
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
+  const t = getDictionary(locale);
   try {
-    const project = await getProjectBySlugTyped(slug);
-    return { title: project?.title ?? "Project", description: project?.summary ?? undefined };
+    const project = await getProjectBySlugTyped(slug, locale);
+    return { title: project?.title ?? t.projects.breadcrumb, description: project?.summary ?? undefined };
   } catch {
-    return { title: "Project" };
+    return { title: t.projects.breadcrumb };
   }
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
+  const t = getDictionary(locale);
   const [project, settings] = await Promise.all([
-    getProjectBySlugTyped(slug),
-    loadSiteSettings(),
+    getProjectBySlugTyped(slug, locale),
+    loadSiteSettings(locale),
   ]);
   if (!project) notFound();
 
@@ -42,13 +44,13 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <>
-      <SubNav authorName={settings.author_name} />
+      <SubNav authorName={settings.author_name} locale={locale} t={t} />
 
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-6">
           <div className="flex items-center gap-2 text-xs font-mono text-secondary mb-8 uppercase tracking-widest">
-            <Link href="/#projects" className="hover:text-primary transition-colors">
-              Projects
+            <Link href={`/${locale}#projects`} className="hover:text-primary transition-colors">
+              {t.projects.breadcrumb}
             </Link>
             <FaChevronRight className="text-[10px]" />
             <span className="text-primary font-bold">{project.title}</span>
@@ -97,7 +99,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
           {images.length > 0 && (
             <div className="mb-24">
-              <ProjectLightbox images={images} siteTitle={settings.site_title} />
+              <ProjectLightbox images={images} siteTitle={settings.site_title} t={t} />
             </div>
           )}
 
@@ -126,20 +128,20 @@ export default async function ProjectDetailPage({ params }: Props) {
               <div className="sticky top-32 space-y-12">
                 {project.role_on_project && (
                   <div>
-                    <h4 className="text-xs font-mono font-bold text-secondary uppercase tracking-[0.2em] mb-4">Role</h4>
+                    <h4 className="text-xs font-mono font-bold text-secondary uppercase tracking-[0.2em] mb-4">{t.projects.role}</h4>
                     <p className="font-bold text-lg">{project.role_on_project}</p>
                   </div>
                 )}
                 {(project.started_on || project.completed_on) && (
                   <div>
-                    <h4 className="text-xs font-mono font-bold text-secondary uppercase tracking-[0.2em] mb-4">Timeline</h4>
+                    <h4 className="text-xs font-mono font-bold text-secondary uppercase tracking-[0.2em] mb-4">{t.projects.timeline}</h4>
                     <p className="font-bold text-lg">
-                      {project.started_on?.slice(0, 7) ?? "—"} — {project.completed_on?.slice(0, 7) ?? "Present"}
+                      {project.started_on?.slice(0, 7) ?? t.certifications.dash} — {project.completed_on?.slice(0, 7) ?? t.projects.present}
                     </p>
                   </div>
                 )}
                 <div>
-                  <h4 className="text-xs font-mono font-bold text-secondary uppercase tracking-[0.2em] mb-4">Tech Stack</h4>
+                  <h4 className="text-xs font-mono font-bold text-secondary uppercase tracking-[0.2em] mb-4">{t.projects.techStack}</h4>
                   <ul className="space-y-2 font-medium">
                     {project.skills.map((skill) => (
                       <li key={skill.id} className="flex items-center gap-3">
@@ -149,11 +151,11 @@ export default async function ProjectDetailPage({ params }: Props) {
                   </ul>
                 </div>
                 <div className="p-6 bg-card rounded-xl border border-line">
-                  <h4 className="text-sm font-bold mb-3">Project Status</h4>
+                  <h4 className="text-sm font-bold mb-3">{t.projects.projectStatus}</h4>
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${project.status === "published" ? "bg-green-500" : "bg-amber-400"}`} />
                     <span className="text-sm font-medium capitalize">
-                      {PROJECT_STATUS_LABELS[project.status] ?? project.status}
+                      {t.status[project.status] ?? project.status}
                     </span>
                   </div>
                 </div>

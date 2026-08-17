@@ -36,20 +36,23 @@ CREATE TABLE IF NOT EXISTS social_links (
 CREATE TABLE IF NOT EXISTS pages (
   id INTEGER PRIMARY KEY,
   title TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
+  slug TEXT NOT NULL,
+  locale TEXT NOT NULL DEFAULT 'en',
   content TEXT NULL,
   meta_title TEXT NULL,
   meta_description TEXT NULL,
   is_published INTEGER NOT NULL DEFAULT 1,
   order_index INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NULL,
-  updated_at TEXT NULL
+  updated_at TEXT NULL,
+  UNIQUE (locale, slug)
 );
 
 CREATE TABLE IF NOT EXISTS menu_items (
   id INTEGER PRIMARY KEY,
   parent_id INTEGER NULL REFERENCES menu_items(id) ON DELETE CASCADE,
   label TEXT NOT NULL,
+  locale TEXT NOT NULL DEFAULT 'en',
   page_id INTEGER NULL REFERENCES pages(id) ON DELETE SET NULL,
   external_url TEXT NULL,
   open_in_new_tab INTEGER NOT NULL DEFAULT 0,
@@ -87,8 +90,10 @@ CREATE TABLE IF NOT EXISTS resumes (
 CREATE TABLE IF NOT EXISTS skill_categories (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
-  order_index INTEGER NOT NULL DEFAULT 0
+  slug TEXT NOT NULL,
+  locale TEXT NOT NULL DEFAULT 'en',
+  order_index INTEGER NOT NULL DEFAULT 0,
+  UNIQUE (locale, slug)
 );
 
 CREATE TABLE IF NOT EXISTS skills (
@@ -108,7 +113,8 @@ CREATE TABLE IF NOT EXISTS projects (
   id INTEGER PRIMARY KEY,
   user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
   title TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
+  slug TEXT NOT NULL,
+  locale TEXT NOT NULL DEFAULT 'en',
   summary TEXT NULL,
   description TEXT NULL,
   status TEXT NOT NULL DEFAULT 'draft',
@@ -120,7 +126,8 @@ CREATE TABLE IF NOT EXISTS projects (
   order_index INTEGER NOT NULL DEFAULT 0,
   views_count INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NULL,
-  updated_at TEXT NULL
+  updated_at TEXT NULL,
+  UNIQUE (locale, slug)
 );
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects (status);
 CREATE INDEX IF NOT EXISTS idx_projects_featured ON projects (is_featured);
@@ -144,6 +151,7 @@ CREATE TABLE IF NOT EXISTS certifications (
   id INTEGER PRIMARY KEY,
   type TEXT NOT NULL DEFAULT 'certification',
   title TEXT NOT NULL,
+  locale TEXT NOT NULL DEFAULT 'en',
   issuer TEXT NULL,
   icon TEXT NULL,
   period TEXT NULL,
@@ -161,6 +169,7 @@ CREATE TABLE IF NOT EXISTS testimonials (
   id INTEGER PRIMARY KEY,
   quote TEXT NOT NULL,
   author TEXT NOT NULL,
+  locale TEXT NOT NULL DEFAULT 'en',
   role TEXT NULL,
   avatar_media_id INTEGER NULL REFERENCES media(id) ON DELETE SET NULL,
   order_index INTEGER NOT NULL DEFAULT 0,

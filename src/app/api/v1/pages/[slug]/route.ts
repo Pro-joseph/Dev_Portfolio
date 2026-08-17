@@ -9,9 +9,13 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Response> {
   const { slug } = await params;
+  const locale = new URL(request.url).searchParams.get("locale") ?? "en";
   const page = await queryOne<PageRow>(
-    "SELECT * FROM pages WHERE slug = $1 AND is_published = true",
-    [slug]
+    `SELECT * FROM pages WHERE slug = $1 AND is_published = true
+     AND (locale = $2 OR locale = 'en')
+     ORDER BY (locale = $2) DESC
+     LIMIT 1`,
+    [slug, locale]
   );
   if (!page) return notFound();
 

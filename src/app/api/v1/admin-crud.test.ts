@@ -210,8 +210,8 @@ describe("admin CRUD — every resource", () => {
       update: projectUpdatePut,
       destroy: projectDeleteDel,
       path: "/api/v1/admin/projects",
-      createBody: { title: "CRUD Project", status: "published" },
-      updateBody: { title: "CRUD Project", status: "draft" },
+      createBody: { title: "CRUD Project", status: "published", locale: "en" },
+      updateBody: { title: "CRUD Project", status: "draft", locale: "en" },
     });
   });
 
@@ -236,8 +236,8 @@ describe("admin CRUD — every resource", () => {
       update: categoryUpdatePut,
       destroy: categoryDeleteDel,
       path: "/api/v1/admin/skill-categories",
-      createBody: { name: "CRUD Category" },
-      updateBody: { name: "CRUD Category 2" },
+      createBody: { name: "CRUD Category", locale: "en" },
+      updateBody: { name: "CRUD Category 2", locale: "en" },
     });
   });
 
@@ -262,8 +262,8 @@ describe("admin CRUD — every resource", () => {
       update: menuItemUpdatePut,
       destroy: menuItemDeleteDel,
       path: "/api/v1/admin/menu-items",
-      createBody: { label: "CRUD Menu", is_visible: false },
-      updateBody: { label: "CRUD Menu", is_visible: true },
+      createBody: { label: "CRUD Menu", locale: "en", is_visible: false },
+      updateBody: { label: "CRUD Menu", locale: "en", is_visible: true },
     });
   });
 
@@ -275,8 +275,8 @@ describe("admin CRUD — every resource", () => {
       update: pageUpdatePut,
       destroy: pageDeleteDel,
       path: "/api/v1/admin/pages",
-      createBody: { title: "CRUD Page", is_published: false },
-      updateBody: { title: "CRUD Page 2" },
+      createBody: { title: "CRUD Page", locale: "en", is_published: false },
+      updateBody: { title: "CRUD Page 2", locale: "en" },
     });
   });
 
@@ -301,8 +301,8 @@ describe("admin CRUD — every resource", () => {
       update: certificationUpdatePut,
       destroy: certificationDeleteDel,
       path: "/api/v1/admin/certifications",
-      createBody: { type: "certification", title: "CRUD Cert" },
-      updateBody: { type: "certification", title: "CRUD Cert 2" },
+      createBody: { type: "certification", title: "CRUD Cert", locale: "en" },
+      updateBody: { type: "certification", title: "CRUD Cert 2", locale: "en" },
     });
   });
 
@@ -314,6 +314,7 @@ describe("admin CRUD — every resource", () => {
         body: JSON.stringify({
           type: "certification",
           title: "Round Trip Cert",
+          locale: "en",
           description: "A meaningful description.",
           issued_on: "2024-05-01",
         }),
@@ -347,6 +348,7 @@ describe("admin CRUD — every resource", () => {
         body: JSON.stringify({
           type: "certification",
           title: "Round Trip Cert Updated",
+          locale: "en",
           description: "An updated description.",
           issued_on: "2025-02-10",
         }),
@@ -386,8 +388,8 @@ describe("admin CRUD — every resource", () => {
       update: testimonialUpdatePut,
       destroy: testimonialDeleteDel,
       path: "/api/v1/admin/testimonials",
-      createBody: { quote: "Great work.", author: "CRUD Tester", is_visible: false },
-      updateBody: { quote: "Great work.", author: "CRUD Tester", is_visible: true },
+      createBody: { quote: "Great work.", author: "CRUD Tester", locale: "en", is_visible: false },
+      updateBody: { quote: "Great work.", author: "CRUD Tester", locale: "en", is_visible: true },
     });
   });
 

@@ -1,0 +1,116 @@
+import type { Dictionary } from "../types";
+
+export const en: Dictionary = {
+  langName: "English",
+  nav: {
+    downloadResume: "Download Resume",
+    getInTouch: "Get In Touch",
+    brandFallback: "Youssef Jdira",
+    projects: "Projects",
+    skills: "Skills",
+    contact: "Contact",
+  },
+  hero: {
+    viewMyWork: "View My Work",
+    openToWork: "Open to work",
+    roleFallback: "Systems Architect",
+    heroImageAltSuffix: "abstract software dashboard",
+    environment: "environment",
+    scrollToProjects: "Scroll to projects",
+    stats: {
+      featuredProjects: "Featured Projects",
+      skillCategories: "Skill Categories",
+      technologies: "Technologies",
+      status: "Status",
+    },
+    statusOpen: "OPEN",
+    statusBusy: "BUSY",
+    featured: {
+      eyebrow: "SELECT * FROM featured_projects",
+      title: "Featured Projects",
+      subtitle:
+        "A selection of systems I've architected and shipped — from distributed backends to full application stacks.",
+    },
+    gallery: {
+      eyebrow: "GALLERY",
+      title: "Systems & Infrastructure",
+      subtitle: "Click any image to explore it up close.",
+    },
+    skills: {
+      eyebrow: "TECHNICAL PROFICIENCY",
+      title: "A comprehensive toolkit for building robust systems.",
+      body: "From low-level systems programming to high-level application architecture, I bring deep expertise across the entire stack to every engagement.",
+    },
+    terminal: {
+      title: "system_monitor.sh",
+      systemStatus: "SYSTEM_STATUS",
+      online: "ONLINE",
+      categories: "CATEGORIES",
+      skills: "SKILLS",
+      status: "STATUS",
+      openToWork: "OPEN TO WORK",
+      notAvailable: "NOT AVAILABLE",
+    },
+    testimonials: {
+      eyebrow: "CLIENT FEEDBACK",
+      title: "What People Say",
+      subtitle: "Collaborators and clients on what it's like to build with me.",
+    },
+  },
+  projects: {
+    allProjects: "All Projects",
+    description:
+      "A selection of systems, platforms, and tools engineered from the database up.",
+    backToPortfolio: "Back to Portfolio",
+    eyebrow: "SELECT * FROM projects",
+    views: "VIEWS",
+    status: "STATUS",
+    view: "View",
+    breadcrumb: "Projects",
+    role: "Role",
+    timeline: "Timeline",
+    present: "Present",
+    techStack: "Tech Stack",
+    projectStatus: "Project Status",
+    personalProject: "Personal project",
+    viewCaseStudy: "View case study",
+  },
+  certifications: {
+    title: "Certifications & Education",
+    description:
+      "Formal credentials and continuous professional development in software engineering and systems architecture.",
+    eyebrow: "ACADEMIC & PROFESSIONAL RECORDS",
+    academicBackground: "Academic Background",
+    professionalCertifications: "Professional Certifications",
+    issued: "ISSUED",
+    verifyBadge: "Verify Badge",
+    dash: "—",
+  },
+  status: {
+    draft: "Draft",
+    published: "Live",
+    archived: "Archived",
+  },
+  sectionHeader: { viewAll: "View All" },
+  skillCard: { items: "ITEMS" },
+  cta: {
+    heading: "Let's build something extraordinary together.",
+    body: "If you have a challenge that requires deep systems thinking, let's talk. The inbox is open.",
+  },
+  footer: {
+    rights: "All rights reserved.",
+    engineeredIn: "Engineered in Munich",
+    taglineFallback:
+      "Systems architect building resilient backends and databases that scale from prototype to production.",
+  },
+  lightbox: {
+    galleryAltSuffix: "gallery",
+    projectImageAltSuffix: "project image",
+    lightboxLabel: "Project image lightbox",
+    close: "Close lightbox",
+    prev: "Previous image",
+    next: "Next image",
+    openInLightbox: "Open in lightbox",
+  },
+  langSwitch: { ariaLabel: "Switch to French" },
+};

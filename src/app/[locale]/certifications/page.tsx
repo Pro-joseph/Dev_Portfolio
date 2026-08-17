@@ -1,26 +1,37 @@
 import type { Metadata } from "next";
 import { getCertificationsData } from "@/lib/resources";
 import { loadSiteSettings } from "@/lib/site-config";
+import { getDictionary } from "@/lib/i18n";
 import { Certification } from "@/lib/types";
 import SubNav from "@/components/public/SubNav";
 import { certIcon } from "@/lib/icons";
 import { FaAward, FaExternalLinkAlt, FaGraduationCap } from "react-icons/fa";
 
-export const metadata: Metadata = {
-  title: "Certifications & Education",
-  description: "Formal credentials and continuous professional development in software engineering and systems architecture.",
-};
-
 export const revalidate = 60;
+
+interface Props {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = getDictionary(locale);
+  return {
+    title: t.certifications.title,
+    description: t.certifications.description,
+  };
+}
 
 function certIconFor(cert: Certification) {
   return certIcon(cert.title, cert.issuer ?? "");
 }
 
-export default async function CertificationsPage() {
+export default async function CertificationsPage({ params }: Props) {
+  const { locale } = await params;
+  const t = getDictionary(locale);
   const [data, settings] = await Promise.all([
-    getCertificationsData(),
-    loadSiteSettings(),
+    getCertificationsData(locale),
+    loadSiteSettings(locale),
   ]);
 
   const education = data.filter((c) => c.type === "education");
@@ -28,18 +39,17 @@ export default async function CertificationsPage() {
 
   return (
     <>
-      <SubNav authorName={settings.author_name} />
+      <SubNav authorName={settings.author_name} locale={locale} t={t} />
 
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-6 max-w-5xl">
           <header className="mb-20 text-center">
             <p className="text-accent text-xs font-mono font-bold uppercase tracking-[0.2em] mb-4">
-              ACADEMIC &amp; PROFESSIONAL RECORDS
+              {t.certifications.eyebrow}
             </p>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Certifications &amp; Education</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t.certifications.title}</h1>
             <p className="text-lg md:text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
-              Formal credentials and continuous professional development in software engineering
-              and systems architecture.
+              {t.certifications.description}
             </p>
           </header>
 
@@ -47,7 +57,7 @@ export default async function CertificationsPage() {
             <section className="mb-24">
               <div className="flex items-center gap-4 mb-12">
                 <FaGraduationCap className="text-accent text-2xl" />
-                <h2 className="text-3xl font-bold">Academic Background</h2>
+                <h2 className="text-3xl font-bold">{t.certifications.academicBackground}</h2>
                 <div className="flex-1 h-px bg-line" />
               </div>
               <div className="space-y-12">
@@ -84,7 +94,7 @@ export default async function CertificationsPage() {
             <section>
               <div className="flex items-center gap-4 mb-12">
                 <FaAward className="text-accent text-2xl" />
-                <h2 className="text-3xl font-bold">Professional Certifications</h2>
+                <h2 className="text-3xl font-bold">{t.certifications.professionalCertifications}</h2>
                 <div className="flex-1 h-px bg-line" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -112,11 +122,11 @@ export default async function CertificationsPage() {
                       )}
                       <div className="flex justify-between items-center">
                         <span className="text-xs font-mono font-bold text-secondary">
-                          ISSUED: {cert.issued_on ? new Date(cert.issued_on + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase() : "—"}
+                          {t.certifications.issued}: {cert.issued_on ? new Date(cert.issued_on + "T00:00:00").toLocaleDateString(locale, { month: "short", year: "numeric" }).toUpperCase() : t.certifications.dash}
                         </span>
                         {cert.verify_url && (
                           <a href={cert.verify_url} target="_blank" rel="noreferrer" className="text-xs font-bold uppercase tracking-widest text-accent hover:underline inline-flex items-center gap-1">
-                            Verify Badge <FaExternalLinkAlt className="text-[9px]" />
+                            {t.certifications.verifyBadge} <FaExternalLinkAlt className="text-[9px]" />
                           </a>
                         )}
                       </div>

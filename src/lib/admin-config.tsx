@@ -8,6 +8,17 @@ import {
   SETTING_TYPES,
   SETTING_TYPE_LABELS,
 } from "./enums";
+import { LOCALES, LOCALE_NAMES } from "./i18n";
+
+const LOCALE_OPTIONS = LOCALES.map((l) => ({ value: l, label: LOCALE_NAMES[l] }));
+
+const localeCell = (r: Record<string, unknown>) => (
+  <Badge tone={r.locale === "fr" ? "sky" : "slate"}>
+    {String(LOCALE_NAMES[(r.locale as "en" | "fr") ?? "en"] ?? "en")}
+  </Badge>
+);
+
+const localeField = { name: "locale", label: "Language", type: "select" as const, required: true, options: LOCALE_OPTIONS, cols: "md:col-span-2" };
 
 export type FieldType =
   | "text"
@@ -63,11 +74,13 @@ export const RESOURCES: ResourceConfig[] = [
     path: "/admin/projects",
     columns: [
       { key: "title", label: "Project", render: (r) => <span className="font-medium">{String(r.title)}</span> },
+      { key: "locale", label: "Lang", render: (r) => localeCell(r) },
       { key: "status", label: "Status", render: (r) => <StatusBadge status={String(r.status)} /> },
       { key: "is_featured", label: "Featured", render: (r) => (r.is_featured ? <Badge tone="sky">Featured</Badge> : <span className="text-ink-400">—</span>) },
       { key: "views_count", label: "Views", render: (r) => <span className="tabular-nums">{Number(r.views_count).toLocaleString()}</span> },
     ],
     fields: [
+      localeField,
       { name: "title", label: "Title", type: "text", required: true, cols: "md:col-span-2" },
       { name: "slug", label: "Slug", type: "text", help: "Leave blank to auto-generate from title", cols: "md:col-span-2" },
       { name: "summary", label: "Summary", type: "textarea", cols: "md:col-span-2" },
@@ -109,10 +122,12 @@ export const RESOURCES: ResourceConfig[] = [
     path: "/admin/skill-categories",
     columns: [
       { key: "name", label: "Name", render: (r) => <span className="font-medium">{String(r.name)}</span> },
+      { key: "locale", label: "Lang", render: (r) => localeCell(r) },
       { key: "slug", label: "Slug" },
       { key: "order_index", label: "Order" },
     ],
     fields: [
+      localeField,
       { name: "name", label: "Name", type: "text", required: true },
       { name: "slug", label: "Slug", type: "text", help: "Leave blank to auto-generate" },
       { name: "order_index", label: "Order", type: "number" },
@@ -159,10 +174,12 @@ export const RESOURCES: ResourceConfig[] = [
     path: "/admin/menu-items",
     columns: [
       { key: "label", label: "Label", render: (r) => <span className="font-medium">{String(r.label)}</span> },
+      { key: "locale", label: "Lang", render: (r) => localeCell(r) },
       { key: "target", label: "Target", render: (r) => urlCell((r as { external_url?: string; page?: { slug?: string } }).external_url ?? ((r as { page?: { slug?: string } }).page?.slug ? `/${(r as { page: { slug: string } }).page.slug}` : null)) },
       { key: "is_visible", label: "Visible", render: (r) => (r.is_visible ? <Badge tone="green">Yes</Badge> : <Badge tone="slate">No</Badge>) },
     ],
     fields: [
+      localeField,
       { name: "label", label: "Label", type: "text", required: true },
       { name: "parent_id", label: "Parent item", type: "select", optionsKey: "menus" },
       { name: "page_id", label: "Internal page", type: "select", optionsKey: "pages" },
@@ -179,10 +196,12 @@ export const RESOURCES: ResourceConfig[] = [
     path: "/admin/pages",
     columns: [
       { key: "title", label: "Title", render: (r) => <span className="font-medium">{String(r.title)}</span> },
+      { key: "locale", label: "Lang", render: (r) => localeCell(r) },
       { key: "slug", label: "Slug", render: (r) => <span className="font-mono text-sky-600">/{String(r.slug)}</span> },
       { key: "is_published", label: "Published", render: (r) => (r.is_published ? <Badge tone="green">Yes</Badge> : <Badge tone="slate">No</Badge>) },
     ],
     fields: [
+      localeField,
       { name: "title", label: "Title", type: "text", required: true, cols: "md:col-span-2" },
       { name: "slug", label: "Slug", type: "text", help: "Leave blank to auto-generate" },
       { name: "content", label: "Content (JSON blocks)", type: "json", cols: "md:col-span-2" },
@@ -200,6 +219,7 @@ export const RESOURCES: ResourceConfig[] = [
     columns: [
       { key: "type", label: "Type", render: (r) => <Badge tone={r.type === "education" ? "sky" : "green"}>{String(r.type)}</Badge> },
       { key: "title", label: "Title", render: (r) => <span className="font-medium">{String(r.title)}</span> },
+      { key: "locale", label: "Lang", render: (r) => localeCell(r) },
       { key: "issuer", label: "Issuer" },
       {
         key: "issued_on",
@@ -215,6 +235,7 @@ export const RESOURCES: ResourceConfig[] = [
     ],
     fields: [
       { name: "type", label: "Type", type: "select", required: true, options: CERT_TYPES.map((t) => ({ value: t, label: CERT_TYPE_LABELS[t] })) },
+      localeField,
       { name: "title", label: "Title", type: "text", required: true, cols: "md:col-span-2" },
       { name: "issuer", label: "Issuer", type: "text" },
       { name: "period", label: "Period (e.g. 2018 - 2021)", type: "text" },
@@ -233,10 +254,12 @@ export const RESOURCES: ResourceConfig[] = [
     path: "/admin/testimonials",
     columns: [
       { key: "author", label: "Author", render: (r) => <span className="font-medium">{String(r.author)}</span> },
+      { key: "locale", label: "Lang", render: (r) => localeCell(r) },
       { key: "role", label: "Role" },
       { key: "is_visible", label: "Visible", render: (r) => (r.is_visible ? <Badge tone="green">Yes</Badge> : <Badge tone="slate">No</Badge>) },
     ],
     fields: [
+      localeField,
       { name: "quote", label: "Quote", type: "textarea", required: true, cols: "md:col-span-2" },
       { name: "author", label: "Author", type: "text", required: true },
       { name: "role", label: "Role", type: "text" },

@@ -6,9 +6,10 @@ interface Props {
   title: string;
   subtitle?: string;
   viewAllHref?: string;
+  viewAllLabel?: string;
 }
 
-export default function SectionHeader({ eyebrow, title, subtitle, viewAllHref }: Props) {
+export default function SectionHeader({ eyebrow, title, subtitle, viewAllHref, viewAllLabel = "View All" }: Props) {
   return (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 mb-14">
       <div>
@@ -26,7 +27,7 @@ export default function SectionHeader({ eyebrow, title, subtitle, viewAllHref }:
           href={viewAllHref}
           className="group flex items-center gap-2 text-sm font-bold tracking-widest uppercase hover:text-accent transition-colors whitespace-nowrap"
         >
-          View All
+          {viewAllLabel}
           <FaLongArrowAltRight className="transition-transform duration-300 group-hover:translate-x-1" />
         </Link>
       )}

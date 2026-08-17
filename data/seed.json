@@ -100,6 +100,34 @@
       "value": null,
       "type": "string",
       "updated_at": "2026-08-11T15:55:53.000Z"
+    },
+    {
+      "id": 20,
+      "key": "site_title_fr",
+      "value": "JosephLab",
+      "type": "string",
+      "updated_at": "2026-08-17T12:00:00.000Z"
+    },
+    {
+      "id": 21,
+      "key": "site_tagline_fr",
+      "value": "Concevoir des systèmes numériques robustes, de la base de données jusqu'à l'interface",
+      "type": "string",
+      "updated_at": "2026-08-17T12:00:00.000Z"
+    },
+    {
+      "id": 22,
+      "key": "site_description_fr",
+      "value": "Développeur full-stack avec une vaste expérience en systèmes backend, bases de données et architecture logicielle.",
+      "type": "text",
+      "updated_at": "2026-08-17T12:00:00.000Z"
+    },
+    {
+      "id": 23,
+      "key": "author_role_fr",
+      "value": "Architecte de systèmes",
+      "type": "string",
+      "updated_at": "2026-08-17T12:00:00.000Z"
     }
   ],
   "social_links": [
@@ -145,7 +173,8 @@
       "external_url": "#projects",
       "open_in_new_tab": false,
       "order_index": 0,
-      "is_visible": true
+      "is_visible": true,
+      "locale": "en"
     },
     {
       "id": 2,
@@ -155,7 +184,8 @@
       "external_url": "#skills",
       "open_in_new_tab": false,
       "order_index": 1,
-      "is_visible": true
+      "is_visible": true,
+      "locale": "en"
     },
     {
       "id": 3,
@@ -165,12 +195,58 @@
       "external_url": "#blog",
       "open_in_new_tab": false,
       "order_index": 2,
-      "is_visible": true
+      "is_visible": true,
+      "locale": "en"
     },
     {
       "id": 4,
       "parent_id": null,
       "label": "Contact",
+      "page_id": null,
+      "external_url": "/#contact",
+      "open_in_new_tab": false,
+      "order_index": 3,
+      "is_visible": true,
+      "locale": "en"
+    },
+    {
+      "id": 5,
+      "parent_id": null,
+      "label": "Projets",
+      "locale": "fr",
+      "page_id": null,
+      "external_url": "#projects",
+      "open_in_new_tab": false,
+      "order_index": 0,
+      "is_visible": true
+    },
+    {
+      "id": 6,
+      "parent_id": null,
+      "label": "Compétences",
+      "locale": "fr",
+      "page_id": null,
+      "external_url": "#skills",
+      "open_in_new_tab": false,
+      "order_index": 1,
+      "is_visible": true
+    },
+    {
+      "id": 7,
+      "parent_id": null,
+      "label": "Blog",
+      "locale": "fr",
+      "page_id": null,
+      "external_url": "#blog",
+      "open_in_new_tab": false,
+      "order_index": 2,
+      "is_visible": true
+    },
+    {
+      "id": 8,
+      "parent_id": null,
+      "label": "Contact",
+      "locale": "fr",
       "page_id": null,
       "external_url": "/#contact",
       "open_in_new_tab": false,
@@ -491,19 +567,22 @@
       "id": 1,
       "name": "Backend",
       "slug": "backend",
-      "order_index": 0
+      "order_index": 0,
+      "locale": "en"
     },
     {
       "id": 2,
       "name": "Frontend",
       "slug": "frontend",
-      "order_index": 1
+      "order_index": 1,
+      "locale": "en"
     },
     {
       "id": 3,
       "name": "DevOps",
       "slug": "devops",
-      "order_index": 2
+      "order_index": 2,
+      "locale": "en"
     }
   ],
   "skills": [
@@ -734,7 +813,8 @@
       "order_index": 0,
       "views_count": 18375,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T16:38:49.000Z"
+      "updated_at": "2026-08-12T16:38:49.000Z",
+      "locale": "en"
     },
     {
       "id": 2,
@@ -752,7 +832,8 @@
       "order_index": 1,
       "views_count": 14250,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T16:38:49.000Z"
+      "updated_at": "2026-08-12T16:38:49.000Z",
+      "locale": "en"
     },
     {
       "id": 3,
@@ -770,7 +851,8 @@
       "order_index": 2,
       "views_count": 9202,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T16:38:49.000Z"
+      "updated_at": "2026-08-12T16:38:49.000Z",
+      "locale": "en"
     },
     {
       "id": 4,
@@ -788,7 +870,8 @@
       "order_index": 3,
       "views_count": 12400,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-11T15:55:53.000Z"
+      "updated_at": "2026-08-11T15:55:53.000Z",
+      "locale": "en"
     },
     {
       "id": 5,
@@ -806,7 +889,8 @@
       "order_index": 4,
       "views_count": 8900,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-11T15:55:53.000Z"
+      "updated_at": "2026-08-11T15:55:53.000Z",
+      "locale": "en"
     },
     {
       "id": 6,
@@ -824,7 +908,8 @@
       "order_index": 5,
       "views_count": 0,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-11T15:55:53.000Z"
+      "updated_at": "2026-08-11T15:55:53.000Z",
+      "locale": "en"
     },
     {
       "id": 7,
@@ -842,7 +927,8 @@
       "order_index": 6,
       "views_count": 6100,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-11T15:55:53.000Z"
+      "updated_at": "2026-08-11T15:55:53.000Z",
+      "locale": "en"
     },
     {
       "id": 9,
@@ -860,7 +946,25 @@
       "order_index": 42,
       "views_count": 66,
       "created_at": "2026-08-11T20:01:59.000Z",
-      "updated_at": "2026-08-11T20:01:59.000Z"
+      "updated_at": "2026-08-11T20:01:59.000Z",
+      "locale": "en"
+    },
+    {
+      "id": 50,
+      "user_id": 1,
+      "title": "Plateforme Nexus",
+      "locale": "fr",
+      "slug": "nexus-platform",
+      "summary": "Une infrastructure SaaS d'entreprise conçue pour des systèmes distribués à haute disponibilité.",
+      "description": "La Plateforme Nexus est une infrastructure SaaS d'entreprise... (traduction de démonstration).",
+      "status": "published",
+      "is_featured": true,
+      "client": "TechCorp",
+      "role_on_project": "Architecte principal",
+      "started_on": "2024-01-15",
+      "completed_on": "2024-11-30",
+      "order_index": 0,
+      "views_count": 0
     }
   ],
   "project_links": [
@@ -1126,7 +1230,8 @@
       "order_index": 1,
       "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T15:18:39.000Z"
+      "updated_at": "2026-08-12T15:18:39.000Z",
+      "locale": "en"
     },
     {
       "id": 3,
@@ -1142,7 +1247,8 @@
       "order_index": 2,
       "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T15:18:30.000Z"
+      "updated_at": "2026-08-12T15:18:30.000Z",
+      "locale": "en"
     },
     {
       "id": 4,
@@ -1158,7 +1264,8 @@
       "order_index": 3,
       "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T15:18:27.000Z"
+      "updated_at": "2026-08-12T15:18:27.000Z",
+      "locale": "en"
     },
     {
       "id": 5,
@@ -1174,7 +1281,8 @@
       "order_index": 4,
       "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T15:18:22.000Z"
+      "updated_at": "2026-08-12T15:18:22.000Z",
+      "locale": "en"
     },
     {
       "id": 6,
@@ -1190,7 +1298,53 @@
       "order_index": 5,
       "is_visible": true,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T15:18:18.000Z"
+      "updated_at": "2026-08-12T15:18:18.000Z",
+      "locale": "en"
+    },
+    {
+      "id": 30,
+      "type": "education",
+      "title": "Licence en génie logiciel",
+      "locale": "fr",
+      "issuer": "Polytechnic University",
+      "icon": null,
+      "period": "2015 - 2018",
+      "issued_on": null,
+      "credential_id": "DIPLOMA_02",
+      "verify_url": null,
+      "description": "Parcours de licence axé sur les principes du génie logiciel et la conception de systèmes.",
+      "order_index": 0,
+      "is_visible": true
+    },
+    {
+      "id": 31,
+      "type": "certification",
+      "title": "Architecte de solutions certifié AWS",
+      "locale": "fr",
+      "issuer": "Professional Level",
+      "icon": "fa-brands fa-aws",
+      "period": null,
+      "issued_on": "2024-03-01T00:00:00.000Z",
+      "credential_id": "AWS_SAA_02",
+      "verify_url": null,
+      "description": "Architecture et conception de solutions cloud évolutives et sécurisées sur AWS.",
+      "order_index": 1,
+      "is_visible": true
+    },
+    {
+      "id": 32,
+      "type": "certification",
+      "title": "Administrateur certifié Kubernetes",
+      "locale": "fr",
+      "issuer": "CNCF / Linux Foundation",
+      "icon": "fa-solid fa-cubes",
+      "period": null,
+      "issued_on": "2024-01-01T00:00:00.000Z",
+      "credential_id": "CKA_02",
+      "verify_url": null,
+      "description": "Exploitation d'environnements Kubernetes prêts pour la production.",
+      "order_index": 2,
+      "is_visible": true
     }
   ],
   "testimonials": [
@@ -1203,7 +1357,8 @@
       "order_index": 0,
       "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T15:14:01.000Z"
+      "updated_at": "2026-08-12T15:14:01.000Z",
+      "locale": "en"
     },
     {
       "id": 2,
@@ -1214,7 +1369,8 @@
       "order_index": 1,
       "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T15:13:56.000Z"
+      "updated_at": "2026-08-12T15:13:56.000Z",
+      "locale": "en"
     },
     {
       "id": 3,
@@ -1225,7 +1381,18 @@
       "order_index": 2,
       "is_visible": false,
       "created_at": "2026-08-11T15:55:53.000Z",
-      "updated_at": "2026-08-12T15:13:52.000Z"
+      "updated_at": "2026-08-12T15:13:52.000Z",
+      "locale": "en"
+    },
+    {
+      "id": 30,
+      "quote": "Un ingénieur exceptionnel qui a transformé notre infrastructure existante en une plateforme moderne et évolutive.",
+      "author": "Alex Morgan",
+      "locale": "fr",
+      "role": "CTO, TechCorp",
+      "avatar_media_id": 14,
+      "order_index": 0,
+      "is_visible": true
     }
   ],
   "contact_messages": [

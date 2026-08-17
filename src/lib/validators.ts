@@ -1,4 +1,5 @@
 import { PROJECT_STATUS, LINK_TYPES, SETTING_TYPES, CERT_TYPES } from "./enums";
+import { LOCALES } from "./i18n";
 
 export type ValidationResult =
   | { ok: true; data: Record<string, unknown> }
@@ -11,6 +12,7 @@ export const ENUMS = {
   linkType: [...LINK_TYPES],
   settingType: [...SETTING_TYPES],
   certType: [...CERT_TYPES],
+  locale: [...LOCALES],
 };
 
 function missing(value: unknown): boolean {

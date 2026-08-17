@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { MenuEntry } from "@/lib/types";
+import type { Dictionary } from "@/lib/i18n";
+import LangSwitch from "./LangSwitch";
 
 interface NavProps {
   siteTitle?: string;
@@ -7,16 +9,26 @@ interface NavProps {
   menu?: MenuEntry[];
   resumeUrl?: string | null;
   resumeFilename?: string | null;
+  t: Dictionary;
+  locale: string;
 }
 
-export default function Nav({ siteTitle, authorName, menu = [], resumeUrl, resumeFilename }: NavProps) {
-  const brand = authorName || siteTitle || "Youssef Jdira";
-  const items = menu.length > 0 ? menu : DEFAULT_MENU;
+export default function Nav({
+  siteTitle,
+  authorName,
+  menu = [],
+  resumeUrl,
+  resumeFilename,
+  t,
+  locale,
+}: NavProps) {
+  const brand = authorName || siteTitle || t.nav.brandFallback;
+  const items = menu.length > 0 ? menu : DEFAULT_MENU(t);
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-surface/85 backdrop-blur-md border-b border-line/70">
       <div className="flex items-center gap-2">
-        <Link href="/" className="font-heading text-lg tracking-tight font-bold">
+        <Link href={`/${locale}`} className="font-heading text-lg tracking-tight font-bold">
           {brand}
         </Link>
         <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
@@ -50,31 +62,34 @@ export default function Nav({ siteTitle, authorName, menu = [], resumeUrl, resum
           )
         )}
       </div>
-      {resumeUrl ? (
-        <a
-          href={resumeUrl}
-          download={resumeFilename || true}
-          rel="noreferrer"
-          className="group relative overflow-hidden bg-primary text-white px-6 py-2 rounded-full text-xs font-bold tracking-widest hover:bg-gray-800 transition-colors"
-        >
-          Download Resume
-        </a>
-      ) : (
-        <Link
-          href="/#contact"
-          className="group relative overflow-hidden bg-primary text-white px-6 py-2 rounded-full text-xs font-bold tracking-widest hover:bg-gray-800 transition-colors"
-        >
-          Get In Touch
-        </Link>
-      )}
+      <div className="flex items-center gap-6">
+        <LangSwitch ariaLabel={t.langSwitch.ariaLabel} />
+        {resumeUrl ? (
+          <a
+            href={resumeUrl}
+            download={resumeFilename || true}
+            rel="noreferrer"
+            className="group relative overflow-hidden bg-primary text-white px-6 py-2 rounded-full text-xs font-bold tracking-widest hover:bg-gray-800 transition-colors"
+          >
+            {t.nav.downloadResume}
+          </a>
+        ) : (
+          <Link
+            href={`/${locale}#contact`}
+            className="group relative overflow-hidden bg-primary text-white px-6 py-2 rounded-full text-xs font-bold tracking-widest hover:bg-gray-800 transition-colors"
+          >
+            {t.nav.getInTouch}
+          </Link>
+        )}
+      </div>
     </nav>
   );
 }
 
-const DEFAULT_MENU: MenuEntry[] = [
-  { id: -1, label: "Projects", url: "#projects", open_in_new_tab: false, children: [] },
-  { id: -2, label: "Skills", url: "#skills", open_in_new_tab: false, children: [] },
-  { id: -3, label: "Contact", url: "/#contact", open_in_new_tab: false, children: [] },
+const DEFAULT_MENU = (t: Dictionary): MenuEntry[] => [
+  { id: -1, label: t.nav.projects, url: "#projects", open_in_new_tab: false, children: [] },
+  { id: -2, label: t.nav.skills, url: "#skills", open_in_new_tab: false, children: [] },
+  { id: -3, label: t.nav.contact, url: "/#contact", open_in_new_tab: false, children: [] },
 ];
 
 function NavLink({

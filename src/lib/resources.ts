@@ -2,6 +2,7 @@ import { query, queryOne } from "./db";
 import { mediaPublicUrl } from "./media-storage";
 import { PROJECT_MORPH } from "./enums";
 import { PAGE_SIZE_PUBLIC } from "./config";
+import { DEFAULT_LOCALE } from "./i18n";
 import type {
   Certification,
   Project,
@@ -10,6 +11,38 @@ import type {
   SkillCategory,
   Testimonial,
 } from "./types";
+
+// ------------------------------------------------------------ i18n helpers
+
+/** Rows are returned for the requested locale plus the default; prefer the
+ *  requested locale and keep default rows whose slug has no localized twin. */
+export function pickByLocale<T extends { slug: string; locale?: string }>(
+  rows: T[],
+  locale: string
+): T[] {
+  const preferred = rows.filter((r) => r.locale === locale);
+  const slugs = new Set(preferred.map((r) => r.slug));
+  const fallback = rows.filter(
+    (r) => r.locale !== locale && !slugs.has(r.slug)
+  );
+  return [...preferred, ...fallback];
+}
+
+/** Whole-list fallback: show the localized rows if any exist for the locale,
+ *  otherwise the default-locale rows. */
+export function pickListByLocale<T extends { locale?: string }>(
+  rows: T[],
+  locale: string
+): T[] {
+  const localized = rows.filter((r) => r.locale === locale);
+  return localized.length > 0
+    ? localized
+    : rows.filter((r) => r.locale === DEFAULT_LOCALE || !r.locale);
+}
+
+function localeOr(slug: string, locale: string): string {
+  return `(${slug} = $${locale} OR ${slug} = '${DEFAULT_LOCALE}')`;
+}
 
 // ----------------------------------------------------------- types
 
@@ -296,6 +329,7 @@ export interface MenuItemRow {
   id: number;
   parent_id: number | null;
   label: string;
+  locale?: string;
   page_id: number | null;
   external_url: string | null;
   open_in_new_tab: boolean;
@@ -321,7 +355,7 @@ function castSetting(row: SiteSettingsRow): unknown {
   }
 }
 
-async function loadSiteData(): Promise<{
+async function loadSiteData(locale: string = DEFAULT_LOCALE): Promise<{
   settings: Record<string, unknown>;
   social_links: Record<string, unknown>[];
   menu: Record<string, unknown>[];
@@ -333,7 +367,10 @@ async function loadSiteData(): Promise<{
       "SELECT id, platform, url, icon FROM social_links WHERE is_visible = true ORDER BY order_index"
     ),
     query<MenuItemRow>(
-      "SELECT * FROM menu_items WHERE is_visible = true ORDER BY order_index"
+      `SELECT * FROM menu_items
+       WHERE is_visible = true AND (locale = $1 OR locale = '${DEFAULT_LOCALE}')
+       ORDER BY order_index`,
+      [locale]
     ),
     query<{ resume_id: number; label: string; language: string; media_disk: string; media_path: string; media_filename: string }>(
       `SELECT r.id AS resume_id, r.label, r.language,
@@ -351,11 +388,14 @@ async function loadSiteData(): Promise<{
   for (const s of settings) settingMap[s.key] = castSetting(s);
 
   const pages = await query<{ id: number; slug: string }>(
-    "SELECT id, slug FROM pages"
+    `SELECT id, slug FROM pages
+     WHERE (locale = $1 OR locale = '${DEFAULT_LOCALE}')`,
+    [locale]
   );
-  const pageBySlug = new Map(pages.map((p) => [p.id, p.slug]));
+  const pageBySlug = new Map(pickByLocale(pages, locale).map((p) => [p.id, p.slug]));
+  const pickedMenu = pickListByLocale(menuItems, locale);
   const pageByParent = new Map<number | null, MenuItemRow[]>();
-  for (const item of menuItems) {
+  for (const item of pickedMenu) {
     const list = pageByParent.get(item.parent_id) ?? [];
     list.push(item);
     pageByParent.set(item.parent_id, list);
@@ -404,8 +444,8 @@ async function loadSiteData(): Promise<{
   };
 }
 
-export async function siteResource(): Promise<Record<string, unknown>> {
-  return loadSiteData();
+export async function siteResource(locale: string = DEFAULT_LOCALE): Promise<Record<string, unknown>> {
+  return loadSiteData(locale);
 }
 
 // ------------------------------------------------------------ data loaders
@@ -417,7 +457,10 @@ export interface ProjectListQuery {
   page?: number;
 }
 
-export async function loadProjectList(q: ProjectListQuery): Promise<{
+export async function loadProjectList(
+  q: ProjectListQuery,
+  locale: string = DEFAULT_LOCALE
+): Promise<{
   rows: ProjectRow[];
   total: number;
   perPage: number;
@@ -426,8 +469,8 @@ export async function loadProjectList(q: ProjectListQuery): Promise<{
   const perPage = Math.max(1, q.perPage || PAGE_SIZE_PUBLIC);
   const page = Math.max(1, q.page || 1);
 
-  const conditions: string[] = ["status = 'published'"];
-  const params: unknown[] = [];
+  const conditions: string[] = ["status = 'published'", localeOr("locale", "1")];
+  const params: unknown[] = [locale];
 
   if (q.featured) {
     params.push(true);
@@ -454,31 +497,42 @@ export async function loadProjectList(q: ProjectListQuery): Promise<{
     [...params, perPage, (page - 1) * perPage]
   );
 
-  return { rows, total, perPage, page };
+  const picked = pickByLocale(rows, locale);
+  return { rows: picked, total, perPage, page };
 }
 
 export async function loadProjectBySlug(
-  slug: string
+  slug: string,
+  locale: string = DEFAULT_LOCALE
 ): Promise<ProjectWithRelations | null> {
   const project = await queryOne<ProjectRow>(
-    "SELECT * FROM projects WHERE slug = $1 AND status = 'published'",
-    [slug]
+    `SELECT * FROM projects WHERE slug = $1 AND status = 'published'
+     AND (locale = $2 OR locale = '${DEFAULT_LOCALE}')
+     ORDER BY (locale = $2) DESC
+     LIMIT 1`,
+    [slug, locale]
   );
   if (!project) return null;
   return buildProject(project);
 }
 
-export async function loadSkillCategories(): Promise<Record<string, unknown>[]> {
+export async function loadSkillCategories(
+  locale: string = DEFAULT_LOCALE
+): Promise<Record<string, unknown>[]> {
   const categories = await query<{
     id: number;
     name: string;
     slug: string;
+    locale?: string;
     order_index: number;
   }>(
-    "SELECT id, name, slug, order_index FROM skill_categories ORDER BY order_index"
+    `SELECT id, name, slug, locale, order_index FROM skill_categories
+     WHERE (locale = $1 OR locale = '${DEFAULT_LOCALE}')
+     ORDER BY order_index`,
+    [locale]
   );
   return Promise.all(
-    categories.map(async (cat) => {
+    pickByLocale(categories, locale).map(async (cat) => {
       const skills = await query<SkillRow>(
         "SELECT id, name, slug, icon, order_index FROM skills WHERE skill_category_id = $1 AND is_visible = true ORDER BY order_index",
         [cat.id]
@@ -494,12 +548,17 @@ export async function loadSkillCategories(): Promise<Record<string, unknown>[]> 
   );
 }
 
-export async function loadTestimonials(): Promise<Record<string, unknown>[]> {
-  const testimonials = await query<TestimonialRow>(
-    "SELECT * FROM testimonials WHERE is_visible = true ORDER BY order_index"
+export async function loadTestimonials(
+  locale: string = DEFAULT_LOCALE
+): Promise<Record<string, unknown>[]> {
+  const testimonials = await query<TestimonialRow & { locale?: string }>(
+    `SELECT * FROM testimonials
+     WHERE is_visible = true AND (locale = $1 OR locale = '${DEFAULT_LOCALE}')
+     ORDER BY order_index`,
+    [locale]
   );
   return Promise.all(
-    testimonials.map(async (t) => {
+    pickListByLocale(testimonials, locale).map(async (t) => {
       const avatar = await queryOne<MediaRow>(
         "SELECT * FROM media WHERE id = $1",
         [t.avatar_media_id]
@@ -509,47 +568,59 @@ export async function loadTestimonials(): Promise<Record<string, unknown>[]> {
   );
 }
 
-export async function loadCertifications(): Promise<Record<string, unknown>[]> {
-  const certifications = await query<CertificationRow>(
-    "SELECT * FROM certifications WHERE is_visible = true ORDER BY order_index"
+export async function loadCertifications(
+  locale: string = DEFAULT_LOCALE
+): Promise<Record<string, unknown>[]> {
+  const certifications = await query<CertificationRow & { locale?: string }>(
+    `SELECT * FROM certifications
+     WHERE is_visible = true AND (locale = $1 OR locale = '${DEFAULT_LOCALE}')
+     ORDER BY order_index`,
+    [locale]
   );
-  return certifications.map(certificationResource);
+  return pickListByLocale(certifications, locale).map(certificationResource);
 }
 
 // ---------------------------------------------------- typed page loaders
 
-export async function getSiteData(): Promise<SiteData> {
-  return (await siteResource()) as unknown as SiteData;
+export async function getSiteData(locale?: string): Promise<SiteData> {
+  return (await siteResource(locale)) as unknown as SiteData;
 }
 
-export async function getSkillCategories(): Promise<SkillCategory[]> {
-  return (await loadSkillCategories()) as unknown as SkillCategory[];
+export async function getSkillCategories(locale?: string): Promise<SkillCategory[]> {
+  return (await loadSkillCategories(locale)) as unknown as SkillCategory[];
 }
 
-export async function getTestimonialsData(): Promise<Testimonial[]> {
-  return (await loadTestimonials()) as unknown as Testimonial[];
+export async function getTestimonialsData(locale?: string): Promise<Testimonial[]> {
+  return (await loadTestimonials(locale)) as unknown as Testimonial[];
 }
 
-export async function getCertificationsData(): Promise<Certification[]> {
-  return (await loadCertifications()) as unknown as Certification[];
+export async function getCertificationsData(locale?: string): Promise<Certification[]> {
+  return (await loadCertifications(locale)) as unknown as Certification[];
 }
 
 export async function getProjectListItems(
-  q: ProjectListQuery
+  q: ProjectListQuery,
+  locale?: string
 ): Promise<ProjectListItem[]> {
-  const { rows } = await loadProjectList(q);
+  const { rows } = await loadProjectList(q, locale);
   const projects = await buildProjectListBatched(rows);
   return projects.map((p) => projectListResource(p) as unknown as ProjectListItem);
 }
 
-export async function getProjectsFull(q: ProjectListQuery): Promise<Project[]> {
-  const { rows } = await loadProjectList(q);
+export async function getProjectsFull(
+  q: ProjectListQuery,
+  locale?: string
+): Promise<Project[]> {
+  const { rows } = await loadProjectList(q, locale);
   const projects = await buildProjectListBatched(rows);
   return projects.map((p) => projectResource(p) as unknown as Project);
 }
 
-export async function getProjectBySlugTyped(slug: string): Promise<Project | null> {
-  const withRels = await loadProjectBySlug(slug);
+export async function getProjectBySlugTyped(
+  slug: string,
+  locale?: string
+): Promise<Project | null> {
+  const withRels = await loadProjectBySlug(slug, locale);
   return withRels ? (projectResource(withRels) as unknown as Project) : null;
 }
 

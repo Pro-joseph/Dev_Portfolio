@@ -6,6 +6,9 @@ import type { SiteSettings } from "./site-settings";
 export { getSiteSettings };
 export type { SiteSettings };
 
-export async function loadSiteSettings(): Promise<SiteSettings> {
-  return getSiteSettings((await siteResource()) as unknown as SiteData);
+export async function loadSiteSettings(locale?: string): Promise<SiteSettings> {
+  return getSiteSettings(
+    (await siteResource(locale)) as unknown as SiteData,
+    locale
+  );
 }

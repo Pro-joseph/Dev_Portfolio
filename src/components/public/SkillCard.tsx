@@ -1,8 +1,15 @@
 import { createElement } from "react";
 import { SkillCategory } from "@/lib/types";
 import { categoryIcon } from "@/lib/icons";
+import type { Dictionary } from "@/lib/i18n";
 
-export default function SkillCard({ category }: { category: SkillCategory }) {
+export default function SkillCard({
+  category,
+  t,
+}: {
+  category: SkillCategory;
+  t: Dictionary;
+}) {
   return (
     <div className="bg-white p-8 rounded-jumbo shadow-sm ring-1 ring-line transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group">
       <div className="flex items-center justify-between mb-6">
@@ -13,7 +20,7 @@ export default function SkillCard({ category }: { category: SkillCategory }) {
           <h3 className="text-xl font-bold font-heading tracking-tight">{category.name}</h3>
         </div>
         <span className="font-mono text-[10px] text-secondary/60 group-hover:text-accent transition-colors">
-          {category.skills.length} ITEMS
+          {category.skills.length} {t.skillCard.items}
         </span>
       </div>
       <div className="aspect-square rounded-xl overflow-hidden mb-6 bg-elevated dot-grid flex items-center justify-center">

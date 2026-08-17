@@ -1,5 +1,6 @@
 import { getSiteData, getProjectsFull, getSkillCategories, getTestimonialsData } from "@/lib/resources";
 import { getSiteSettings } from "@/lib/site-config";
+import { getDictionary } from "@/lib/i18n";
 import Image from "next/image";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
@@ -14,12 +15,19 @@ import { FaArrowRight, FaChevronDown } from "react-icons/fa";
 
 export const revalidate = 60;
 
-export default async function HomePage() {
+interface Props {
+  params: Promise<{ locale: string }>;
+}
+
+export default async function HomePage({ params }: Props) {
+  const { locale } = await params;
+  const t = getDictionary(locale);
+
   const [site, featuredProjects, skills, testimonials] = await Promise.all([
-    getSiteData(),
-    getProjectsFull({ featured: true, perPage: 3 }),
-    getSkillCategories(),
-    getTestimonialsData(),
+    getSiteData(locale),
+    getProjectsFull({ featured: true, perPage: 3 }, locale),
+    getSkillCategories(locale),
+    getTestimonialsData(locale),
   ]);
 
   const galleryImages = [
@@ -34,7 +42,7 @@ export default async function HomePage() {
   const skillCategories = skills;
   const techNames = skillCategories.flatMap((c) => c.skills.map((s) => s.name)).slice(0, 12);
   const totalSkills = skillCategories.reduce((n, c) => n + c.skills.length, 0);
-  const settings = getSiteSettings(site);
+  const settings = getSiteSettings(site, locale);
   const available = settings.announcement_enabled;
 
   return (
@@ -45,6 +53,8 @@ export default async function HomePage() {
         menu={site.menu}
         resumeUrl={site.resume?.url}
         resumeFilename={site.resume?.filename}
+        t={t}
+        locale={locale}
       />
 
       {/* Hero */}
@@ -57,7 +67,7 @@ export default async function HomePage() {
               <Reveal>
                 <p className="flex items-center gap-3 text-secondary text-xs tracking-[0.2em] uppercase mb-6 font-semibold">
                   <span className="inline-block w-8 h-px bg-accent" />
-                  {settings.author_role?.toUpperCase() ?? "SYSTEMS ARCHITECT"}
+                  {settings.author_role?.toUpperCase() ?? t.hero.roleFallback.toUpperCase()}
                 </p>
               </Reveal>
               <Reveal delay={80}>
@@ -76,13 +86,13 @@ export default async function HomePage() {
                     href="#projects"
                     className="group inline-flex items-center gap-3 bg-accent text-white px-8 py-4 rounded-xl font-bold tracking-widest uppercase text-sm hover:bg-accent-hover hover:-translate-y-0.5 transition-all shadow-lg shadow-accent/20"
                   >
-                    View My Work
+                    {t.hero.viewMyWork}
                     <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
                   </a>
                   {available && (
                     <div className="flex items-center gap-2 font-mono text-xs text-secondary uppercase tracking-widest">
                       <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                      Open to work
+                      {t.hero.openToWork}
                     </div>
                   )}
                 </div>
@@ -95,7 +105,7 @@ export default async function HomePage() {
                     <Image
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       src={settings.hero_image}
-                      alt={`${settings.site_title} abstract software dashboard`}
+                      alt={`${settings.site_title} ${t.hero.heroImageAltSuffix}`}
                       width={960}
                       height={540}
                       sizes="(max-width: 1024px) 100vw, 42vw"
@@ -103,7 +113,7 @@ export default async function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent pointer-events-none" />
                     <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-surface/80 backdrop-blur-md px-4 py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest text-secondary">
                       <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                      environment: {process.env.VERCEL_ENV ?? process.env.NODE_ENV}
+                      {t.hero.environment}: {process.env.VERCEL_ENV ?? process.env.NODE_ENV}
                     </div>
                   </div>
                 </Reveal>
@@ -115,10 +125,10 @@ export default async function HomePage() {
           <Reveal delay={320}>
             <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-line rounded-jumbo overflow-hidden border border-line">
               {[
-                { label: "Featured Projects", value: String(featuredProjects.length).padStart(2, "0") },
-                { label: "Skill Categories", value: String(skillCategories.length).padStart(2, "0") },
-                { label: "Technologies", value: String(totalSkills).padStart(2, "0") },
-                { label: "Status", value: available ? "OPEN" : "BUSY" },
+                { label: t.hero.stats.featuredProjects, value: String(featuredProjects.length).padStart(2, "0") },
+                { label: t.hero.stats.skillCategories, value: String(skillCategories.length).padStart(2, "0") },
+                { label: t.hero.stats.technologies, value: String(totalSkills).padStart(2, "0") },
+                { label: t.hero.stats.status, value: available ? t.hero.statusOpen : t.hero.statusBusy },
               ].map((stat) => (
                 <div key={stat.label} className="bg-elevated py-6 px-6 flex flex-col gap-1">
                   <span className="font-mono text-2xl font-bold text-primary">{stat.value}</span>
@@ -131,7 +141,7 @@ export default async function HomePage() {
           </Reveal>
 
           <div className="flex justify-center mt-14 text-secondary">
-            <a href="#projects" aria-label="Scroll to projects" className="animate-bounce">
+            <a href="#projects" aria-label={t.hero.scrollToProjects} className="animate-bounce">
               <FaChevronDown className="text-2xl" />
             </a>
           </div>
@@ -143,16 +153,17 @@ export default async function HomePage() {
         <div className="container mx-auto">
           <Reveal>
             <SectionHeader
-              eyebrow="SELECT * FROM featured_projects"
-              title="Featured Projects"
-              subtitle="A selection of systems I've architected and shipped — from distributed backends to full application stacks."
-              viewAllHref="/projects"
+              eyebrow={t.hero.featured.eyebrow}
+              title={t.hero.featured.title}
+              subtitle={t.hero.featured.subtitle}
+              viewAllHref={`/${locale}/projects`}
+              viewAllLabel={t.sectionHeader.viewAll}
             />
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredProjects.map((project, i) => (
               <Reveal key={project.id} delay={i * 100}>
-                <ProjectCard project={project} index={i} />
+                <ProjectCard project={project} index={i} t={t} locale={locale} />
               </Reveal>
             ))}
           </div>
@@ -166,18 +177,18 @@ export default async function HomePage() {
             <div className="mb-12">
               <p className="flex items-center gap-3 text-secondary text-xs tracking-[0.2em] uppercase mb-4 font-semibold">
                 <span className="inline-block w-8 h-px bg-accent" />
-                GALLERY
+                {t.hero.gallery.eyebrow}
               </p>
               <h2 className="font-heading text-4xl md:text-5xl font-bold tracking-tight">
-                Systems &amp; Infrastructure
+                {t.hero.gallery.title}
               </h2>
               <p className="mt-5 text-secondary text-lg max-w-xl leading-relaxed">
-                Click any image to explore it up close.
+                {t.hero.gallery.subtitle}
               </p>
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <Gallery images={galleryImages} siteTitle={settings.site_title} />
+            <Gallery images={galleryImages} siteTitle={settings.site_title} t={t} />
           </Reveal>
         </div>
       </section>
@@ -189,14 +200,13 @@ export default async function HomePage() {
             <Reveal className="lg:col-span-6">
               <p className="flex items-center gap-3 text-secondary text-xs tracking-[0.2em] uppercase mb-4 font-semibold">
                 <span className="inline-block w-8 h-px bg-accent" />
-                TECHNICAL PROFICIENCY
+                {t.hero.skills.eyebrow}
               </p>
               <h2 className="font-heading text-4xl md:text-5xl font-bold tracking-tight mb-8">
-                A comprehensive toolkit for building robust systems.
+                {t.hero.skills.title}
               </h2>
               <p className="text-secondary text-lg leading-relaxed">
-                From low-level systems programming to high-level application architecture, I
-                bring deep expertise across the entire stack to every engagement.
+                {t.hero.skills.body}
               </p>
             </Reveal>
             <Reveal delay={120} className="lg:col-span-6 flex items-center">
@@ -206,23 +216,25 @@ export default async function HomePage() {
                     <span className="w-2 h-2 rounded-full bg-rose-400" />
                     <span className="w-2 h-2 rounded-full bg-amber-400" />
                     <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="ml-2 text-secondary">system_monitor.sh</span>
+                    <span className="ml-2 text-secondary">{t.hero.terminal.title}</span>
                   </div>
                   <div className="flex justify-between border-b border-line pb-2">
-                    <span className="text-secondary">SYSTEM_STATUS</span>
-                    <span className="text-green-600">ONLINE</span>
+                    <span className="text-secondary">{t.hero.terminal.systemStatus}</span>
+                    <span className="text-green-600">{t.hero.terminal.online}</span>
                   </div>
                   <div className="flex justify-between border-b border-line pb-2">
-                    <span className="text-secondary">CATEGORIES</span>
+                    <span className="text-secondary">{t.hero.terminal.categories}</span>
                     <span>{String(skillCategories.length).padStart(2, "0")}</span>
                   </div>
                   <div className="flex justify-between border-b border-line pb-2">
-                    <span className="text-secondary">SKILLS</span>
+                    <span className="text-secondary">{t.hero.terminal.skills}</span>
                     <span>{totalSkills}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-secondary">STATUS</span>
-                    <span className="text-green-600">{available ? "OPEN TO WORK" : "NOT AVAILABLE"}</span>
+                    <span className="text-secondary">{t.hero.terminal.status}</span>
+                    <span className="text-green-600">
+                      {available ? t.hero.terminal.openToWork : t.hero.terminal.notAvailable}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -231,7 +243,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {skillCategories.map((category, i) => (
               <Reveal key={category.id} delay={i * 100}>
-                <SkillCard category={category} />
+                <SkillCard category={category} t={t} />
               </Reveal>
             ))}
           </div>
@@ -244,9 +256,9 @@ export default async function HomePage() {
           <div className="container mx-auto">
             <Reveal>
               <SectionHeader
-                eyebrow="CLIENT FEEDBACK"
-                title="What People Say"
-                subtitle="Collaborators and clients on what it's like to build with me."
+                eyebrow={t.hero.testimonials.eyebrow}
+                title={t.hero.testimonials.title}
+                subtitle={t.hero.testimonials.subtitle}
               />
             </Reveal>
             <Reveal delay={100}>
@@ -262,7 +274,7 @@ export default async function HomePage() {
 
       {/* CTA */}
       <Reveal>
-        <Cta email={settings.contact_email} techNames={techNames} available={available} />
+        <Cta email={settings.contact_email} techNames={techNames} available={available} t={t} />
       </Reveal>
 
       <Footer
@@ -270,6 +282,7 @@ export default async function HomePage() {
         siteTitle={settings.site_title}
         authorName={settings.author_name}
         tagline={settings.site_description}
+        t={t}
       />
     </>
   );
