@@ -8,7 +8,6 @@ import SectionHeader from "@/components/public/SectionHeader";
 import ProjectCard from "@/components/public/ProjectCard";
 import SkillCard from "@/components/public/SkillCard";
 import TestimonialCard from "@/components/public/TestimonialCard";
-import Gallery from "@/components/public/Gallery";
 import Cta from "@/components/public/Cta";
 import Reveal from "@/components/public/Reveal";
 import { FaArrowRight, FaChevronDown } from "react-icons/fa";
@@ -29,15 +28,6 @@ export default async function HomePage({ params }: Props) {
     getSkillCategories(locale),
     getTestimonialsData(locale),
   ]);
-
-  const galleryImages = [
-    ...new Map(
-      featuredProjects
-        .flatMap((p) => [p.cover, ...p.gallery])
-        .filter((m): m is NonNullable<typeof m> => Boolean(m?.url))
-        .map((m) => [m.url, m] as const)
-    ).values(),
-  ].slice(0, 4);
 
   const skillCategories = skills;
   const techNames = skillCategories.flatMap((c) => c.skills.map((s) => s.name)).slice(0, 12);
@@ -148,29 +138,6 @@ export default async function HomePage({ params }: Props) {
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Gallery */}
-      <section className="py-24 px-6">
-        <div className="container mx-auto">
-          <Reveal>
-            <div className="mb-12">
-              <p className="flex items-center gap-3 text-secondary text-xs tracking-[0.2em] uppercase mb-4 font-semibold">
-                <span className="inline-block w-8 h-px bg-accent" />
-                {t.hero.gallery.eyebrow}
-              </p>
-              <h2 className="font-heading text-4xl md:text-5xl font-bold tracking-tight">
-                {t.hero.gallery.title}
-              </h2>
-              <p className="mt-5 text-secondary text-lg max-w-xl leading-relaxed">
-                {t.hero.gallery.subtitle}
-              </p>
-            </div>
-          </Reveal>
-          <Reveal delay={100}>
-            <Gallery images={galleryImages} siteTitle={settings.site_title} t={t} />
-          </Reveal>
         </div>
       </section>
 
