@@ -65,8 +65,10 @@ export const certificationsValidator: Validator = makeValidator(() => ({
   issuer: { max: 160 },
   icon: { max: 120 },
   period: { max: 60 },
+  issued_on: {},
   credential_id: { max: 80 },
   verify_url: { max: 500 },
+  description: { max: 2000 },
   order_index: { numeric: true },
 }));
 

@@ -306,6 +306,41 @@ describe("admin CRUD — every resource", () => {
     });
   });
 
+  it("certifications persist description and issued_on", async () => {
+    const created = await certificationsPost(
+      jsonRequest("/api/v1/admin/certifications", {
+        method: "POST",
+        headers: jsonAuth(token),
+        body: JSON.stringify({
+          type: "certification",
+          title: "Round Trip Cert",
+          description: "A meaningful description.",
+          issued_on: "2024-05-01",
+        }),
+      })
+    );
+    expect(created.status).toBe(201);
+    const createdData = (await body(created)).data as {
+      id: number;
+      description: string | null;
+      issued_on: string | null;
+    };
+    expect(createdData.description).toBe("A meaningful description.");
+    expect(createdData.issued_on).toBe("2024-05-01T00:00:00.000000Z");
+
+    const show = await certificationShowGet(
+      jsonRequest(`/api/v1/admin/certifications/${createdData.id}`, { headers: auth(token) }),
+      { params: Promise.resolve({ id: String(createdData.id) }) }
+    );
+    expect(show.status).toBe(200);
+    const showData = (await body(show)).data as {
+      description: string | null;
+      issued_on: string | null;
+    };
+    expect(showData.description).toBe("A meaningful description.");
+    expect(showData.issued_on).toBe("2024-05-01T00:00:00.000000Z");
+  });
+
   it("testimonials", async () => {
     await crudCycle({
       list: testimonialsGet,
