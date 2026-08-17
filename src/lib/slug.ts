@@ -25,7 +25,8 @@ export async function uniqueSlug(
   const hasLocale = Boolean(locale);
   for (;;) {
     const clause =
-      (ignoreId ? " AND id != $2" : "") + (hasLocale ? " AND locale = $3" : "");
+      (ignoreId ? " AND id != $2" : "") +
+      (hasLocale ? ` AND locale = $${ignoreId ? 3 : 2}` : "");
     const params = ignoreId
       ? hasLocale
         ? [current, ignoreId, locale]
