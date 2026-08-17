@@ -191,31 +191,60 @@ export default async function HomePage({ params }: Props) {
               </p>
             </Reveal>
             <Reveal delay={120} className="lg:col-span-6 flex items-center">
-              <div className="bg-white p-10 rounded-jumbo shadow-sm ring-1 ring-line w-full">
-                <div className="font-mono text-sm space-y-4">
-                  <div className="flex items-center gap-2 pb-4 border-b border-line">
-                    <span className="w-2 h-2 rounded-full bg-rose-400" />
-                    <span className="w-2 h-2 rounded-full bg-amber-400" />
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="ml-2 text-secondary">{t.hero.terminal.title}</span>
-                  </div>
-                  <div className="flex justify-between border-b border-line pb-2">
-                    <span className="text-secondary">{t.hero.terminal.systemStatus}</span>
-                    <span className="text-green-600">{t.hero.terminal.online}</span>
-                  </div>
-                  <div className="flex justify-between border-b border-line pb-2">
-                    <span className="text-secondary">{t.hero.terminal.categories}</span>
-                    <span>{String(skillCategories.length).padStart(2, "0")}</span>
-                  </div>
-                  <div className="flex justify-between border-b border-line pb-2">
-                    <span className="text-secondary">{t.hero.terminal.skills}</span>
-                    <span>{totalSkills}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-secondary">{t.hero.terminal.status}</span>
-                    <span className="text-green-600">
+              <div className="relative overflow-hidden bg-white p-10 rounded-jumbo shadow-sm ring-1 ring-line w-full">
+                <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
+                <div className="relative">
+                  <div className="flex items-center justify-between gap-4 mb-10">
+                    <span className="font-mono text-xs text-secondary uppercase tracking-[0.2em]">
+                      {t.hero.terminal.title}
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wide uppercase ${
+                        available
+                          ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                          : "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+                      }`}
+                    >
+                      <span className="relative flex h-2 w-2">
+                        <span
+                          className={`absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping ${
+                            available ? "bg-emerald-500" : "bg-amber-500"
+                          }`}
+                        />
+                        <span
+                          className={`relative inline-flex h-2 w-2 rounded-full ${
+                            available ? "bg-emerald-600" : "bg-amber-600"
+                          }`}
+                        />
+                      </span>
                       {available ? t.hero.terminal.openToWork : t.hero.terminal.notAvailable}
                     </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-6">
+                    <div>
+                      <p className="font-heading text-3xl md:text-4xl font-bold tracking-tight">
+                        {String(skillCategories.length).padStart(2, "0")}
+                      </p>
+                      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.15em] text-secondary">
+                        {t.hero.terminal.categories}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-heading text-3xl md:text-4xl font-bold tracking-tight">
+                        {totalSkills}
+                      </p>
+                      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.15em] text-secondary">
+                        {t.hero.terminal.skills}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-heading text-3xl md:text-4xl font-bold tracking-tight text-green-600">
+                        {t.hero.terminal.online}
+                      </p>
+                      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.15em] text-secondary">
+                        {t.hero.terminal.status}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
