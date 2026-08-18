@@ -49,7 +49,7 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab", t }: 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-8 relative aspect-video rounded-jumbo overflow-hidden border border-line shadow-xl">
+        <div className={`${images.length > 1 ? "md:col-span-8" : "md:col-span-12"} relative aspect-video rounded-jumbo overflow-hidden border border-line shadow-xl`}>
           <button
             type="button"
             onClick={() => open(0)}
@@ -59,20 +59,22 @@ export default function ProjectLightbox({ images, siteTitle = "JosephLab", t }: 
             <Image className="w-full h-full object-cover" src={images[0].url ?? ""} alt={images[0].alt_text ?? `${siteTitle} ${t.lightbox.projectImageAltSuffix}`} width={1280} height={720} sizes="(max-width: 768px) 100vw, 66vw" />
           </button>
         </div>
-        <div className="md:col-span-4 grid md:grid-rows-2 gap-6">
-          {images.slice(1, 3).map((image, i) => (
-            <div key={image.id ?? i} className="relative rounded-jumbo overflow-hidden border border-line shadow-lg aspect-video md:aspect-auto">
-              <button
-                type="button"
-                onClick={() => open(i + 1)}
-                className="block w-full h-full cursor-zoom-in"
-                aria-label={`${image.alt_text ?? t.lightbox.projectImageAltSuffix} - ${t.lightbox.openInLightbox}`}
-              >
-                <Image className="w-full h-full object-cover" src={image.url ?? ""} alt={image.alt_text ?? `${siteTitle} ${t.lightbox.projectImageAltSuffix}`} width={640} height={640} sizes="(max-width: 768px) 100vw, 33vw" />
-              </button>
-            </div>
-          ))}
-        </div>
+        {images.length > 1 && (
+          <div className={`md:col-span-4 grid gap-6 ${images.length > 2 ? "md:grid-rows-2" : "md:grid-rows-1"}`}>
+            {images.slice(1, 3).map((image, i) => (
+              <div key={image.id ?? i} className="relative rounded-jumbo overflow-hidden border border-line shadow-lg aspect-video md:aspect-auto">
+                <button
+                  type="button"
+                  onClick={() => open(i + 1)}
+                  className="block w-full h-full cursor-zoom-in"
+                  aria-label={`${image.alt_text ?? t.lightbox.projectImageAltSuffix} - ${t.lightbox.openInLightbox}`}
+                >
+                  <Image className="w-full h-full object-cover" src={image.url ?? ""} alt={image.alt_text ?? `${siteTitle} ${t.lightbox.projectImageAltSuffix}`} width={640} height={640} sizes="(max-width: 768px) 100vw, 33vw" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {current && (

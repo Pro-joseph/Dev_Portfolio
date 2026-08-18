@@ -38,7 +38,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   const demoLink = project.links.find((l) => l.type === "demo");
   const githubLink = project.links.find((l) => l.type === "github");
   const otherLinks = project.links.filter((l) => l.type !== "demo" && l.type !== "github");
-  const images = [project.cover, ...project.gallery].filter(
+  const images = [...project.gallery].filter(
     (m): m is NonNullable<typeof m> => Boolean(m?.url)
   );
 

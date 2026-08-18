@@ -15,9 +15,7 @@ export default function ProjectCard({
   t: Dictionary;
   locale: string;
 }) {
-  const images = [project.cover, ...project.gallery]
-    .filter(Boolean)
-    .slice(0, 3) as NonNullable<Project["cover"]>[];
+  const cover = project.cover;
 
   return (
     <Link href={`/${locale}/projects/${project.slug}`} className="group block cursor-pointer">
@@ -38,23 +36,20 @@ export default function ProjectCard({
             <p className="text-secondary text-sm">{project.client ?? t.projects.personalProject}</p>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          {[0, 1, 2].map((i) =>
-            images[i] ? (
-              <Image
-                key={i}
-                className="w-full aspect-[4/5] object-cover rounded-xl grayscale group-hover:grayscale-0 group-hover:scale-[1.03] transition-all duration-500"
-                src={images[i].url ?? ""}
-                alt={images[i].alt_text ?? project.title}
-                width={320}
-                height={400}
-                sizes="(max-width: 768px) 33vw, 320px"
-              />
-            ) : (
-              <div key={i} className="w-full aspect-[4/5] rounded-xl bg-card" />
-            )
-          )}
-        </div>
+        {cover ? (
+          <div className="rounded-xl overflow-hidden">
+            <Image
+              className="w-full aspect-video object-cover grayscale group-hover:grayscale-0 group-hover:scale-[1.03] transition-all duration-500"
+              src={cover.url ?? ""}
+              alt={cover.alt_text ?? project.title}
+              width={640}
+              height={360}
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          </div>
+        ) : (
+          <div className="w-full aspect-video rounded-xl bg-card" />
+        )}
         <div className="mt-auto pt-8 flex items-center justify-between">
           <span className="text-xs font-bold tracking-widest uppercase text-secondary">
             {t.status[project.status] ?? project.status}
