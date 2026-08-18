@@ -53,7 +53,7 @@ export default async function HomePage({ params }: Props) {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-surface pointer-events-none" />
         <div className="container mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-6">
               <Reveal>
                 <p className="flex items-center gap-3 text-secondary text-xs tracking-[0.2em] uppercase mb-6 font-semibold">
                   <span className="inline-block w-8 h-px bg-accent" />
@@ -88,17 +88,17 @@ export default async function HomePage({ params }: Props) {
                 </div>
               </Reveal>
             </div>
-            <div className="lg:col-span-5 flex justify-center">
+            <div className="lg:col-span-6 flex justify-center">
               {settings.hero_image && (
-                <Reveal delay={200} className="w-full max-w-md">
+                <Reveal delay={200} className="w-full">
                   <div className="relative aspect-video rounded-jumbo overflow-hidden shadow-2xl ring-1 ring-line group">
                     <Image
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       src={settings.hero_image}
                       alt={`${settings.site_title} ${t.hero.heroImageAltSuffix}`}
-                      width={960}
-                      height={540}
-                      sizes="(max-width: 1024px) 100vw, 42vw"
+                      width={1280}
+                      height={720}
+                      sizes="(max-width: 1024px) 100vw, 50vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent pointer-events-none" />
                     <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-surface/80 backdrop-blur-md px-4 py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest text-secondary">
