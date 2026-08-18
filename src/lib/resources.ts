@@ -288,9 +288,10 @@ export async function buildProjectListBatched(
        ORDER BY s.order_index`,
       [ids]
     ),
-    query<MediaRow & { project_id: number }>(
-      `SELECT m.*, m.mediable_id AS project_id
+    query<MediaRow & { slug: string }>(
+      `SELECT m.*, p.slug AS slug
        FROM media m
+       JOIN projects p ON p.id = m.mediable_id
        WHERE m.mediable_type = '${PROJECT_MORPH}'
          AND m.mediable_id IN (
            SELECT id FROM projects WHERE slug IN (
@@ -305,8 +306,6 @@ export async function buildProjectListBatched(
   const linksByProject = new Map<number, ProjectLinkRow[]>();
   const skillsByProject = new Map<number, SkillRow[]>();
   const mediaBySlug = new Map<string, MediaRow[]>();
-  const idToSlug = new Map<number, string>();
-  for (const p of rows) idToSlug.set(p.id, String(p.slug));
   for (const l of links) {
     const list = linksByProject.get(l.project_id) ?? [];
     list.push(l);
@@ -318,7 +317,7 @@ export async function buildProjectListBatched(
     skillsByProject.set(s.project_id, list);
   }
   for (const m of media) {
-    const slug = idToSlug.get(m.project_id);
+    const slug = String(m.slug ?? "");
     if (!slug) continue;
     const list = mediaBySlug.get(slug) ?? [];
     list.push(m);
@@ -505,21 +504,19 @@ export async function loadProjectList(
   }
 
   const where = conditions.join(" AND ");
-  const totalRow = await query<{ n: number }>(
-    `SELECT COUNT(*)::int AS n FROM projects WHERE ${where}`,
+
+  const all = await query<ProjectRow>(
+    `SELECT * FROM projects WHERE ${where}
+     ORDER BY is_featured DESC, order_index ASC, id ASC`,
     params
   );
-  const total = Number(totalRow[0]?.n ?? 0);
-
-  const rows = await query<ProjectRow>(
-    `SELECT * FROM projects WHERE ${where}
-     ORDER BY is_featured DESC, order_index ASC, id ASC
-     LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
-    [...params, perPage, (page - 1) * perPage]
+  const picked = pickByLocale(all, locale, (r) => r.slug);
+  const total = picked.length;
+  const rows = picked.slice(
+    (page - 1) * perPage,
+    (page - 1) * perPage + perPage
   );
-
-  const picked = pickByLocale(rows, locale, (r) => r.slug);
-  return { rows: picked, total, perPage, page };
+  return { rows, total, perPage, page };
 }
 
 export async function loadProjectBySlug(
