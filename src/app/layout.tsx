@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { Analytics } from "@vercel/analytics/react";
 import { Hanken_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { loadSiteSettings } from "@/lib/site-config";
 import { normalizeLocale, linkedinUrl } from "@/lib/seo";
@@ -105,6 +106,7 @@ export default async function RootLayout({
     >
       <body className="min-h-screen bg-surface font-sans text-primary overflow-x-hidden">
         {children}
+        <Analytics />
       </body>
     </html>
   );
