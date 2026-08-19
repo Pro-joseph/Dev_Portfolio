@@ -1,5 +1,13 @@
 import { queryOne } from "@/lib/db";
-import { checkPassword, signToken, type AuthUser } from "@/lib/auth";
+import {
+  checkPassword,
+  signToken,
+  createSession,
+  purgeExpiredSessions,
+  sessionCookieHeader,
+  TOKEN_TTL_SECONDS,
+  type AuthUser,
+} from "@/lib/auth";
 import { json, validationError } from "@/lib/http";
 import { makeValidator } from "@/lib/validators";
 import { readJson } from "@/lib/request";
@@ -28,5 +36,12 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const safeUser = { id: user.id, name: user.name, email: user.email, role: user.role };
-  return json({ token: signToken(safeUser), user: safeUser });
+
+  await purgeExpiredSessions(user.id);
+  const jti = await createSession(user.id);
+  const token = signToken(safeUser, jti);
+
+  const response = json({ token, user: safeUser });
+  response.headers.append("Set-Cookie", sessionCookieHeader(token, TOKEN_TTL_SECONDS));
+  return response;
 }

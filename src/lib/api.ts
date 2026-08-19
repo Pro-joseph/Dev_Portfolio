@@ -1,24 +1,16 @@
-import { redirect } from "next/navigation";
-
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api/v1";
 
 export function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("jl_token");
+  return null;
 }
 
-export function setToken(token: string): void {
-  localStorage.setItem("jl_token", token);
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("jl-token"));
-  }
+export function setToken(_token: string): void {
+  void _token;
+  /* sessions are held in an HttpOnly cookie set by the server */
 }
 
 export function clearToken(): void {
-  localStorage.removeItem("jl_token");
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("jl-token"));
-  }
+  /* sessions are held in an HttpOnly cookie cleared by the server */
 }
 
 export function subscribeToken(callback: () => void): () => void {
@@ -52,9 +44,8 @@ export interface ApiOptions extends Omit<RequestInit, "body"> {
 
 export async function api<T>(
   path: string,
-  { body, auth = true, headers, ...rest }: ApiOptions = {}
+  { body, headers, ...rest }: ApiOptions = {}
 ): Promise<T> {
-  const token = getToken();
   const isForm = typeof FormData !== "undefined" && body instanceof FormData;
   const finalHeaders: Record<string, string> = {
     Accept: "application/json",
@@ -63,10 +54,6 @@ export async function api<T>(
 
   if (body !== undefined && !isForm) {
     finalHeaders["Content-Type"] = "application/json";
-  }
-
-  if (auth && token) {
-    finalHeaders["Authorization"] = `Bearer ${token}`;
   }
 
   const response = await fetch(`${API_URL}${path}`, {
@@ -116,13 +103,10 @@ export const http = {
       },
     }),
   download: async (path: string, options?: ApiOptions): Promise<Blob> => {
-    const token = getToken();
+    void options;
     const headers: Record<string, string> = {
       Accept: "text/csv,application/octet-stream",
     };
-    if (options?.auth !== false && token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
     const response = await fetch(`${API_URL}${path}`, {
       headers,
       cache: "no-store",
@@ -140,9 +124,6 @@ export const http = {
   },
 };
 
-export function requireLogin(admin = true): void {
-  if (typeof window === "undefined") return;
-  if (!getToken()) {
-    redirect(admin ? "/admin/login" : "/");
-  }
+export function requireLogin(): void {
+  /* auth is enforced server-side via the HttpOnly session cookie */
 }

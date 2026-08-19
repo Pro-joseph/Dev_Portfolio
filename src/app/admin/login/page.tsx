@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PiInfinity, PiSpinner, PiWarningCircle } from "react-icons/pi";
-import { http, setToken } from "@/lib/api";
+import { http } from "@/lib/api";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -28,12 +28,11 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await http.post<{ token: string; user: { role: string } }>(
+      await http.post<{ token: string; user: { role: string } }>(
         "/auth/login",
         { email, password },
         { auth: false }
       );
-      setToken(res.token);
       router.push("/admin");
     } catch (err) {
       setError(

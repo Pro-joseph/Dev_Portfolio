@@ -790,9 +790,26 @@ describe("auth + guards", () => {
     expect(res.status).toBe(200);
   });
 
-  it("me still works after login", async () => {
-    const res = await meGet(jsonRequest("/api/v1/auth/me", { headers: auth(token) }));
-    expect(res.status).toBe(200);
+  it("rejects the session token after logout (revoked server-side)", async () => {
+    const login = await loginPost(
+      jsonRequest("/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "admin@josephlab.dev", password: "password" }),
+      })
+    );
+    const sessionToken = (await body(login)).token as string;
+
+    const before = await meGet(jsonRequest("/api/v1/auth/me", { headers: auth(sessionToken) }));
+    expect(before.status).toBe(200);
+
+    const out = await logoutPost(
+      jsonRequest("/api/v1/auth/logout", { method: "POST", headers: auth(sessionToken) })
+    );
+    expect(out.status).toBe(200);
+
+    const after = await meGet(jsonRequest("/api/v1/auth/me", { headers: auth(sessionToken) }));
+    expect(after.status).toBe(401);
   });
 
   it("422s on missing required fields", async () => {

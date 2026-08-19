@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import useSWR from "swr";
-import { http, clearToken } from "@/lib/api";
+import { http } from "@/lib/api";
 import { DashboardStats } from "@/lib/types";
 import { getSiteSettings } from "@/lib/site-settings";
 import AvatarPicker from "@/components/admin/AvatarPicker";
@@ -69,7 +69,6 @@ export default function Sidebar() {
     } catch {
       /* ignore */
     }
-    clearToken();
     router.push("/admin/login");
   };
 

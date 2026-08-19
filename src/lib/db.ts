@@ -144,6 +144,29 @@ function getPg(): Pool {
   return pgPool;
 }
 
+// One-time, idempotent guarantee that the auth sessions table exists on Postgres
+// (SQLite auto-applies the full schema on startup; Postgres relies on migrations).
+let pgSchemaEnsured: Promise<void> | null = null;
+
+function ensurePgSchema(): Promise<void> {
+  if (!pgSchemaEnsured) {
+    pgSchemaEnsured = getPg()
+      .query(`CREATE TABLE IF NOT EXISTS sessions (
+        id TEXT PRIMARY KEY,
+        user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at TEXT NULL,
+        expires_at TEXT NULL,
+        last_seen_at TEXT NULL
+      );`)
+      .then(() => undefined)
+      .catch((err: unknown) => {
+        pgSchemaEnsured = null;
+        throw err;
+      });
+  }
+  return pgSchemaEnsured;
+}
+
 // ---------------------------------------------------------------- sqlite
 
 let sqlite: DatabaseSync | null = null;
@@ -228,6 +251,7 @@ async function exec(
   params: unknown[] = []
 ): Promise<Record<string, unknown>[]> {
   if (USE_POSTGRES) {
+    await ensurePgSchema();
     const bind = params.map((p) => (p === undefined ? null : p));
     const res = await getPg().query(text, bind);
     return (res.rows as Record<string, unknown>[]).map(normalizeRow);
@@ -241,8 +265,9 @@ async function exec(
   return rows;
 }
 
-async function run(text: string, params: unknown[] = []): Promise<void> {
+export async function run(text: string, params: unknown[] = []): Promise<void> {
   if (USE_POSTGRES) {
+    await ensurePgSchema();
     const bind = params.map((p) => (p === undefined ? null : p));
     await getPg().query(text, bind);
     return;
