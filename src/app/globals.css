@@ -138,6 +138,11 @@ body {
   font-size: 14px;
   color: #475569;
 }
+.EasyMDEContainer .editor-toolbar button.size-format i,
+.EasyMDEContainer .editor-toolbar button.view-zoom i {
+  font-weight: 700;
+  font-style: normal;
+}
 .EasyMDEContainer .editor-toolbar button:hover,
 .EasyMDEContainer .editor-toolbar button.active {
   border-color: #e2e8f0;

@@ -42,6 +42,16 @@ export default function MarkdownEditor({ value, onChange, placeholder }: Props) 
     }
   };
 
+  const wrapSelection = (editor: EasyMDE, factor: number) => {
+    const cm = editor.codemirror;
+    const selection = cm.getSelection();
+    if (!selection) {
+      cm.focus();
+      return;
+    }
+    cm.replaceSelection(`<span style="font-size:${factor}em">${selection}</span>`);
+  };
+
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
@@ -77,16 +87,38 @@ export default function MarkdownEditor({ value, onChange, placeholder }: Props) 
         },
         "|",
         {
-          name: "font-decrease",
-          title: "Decrease text size",
-          className: "size-btn",
+          name: "size-small",
+          title: "Small text",
+          className: "size-format",
+          icon: "<i aria-hidden='true'>S</i>",
+          action: (ed) => wrapSelection(ed, 0.9),
+        },
+        {
+          name: "size-large",
+          title: "Large text",
+          className: "size-format",
+          icon: "<i aria-hidden='true'>L</i>",
+          action: (ed) => wrapSelection(ed, 1.25),
+        },
+        {
+          name: "size-xlarge",
+          title: "Extra large text",
+          className: "size-format",
+          icon: "<i aria-hidden='true'>XL</i>",
+          action: (ed) => wrapSelection(ed, 1.5),
+        },
+        "|",
+        {
+          name: "view-decrease",
+          title: "Zoom editor smaller",
+          className: "view-zoom",
           icon: "<i aria-hidden='true'>A−</i>",
           action: (ed) => changeSize(ed, -1),
         },
         {
-          name: "font-increase",
-          title: "Increase text size",
-          className: "size-btn",
+          name: "view-increase",
+          title: "Zoom editor bigger",
+          className: "view-zoom",
           icon: "<i aria-hidden='true'>A+</i>",
           action: (ed) => changeSize(ed, 1),
         },
