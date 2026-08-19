@@ -15,6 +15,7 @@
     "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "easymde": "^2.21.0",
+    "font-awesome": "^4.7.0",
     "next": "16.3.0",
     "pg": "^8.23.0",
     "postgres": "^3.4.9",

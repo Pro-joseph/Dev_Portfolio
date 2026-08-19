@@ -134,6 +134,10 @@ body {
 .EasyMDEContainer .editor-toolbar button {
   color: #475569;
 }
+.EasyMDEContainer .editor-toolbar button i {
+  font-size: 14px;
+  color: #475569;
+}
 .EasyMDEContainer .editor-toolbar button:hover,
 .EasyMDEContainer .editor-toolbar button.active {
   border-color: #e2e8f0;
