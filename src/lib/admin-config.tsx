@@ -23,6 +23,7 @@ const localeField = { name: "locale", label: "Language", type: "select" as const
 export type FieldType =
   | "text"
   | "textarea"
+  | "markdown"
   | "number"
   | "date"
   | "boolean"
@@ -89,7 +90,7 @@ export const RESOURCES: ResourceConfig[] = [
       { name: "title", label: "Title", type: "text", required: true, cols: "md:col-span-2" },
       { name: "slug", label: "Slug", type: "text", help: "Leave blank to auto-generate from title", cols: "md:col-span-2" },
       { name: "summary", label: "Summary", type: "textarea", cols: "md:col-span-2" },
-      { name: "description", label: "Description (markdown)", type: "textarea", help: "Use ## for section headings and ![alt](image-url) to embed images", cols: "md:col-span-2" },
+      { name: "description", label: "Description (markdown)", type: "markdown", help: "Use ## for section headings and the Image button to embed screenshots", cols: "md:col-span-2" },
       { name: "status", label: "Status", type: "select", required: true, options: PROJECT_STATUS.map((s) => ({ value: s, label: PROJECT_STATUS_LABELS[s] })) },
       { name: "is_featured", label: "Featured", type: "boolean" },
       { name: "client", label: "Client", type: "text" },
@@ -212,7 +213,7 @@ export const RESOURCES: ResourceConfig[] = [
       localeField,
       { name: "title", label: "Title", type: "text", required: true, cols: "md:col-span-2" },
       { name: "slug", label: "Slug", type: "text", help: "Leave blank to auto-generate" },
-      { name: "content", label: "Content", type: "textarea", help: "Markdown supported", cols: "md:col-span-2" },
+      { name: "content", label: "Content", type: "markdown", help: "Markdown supported — use the Image button to embed images", cols: "md:col-span-2" },
       { name: "meta_title", label: "Meta title", type: "text", cols: "md:col-span-2" },
       { name: "meta_description", label: "Meta description", type: "textarea", cols: "md:col-span-2" },
       { name: "is_published", label: "Published", type: "boolean" },

@@ -2,6 +2,7 @@
 
 import { FieldDef } from "@/lib/admin-config";
 import Image from "next/image";
+import MarkdownEditor from "./MarkdownEditor";
 import { PiPlus, PiTrash, PiArrowUp, PiArrowDown, PiX } from "react-icons/pi";
 import { ProjectLinkType } from "@/lib/types";
 import { LINK_TYPES } from "@/lib/enums";
@@ -217,6 +218,14 @@ export function Field({ field, value, options = [], onChange, error }: FieldProp
             placeholder={field.placeholder}
             value={typeof value === "string" ? value : ""}
             onChange={(e) => onChange(e.target.value)}
+          />
+        );
+      case "markdown":
+        return (
+          <MarkdownEditor
+            value={typeof value === "string" ? value : ""}
+            onChange={(v) => onChange(v)}
+            placeholder={field.placeholder}
           />
         );
       case "number":

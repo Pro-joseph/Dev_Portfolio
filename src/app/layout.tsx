@@ -5,6 +5,7 @@ import { Hanken_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { loadSiteSettings } from "@/lib/site-config";
 import { normalizeLocale, linkedinUrl } from "@/lib/seo";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n";
+import "easymde/dist/easymde.min.css";
 import "./globals.css";
 
 const inter = Inter({
