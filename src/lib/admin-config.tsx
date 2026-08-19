@@ -212,7 +212,7 @@ export const RESOURCES: ResourceConfig[] = [
       localeField,
       { name: "title", label: "Title", type: "text", required: true, cols: "md:col-span-2" },
       { name: "slug", label: "Slug", type: "text", help: "Leave blank to auto-generate" },
-      { name: "content", label: "Content (JSON blocks)", type: "json", cols: "md:col-span-2" },
+      { name: "content", label: "Content", type: "textarea", help: "Markdown supported", cols: "md:col-span-2" },
       { name: "meta_title", label: "Meta title", type: "text", cols: "md:col-span-2" },
       { name: "meta_description", label: "Meta description", type: "textarea", cols: "md:col-span-2" },
       { name: "is_published", label: "Published", type: "boolean" },
