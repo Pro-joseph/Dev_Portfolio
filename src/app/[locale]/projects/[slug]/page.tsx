@@ -5,9 +5,8 @@ import { loadSiteSettings } from "@/lib/site-config";
 import { getDictionary } from "@/lib/i18n";
 import SubNav from "@/components/public/SubNav";
 import Markdown from "@/components/public/Markdown";
-import ProjectLightbox from "@/components/public/ProjectLightbox";
 import Link from "next/link";
-import { FaExternalLinkAlt, FaGithub, FaCheck, FaChevronRight } from "react-icons/fa";
+import { FaExternalLinkAlt, FaGithub, FaChevronRight } from "react-icons/fa";
 
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
@@ -38,9 +37,6 @@ export default async function ProjectDetailPage({ params }: Props) {
   const demoLink = project.links.find((l) => l.type === "demo");
   const githubLink = project.links.find((l) => l.type === "github");
   const otherLinks = project.links.filter((l) => l.type !== "demo" && l.type !== "github");
-  const images = [...project.gallery].filter(
-    (m): m is NonNullable<typeof m> => Boolean(m?.url)
-  );
 
   return (
     <>
@@ -48,7 +44,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-6">
-          <div className="flex items-center gap-2 text-xs font-mono text-secondary mb-8 uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-xs font-mono text-secondary mb-10 uppercase tracking-widest">
             <Link href={`/${locale}#projects`} className="hover:text-primary transition-colors">
               {t.projects.breadcrumb}
             </Link>
@@ -56,13 +52,41 @@ export default async function ProjectDetailPage({ params }: Props) {
             <span className="text-primary font-bold">{project.title}</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
-            <div className="lg:col-span-8">
-              <h1 className="text-4xl md:text-7xl font-bold mb-6">{project.title}</h1>
-              <p className="text-lg md:text-xl text-secondary leading-relaxed mb-8">
-                {project.summary ?? project.description?.split("\n")[0]}
-              </p>
-              <div className="flex flex-wrap gap-3">
+          <header className="max-w-4xl mx-auto mb-16">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-5">{project.title}</h1>
+            <p className="text-lg md:text-xl text-secondary leading-relaxed mb-10">
+              {project.summary ?? project.description?.split("\n")[0]}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
+              {project.role_on_project && (
+                <span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary mr-2">
+                    {t.projects.role}
+                  </span>
+                  <span className="font-bold">{project.role_on_project}</span>
+                </span>
+              )}
+              {(project.started_on || project.completed_on) && (
+                <span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary mr-2">
+                    {t.projects.timeline}
+                  </span>
+                  <span className="font-bold">
+                    {project.started_on?.slice(0, 7) ?? t.certifications.dash} — {project.completed_on?.slice(0, 7) ?? t.projects.present}
+                  </span>
+                </span>
+              )}
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className={`w-2 h-2 rounded-full ${project.status === "published" ? "bg-green-500" : "bg-amber-400"}`}
+                />
+                <span className="font-bold capitalize">{t.status[project.status] ?? project.status}</span>
+              </span>
+            </div>
+
+            {project.skills.length > 0 && (
+              <div className="flex flex-wrap gap-3 mt-6">
                 {project.skills.map((skill) => (
                   <span
                     key={skill.id}
@@ -72,96 +96,53 @@ export default async function ProjectDetailPage({ params }: Props) {
                   </span>
                 ))}
               </div>
-            </div>
-            <div className="lg:col-span-4 flex flex-col justify-end gap-4">
-              {demoLink && (
-                <a
-                  href={demoLink.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full bg-primary text-white py-4 rounded-lg font-bold text-center hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-                >
-                  <FaExternalLinkAlt /> {demoLink.label}
-                </a>
-              )}
-              {githubLink && (
-                <a
-                  href={githubLink.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full border border-line py-4 rounded-lg font-bold text-center hover:bg-elevated transition-colors flex items-center justify-center gap-2"
-                >
-                  <FaGithub /> {githubLink.label}
-                </a>
-              )}
-            </div>
-          </div>
+            )}
 
-          {images.length > 0 && (
-            <div className="mb-24">
-              <ProjectLightbox images={images} siteTitle={settings.site_title} t={t} />
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
-            <div className="lg:col-span-8">
-              {project.description && <Markdown content={project.description} />}
-
-              {otherLinks.length > 0 && (
-                <div className="mt-16 flex flex-wrap gap-4">
-                  {otherLinks.map((link) => (
-                    <a
-                      key={link.id}
-                      href={link.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary border-b-2 border-primary hover:border-accent hover:text-accent transition-all pb-1"
-                    >
-                      <FaExternalLinkAlt className="text-[10px]" /> {link.label}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="lg:col-span-4">
-              <div className="sticky top-32 space-y-12">
-                {project.role_on_project && (
-                  <div>
-                    <h4 className="text-xs font-mono font-bold text-secondary uppercase tracking-[0.2em] mb-4">{t.projects.role}</h4>
-                    <p className="font-bold text-lg">{project.role_on_project}</p>
-                  </div>
+            {(demoLink || githubLink) && (
+              <div className="flex flex-wrap gap-4 mt-10">
+                {demoLink && (
+                  <a
+                    href={demoLink.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-xl font-bold hover:bg-gray-800 transition-colors"
+                  >
+                    <FaExternalLinkAlt /> {demoLink.label}
+                  </a>
                 )}
-                {(project.started_on || project.completed_on) && (
-                  <div>
-                    <h4 className="text-xs font-mono font-bold text-secondary uppercase tracking-[0.2em] mb-4">{t.projects.timeline}</h4>
-                    <p className="font-bold text-lg">
-                      {project.started_on?.slice(0, 7) ?? t.certifications.dash} — {project.completed_on?.slice(0, 7) ?? t.projects.present}
-                    </p>
-                  </div>
+                {githubLink && (
+                  <a
+                    href={githubLink.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 border border-line px-8 py-4 rounded-xl font-bold hover:bg-elevated transition-colors"
+                  >
+                    <FaGithub /> {githubLink.label}
+                  </a>
                 )}
-                <div>
-                  <h4 className="text-xs font-mono font-bold text-secondary uppercase tracking-[0.2em] mb-4">{t.projects.techStack}</h4>
-                  <ul className="space-y-2 font-medium">
-                    {project.skills.map((skill) => (
-                      <li key={skill.id} className="flex items-center gap-3">
-                        <FaCheck className="text-green-500 text-xs" /> {skill.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="p-6 bg-card rounded-xl border border-line">
-                  <h4 className="text-sm font-bold mb-3">{t.projects.projectStatus}</h4>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${project.status === "published" ? "bg-green-500" : "bg-amber-400"}`} />
-                    <span className="text-sm font-medium capitalize">
-                      {t.status[project.status] ?? project.status}
-                    </span>
-                  </div>
-                </div>
               </div>
-            </div>
-          </div>
+            )}
+          </header>
+
+          <article className="max-w-4xl mx-auto">
+            {project.description && <Markdown content={project.description} />}
+
+            {otherLinks.length > 0 && (
+              <div className="mt-16 flex flex-wrap gap-4">
+                {otherLinks.map((link) => (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary border-b-2 border-primary hover:border-accent hover:text-accent transition-all pb-1"
+                  >
+                    <FaExternalLinkAlt className="text-[10px]" /> {link.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </article>
         </div>
       </main>
     </>
