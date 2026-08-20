@@ -1,37 +1,46 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getToken, subscribeToken } from "@/lib/api";
+import { http } from "@/lib/api";
 import Sidebar from "@/components/admin/Sidebar";
 import Topbar from "@/components/admin/Topbar";
 import { DashboardRangeProvider } from "@/components/admin/admin-context";
 
-const subscribeNoop = () => () => {};
-const getClientHydrated = () => true;
-const getServerHydrated = () => false;
-
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const hydrated = useSyncExternalStore(
-    subscribeNoop,
-    getClientHydrated,
-    getServerHydrated
-  );
-  const token = useSyncExternalStore(subscribeToken, getToken, () => null);
+  const isLoginPage = pathname.startsWith("/admin/login");
+  const [authed, setAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (hydrated && !token) {
+    if (isLoginPage) return;
+    let cancelled = false;
+    http
+      .get("/auth/me")
+      .then(() => {
+        if (!cancelled) setAuthed(true);
+      })
+      .catch(() => {
+        if (!cancelled) setAuthed(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoginPage]);
+
+  useEffect(() => {
+    if (isLoginPage) return;
+    if (authed === false) {
       router.replace("/admin/login");
     }
-  }, [hydrated, token, router]);
+  }, [authed, isLoginPage, router]);
 
-  if (pathname.startsWith("/admin/login")) {
+  if (isLoginPage) {
     return <>{children}</>;
   }
 
-  if (!hydrated || !token) {
+  if (authed === null || authed === false) {
     return (
       <div className="h-screen w-full bg-[#f8fafc] flex items-center justify-center">
         <div className="w-9 h-9 rounded-lg bg-ink-900 text-white flex items-center justify-center animate-pulse">
