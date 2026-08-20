@@ -5,6 +5,7 @@ import { loadSiteSettings } from "@/lib/site-config";
 import { getDictionary } from "@/lib/i18n";
 import SubNav from "@/components/public/SubNav";
 import Markdown from "@/components/public/Markdown";
+import ViewTracker from "@/components/public/ViewTracker";
 import Link from "next/link";
 import { FaExternalLinkAlt, FaGithub, FaChevronRight } from "react-icons/fa";
 
@@ -40,6 +41,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <>
+      <ViewTracker slug={project.slug} locale={locale} />
       <SubNav authorName={settings.author_name} locale={locale} t={t} />
 
       <main className="pt-32 pb-20">
