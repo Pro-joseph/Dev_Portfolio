@@ -197,3 +197,14 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   created_at TEXT NULL,
   updated_at TEXT NULL
 );
+
+CREATE TABLE IF NOT EXISTS visit_logs (
+  id BIGINT PRIMARY KEY,
+  path TEXT NOT NULL,
+  locale TEXT NULL,
+  country TEXT NULL,
+  region TEXT NULL,
+  city TEXT NULL,
+  referrer TEXT NULL,
+  created_at TEXT NULL
+);

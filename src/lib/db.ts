@@ -158,6 +158,18 @@ function ensurePgSchema(): Promise<void> {
         expires_at TEXT NULL,
         last_seen_at TEXT NULL
       );`)
+      .then(() =>
+        getPg().query(`CREATE TABLE IF NOT EXISTS visit_logs (
+          id BIGINT PRIMARY KEY,
+          path TEXT NOT NULL,
+          locale TEXT NULL,
+          country TEXT NULL,
+          region TEXT NULL,
+          city TEXT NULL,
+          referrer TEXT NULL,
+          created_at TEXT NULL
+        );`)
+      )
       .then(() => undefined)
       .catch((err: unknown) => {
         pgSchemaEnsured = null;

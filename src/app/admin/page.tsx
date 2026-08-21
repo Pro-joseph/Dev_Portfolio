@@ -24,9 +24,39 @@ import {
   PiCube,
   PiCheckCircle,
   PiCaretUp,
+  PiGlobe,
 } from "react-icons/pi";
 
 const fmt = (n: number) => n.toLocaleString("en-US");
+
+interface GeoStats {
+  total: number;
+  countries: { name: string; count: number }[];
+  cities: { name: string; country: string | null; count: number }[];
+  series: { date: string; visits: number }[];
+  recent: {
+    path: string;
+    locale: string | null;
+    country: string | null;
+    city: string | null;
+    created_at: string;
+  }[];
+}
+
+const flag = (cc: string) => {
+  if (!cc || cc.length !== 2 || !/^[a-zA-Z]{2}$/.test(cc)) return "🌍";
+  return String.fromCodePoint(
+    ...[...cc.toUpperCase()].map((ch) => 127397 + ch.charCodeAt(0))
+  );
+};
+
+const timeAgo = (iso: string) => {
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+};
 
 function Spark({ data, color }: { data: number[]; color: string }) {
   const series = data.map((v, i) => ({ i, v }));
@@ -55,6 +85,11 @@ export default function AdminDashboardPage() {
 
   const { data: health } = useSWR<SystemStatus>("/admin/system/status", (key: string) =>
     http.get<SystemStatus>(key, { auth: true })
+  );
+
+  const { data: geo } = useSWR<GeoStats>(
+    `/admin/dashboard/geo?days=${range}`,
+    (key: string) => http.get<GeoStats>(key, { auth: true })
   );
 
   if (isLoading || !data) {
@@ -350,6 +385,127 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Visitor locations */}
+      <div className="bg-white rounded-2xl border border-ink-200 p-6">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h3 className="font-semibold tracking-tight">Visitor Locations</h3>
+            <p className="text-[12px] text-ink-400 mt-0.5">
+              {fmt(geo?.total ?? 0)} visits in the last {range} days
+            </p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+            <PiGlobe className="text-[20px]" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div>
+            <p className="text-[11px] font-semibold text-ink-500 uppercase tracking-widest mb-3">
+              Top countries
+            </p>
+            <div className="space-y-2.5">
+              {(geo?.countries ?? []).map((c) => {
+                const max = geo?.countries[0]?.count || 1;
+                return (
+                  <div key={c.name}>
+                    <div className="flex items-center justify-between text-[12.5px] mb-1">
+                      <span className="font-medium text-ink-700">
+                        {flag(c.name)} {c.name}
+                      </span>
+                      <span className="text-ink-400 tabular-nums">{fmt(c.count)}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-ink-100 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-sky-500"
+                        style={{ width: `${Math.max(4, (c.count / max) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+              {geo && geo.countries.length === 0 && (
+                <p className="text-[12.5px] text-ink-400">No visits recorded yet.</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[11px] font-semibold text-ink-500 uppercase tracking-widest mb-3">
+              Top cities
+            </p>
+            <div className="space-y-2.5">
+              {(geo?.cities ?? []).map((c) => {
+                const max = geo?.cities[0]?.count || 1;
+                return (
+                  <div key={`${c.name}-${c.country ?? ""}`}>
+                    <div className="flex items-center justify-between text-[12.5px] mb-1">
+                      <span className="font-medium text-ink-700 truncate">
+                        {flag(c.country ?? "")} {c.name}
+                      </span>
+                      <span className="text-ink-400 tabular-nums shrink-0 ml-2">{fmt(c.count)}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-ink-100 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-indigo-500"
+                        style={{ width: `${Math.max(4, (c.count / max) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+              {geo && geo.cities.length === 0 && (
+                <p className="text-[12.5px] text-ink-400">No visits recorded yet.</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[11px] font-semibold text-ink-500 uppercase tracking-widest mb-3">
+              Visits per day
+            </p>
+            <ResponsiveContainer width="100%" height={150}>
+              <AreaChart data={geo?.series ?? []} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
+                <defs>
+                  <linearGradient id="geoFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} minTickGap={24} />
+                <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
+                <Tooltip
+                  cursor={{ stroke: "#e2e8f0" }}
+                  contentStyle={{ borderRadius: 10, border: "1px solid #e2e8f0", fontSize: 12 }}
+                />
+                <Area type="monotone" dataKey="visits" stroke="#6366f1" strokeWidth={2.5} fill="url(#geoFill)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {(geo?.recent.length ?? 0) > 0 && (
+          <div className="mt-6 pt-5 border-t border-ink-100">
+            <p className="text-[11px] font-semibold text-ink-500 uppercase tracking-widest mb-3">
+              Recent visits
+            </p>
+            <div className="space-y-2">
+              {geo!.recent.slice(0, 8).map((v, i) => (
+                <div key={i} className="flex items-center gap-3 text-[12.5px] min-w-0">
+                  <span className="shrink-0">{flag(v.country ?? "")}</span>
+                  <span className="font-mono text-[11.5px] text-ink-600 truncate">{v.path}</span>
+                  <span className="text-ink-400 truncate hidden sm:inline">
+                    {[v.city, v.country].filter(Boolean).join(", ")}
+                  </span>
+                  <span className="ml-auto text-ink-400 shrink-0">{timeAgo(v.created_at)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
