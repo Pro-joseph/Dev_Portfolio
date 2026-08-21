@@ -90,7 +90,7 @@ export const RESOURCES: ResourceConfig[] = [
       { name: "title", label: "Title", type: "text", required: true, cols: "md:col-span-2" },
       { name: "slug", label: "Slug", type: "text", help: "Leave blank to auto-generate from title", cols: "md:col-span-2" },
       { name: "summary", label: "Summary", type: "textarea", cols: "md:col-span-2" },
-      { name: "description", label: "Description (markdown)", type: "markdown", help: "Use ## for section headings and the Image button to embed screenshots", cols: "md:col-span-2" },
+      { name: "description", label: "Description (markdown)", type: "markdown", help: "Sections: ## Title · Separator: --- · Images: Image button — no HTML needed", cols: "md:col-span-2" },
       { name: "status", label: "Status", type: "select", required: true, options: PROJECT_STATUS.map((s) => ({ value: s, label: PROJECT_STATUS_LABELS[s] })) },
       { name: "is_featured", label: "Featured", type: "boolean" },
       { name: "client", label: "Client", type: "text" },

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -138,7 +139,6 @@ body {
   font-size: 14px;
   color: #475569;
 }
-.EasyMDEContainer .editor-toolbar button.size-format i,
 .EasyMDEContainer .editor-toolbar button.view-zoom i {
   font-weight: 700;
   font-style: normal;
